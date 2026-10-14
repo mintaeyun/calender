@@ -1,5 +1,5 @@
-import { PagePlaceholder } from "@/components/layout/PagePlaceholder";
+import { LedgerCalendar } from "@/features/ledger/components/LedgerCalendar";
 
 export default function Page() {
-  return <PagePlaceholder title="가계부 달력" />;
+  return <LedgerCalendar />;
 }

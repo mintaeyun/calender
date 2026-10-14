@@ -1,5 +1,5 @@
-import { PagePlaceholder } from "@/components/layout/PagePlaceholder";
+import { LedgerBudget } from "@/features/ledger/components/LedgerBudget";
 
 export default function Page() {
-  return <PagePlaceholder title="예산" />;
+  return <LedgerBudget />;
 }

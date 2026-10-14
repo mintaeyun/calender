@@ -21,7 +21,7 @@ export function adminClient(): Db {
 
 /** 호출자의 JWT 로 동작하는 클라이언트. RLS 가 적용된다. */
 export function userClient(req: Request): Db {
-  return createClient<Database>(need("SUPABASE_URL"), need("SUPABASE_ANON_KEY"), {
+  return createClient<Database>(need("SUPABASE_URL"), Deno.env.get("SUPABASE_PUBLISHABLE_KEY") ?? need("SUPABASE_ANON_KEY"), {
     global: { headers: { Authorization: req.headers.get("Authorization") ?? "" } },
     auth: { persistSession: false, autoRefreshToken: false },
   });
