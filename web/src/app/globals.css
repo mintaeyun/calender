@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: "YeogiOttaeJalnan";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_four@1.2/JalnanOTF00.woff") format("woff");
+  font-weight: normal;
+  font-display: swap;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; background: #000; color: #f2f2f3; font-family: Pretendard, "Noto Sans KR", sans-serif; }
+a { color: oklch(0.9 0.19 125); text-decoration: none; }
+a:hover { text-decoration: underline; }

@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" rel="stylesheet">
+<style>@font-face{font-family:'YeogiOttaeJalnan';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_four@1.2/JalnanOTF00.woff') format('woff');font-weight:normal;font-display:swap;} body{margin:0;background:#000;} a{color:oklch(0.9 0.19 125);text-decoration:none;} a:hover{text-decoration:underline;} *{box-sizing:border-box;}</style>
+</helmet>
+<div style="min-height:100vh;background:#000;color:#f2f2f3;font-family:Pretendard,'Noto Sans KR',sans-serif;">
+
+<sc-if value="{{ isLogin }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="로그인" style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px;">
+    <div style="width:420px;max-width:100%;background:#141416;border:1px solid #26262a;border-radius:28px;padding:40px 36px;display:flex;flex-direction:column;gap:18px;">
+      <div style="display:flex;align-items:center;gap:12px;"><div style="width:40px;height:40px;border-radius:50%;background:oklch(0.55 0.22 290);"></div><span style="font-size:21px;font-family:'YeogiOttaeJalnan',Pretendard,sans-serif;font-weight:normal;line-height:1.3;">라이프 매니저</span></div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px;"><span style="font-size:30px;font-family:'YeogiOttaeJalnan',Pretendard,sans-serif;font-weight:normal;line-height:1.3;letter-spacing:-0.01em;">다시 오셨네요</span><span style="font-size:15px;color:#8d8d94;">일정 · 할일 · 가계부를 한곳에서</span></div>
+      <div style="display:flex;flex-direction:column;gap:6px;"><span style="font-size:13px;color:#b4b4ba;">이메일</span><div style="background:#1f1f23;border-radius:14px;padding:14px 16px;font-size:15px;">me@example.com</div></div>
+      <div style="display:flex;flex-direction:column;gap:6px;"><div style="display:flex;justify-content:space-between;"><span style="font-size:13px;color:#b4b4ba;">비밀번호</span><span style="font-size:13px;color:#8d8d94;">비밀번호 재설정</span></div><div style="background:#1f1f23;border-radius:14px;padding:14px 16px;font-size:15px;letter-spacing:0.2em;">••••••••••</div></div>
+      <div onClick="{{ goDash }}" style="cursor:pointer;background:#fff;color:#000;font-weight:700;font-size:15px;text-align:center;padding:15px;border-radius:999px;margin-top:6px;">로그인</div>
+      <div style="display:flex;align-items:center;gap:12px;font-size:12px;color:#6c6c73;"><div style="flex:1;height:1px;background:#26262a;"></div>또는<div style="flex:1;height:1px;background:#26262a;"></div></div>
+      <div onClick="{{ goDash }}" style="cursor:pointer;border:1px solid #3a3a40;font-size:15px;text-align:center;padding:14px;border-radius:999px;display:flex;align-items:center;justify-content:center;gap:10px;"><span style="width:20px;height:20px;border-radius:50%;background:#fff;color:#000;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;">G</span>Google로 계속하기</div>
+      <span style="font-size:12px;color:#6c6c73;text-align:center;">허용된 이메일만 가입할 수 있습니다</span>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ isApp }}" hint-placeholder-val="{{ true }}">
+<div style="max-width:1340px;margin:0 auto;padding:26px 28px 48px;display:flex;flex-direction:column;gap:24px;">
+
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+    <div onClick="{{ goDash }}" style="display:flex;align-items:center;gap:12px;cursor:pointer;min-width:0;"><div style="width:38px;height:38px;border-radius:50%;background:oklch(0.55 0.22 290);"></div><span style="font-size:20px;font-family:'YeogiOttaeJalnan',Pretendard,sans-serif;font-weight:normal;line-height:1.3;">라이프 매니저</span></div>
+    <div style="display:flex;gap:6px;font-size:15px;">
+      <sc-for list="{{ nav }}" as="n" hint-placeholder-count="5">
+        <span onClick="{{ n.onClick }}" style="cursor:pointer;background:{{ n.bg }};color:{{ n.fg }};font-weight:{{ n.fw }};padding:10px 20px;border-radius:999px;white-space:nowrap;">{{ n.label }}</span>
+      </sc-for>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;min-width:0;justify-content:flex-end;">
+      <span onClick="{{ goSearch }}" style="cursor:pointer;background:#1c1c1f;border-radius:999px;padding:10px 16px;font-size:14px;color:#b4b4ba;display:flex;align-items:center;gap:8px;white-space:nowrap;"><span style="width:12px;height:12px;border:2px solid #b4b4ba;border-radius:50%;"></span>검색</span>
+      <span onClick="{{ goNoti }}" style="cursor:pointer;background:#1c1c1f;border-radius:999px;padding:10px 16px;font-size:14px;color:#d6d6da;display:flex;align-items:center;gap:8px;white-space:nowrap;">알림<sc-if value="{{ hasUnread }}" hint-placeholder-val="{{ true }}"><span style="background:oklch(0.65 0.2 25);color:#fff;font-size:11px;font-weight:700;border-radius:999px;padding:1px 7px;">{{ unreadCount }}</span></sc-if></span>
+      <div onClick="{{ goLogin }}" title="로그아웃" style="cursor:pointer;width:42px;height:42px;border-radius:50%;background:#3a3a40;"></div>
+    </div>
+  </div>
+
+  <!-- ================= 대시보드 ================= -->
+  <sc-if value="{{ isDash }}" hint-placeholder-val="{{ true }}">
+    <div data-screen-label="대시보드" style="display:flex;flex-direction:column;gap:22px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;">
+        <div style="font-size:38px;font-family:'YeogiOttaeJalnan',Pretendard,sans-serif;font-weight:normal;line-height:1.3;letter-spacing:-0.01em;">좋은 오후예요, <span style="color:#8d8d94;white-space:nowrap;">10월 14일 수요일</span></div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <span style="background:#1c1c1f;border-radius:999px;padding:10px 16px;font-size:14px;color:#d6d6da;">18° 맑음 · 체감 17° · <span style="color:oklch(0.9 0.19 125);">19시 비 60%</span></span>
+        </div>
+      </div>
+      <div style="display:flex;gap:28px;min-height:200px;flex-wrap:wrap;">
+        <div style="width:330px;display:flex;flex-direction:column;gap:10px;">
+          <div style="font-size:15px;color:#b4b4ba;">10월 지출</div>
+          <div style="display:flex;align-items:baseline;gap:10px;"><span style="font-size:52px;font-weight:700;letter-spacing:-0.03em;line-height:1;">1,642,300</span><span style="font-size:30px;font-weight:600;color:#6c6c73;">원</span><span style="font-size:13px;color:oklch(0.9 0.19 125);">+8.2%</span></div>
+          <div style="font-size:14px;color:#b4b4ba;">남은 예산 <span style="color:#fff;font-weight:600;">557,700원</span> · 잔액 2,207,700원</div>
+          <div style="display:flex;gap:8px;margin-top:auto;">
+            <span onClick="{{ openQuickTx }}" style="cursor:pointer;background:#fff;color:#000;font-size:14px;font-weight:600;padding:11px 18px;border-radius:999px;white-space:nowrap;">지출 추가 ↓</span>
+            <span onClick="{{ openQuickEv }}" style="cursor:pointer;background:#fff;color:#000;font-size:14px;font-weight:600;padding:11px 18px;border-radius:999px;white-space:nowrap;">일정 추가 +</span>
+            <span onClick="{{ openQuickTodo }}" style="cursor:pointer;border:1px solid #3a3a40;font-size:14px;padding:11px 18px;border-radius:999px;white-space:nowrap;">할일 +</span>
+          </div>
+        </div>
+        <div style="flex:1;min-width:520px;display:flex;flex-direction:column;gap:8px;">
+          <div style="flex:1;display:grid;grid-template-columns:650fr 482fr 214fr 557fr;position:relative;">
+            <div style="position:absolute;left:0;right:0;top:46px;border-top:1px dashed #4a4a50;"></div>
+            
+            <div style="border-left:1px solid #2e2e33;padding:0 12px;display:flex;flex-direction:column;justify-content:flex-end;gap:10px;"><div style="font-size:16px;font-weight:600;margin-bottom:auto;padding-top:60px;">650,000</div><div style="font-size:13px;color:#b4b4ba;"><span style="color:#fff;font-weight:600;">40%</span> 주거</div><div style="height:46px;background:oklch(0.55 0.22 290);border-radius:8px;"></div></div>
+            <div style="border-left:1px solid #2e2e33;padding:0 12px;display:flex;flex-direction:column;justify-content:flex-end;gap:10px;"><div style="font-size:16px;font-weight:600;margin-bottom:auto;padding-top:60px;">482,000</div><div style="font-size:13px;color:#b4b4ba;"><span style="color:#fff;font-weight:600;">29%</span> 식비</div><div style="height:46px;background:repeating-linear-gradient(90deg,oklch(0.6 0.2 290) 0 8px,transparent 8px 14px);"></div></div>
+            <div style="border-left:1px solid #2e2e33;padding:0 12px;display:flex;flex-direction:column;justify-content:flex-end;gap:10px;"><div style="font-size:16px;font-weight:600;margin-bottom:auto;padding-top:60px;">214,000</div><div style="font-size:13px;color:#b4b4ba;"><span style="color:#fff;font-weight:600;">13%</span> 쇼핑</div><div style="height:46px;background:repeating-linear-gradient(90deg,oklch(0.42 0.15 290) 0 8px,transparent 8px 14px);"></div></div>
+            <div style="border-left:1px dashed #3a3a40;padding:0 12px;display:flex;flex-direction:column;justify-content:flex-end;gap:10px;"><div style="font-size:16px;font-weight:600;margin-bottom:auto;padding-top:62px;color:#8d8d94;">557,700</div><div style="font-size:13px;color:#8d8d94;">남은 예산 · 일 32,800원</div><div style="height:46px;border:1px dashed #3a3a40;border-radius:8px;"></div></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;color:#b4b4ba;"><span>10월 1일</span><span>예산 2,200,000원 중 74.6% · 점선 = 80% 알림선</span><span>10월 31일</span></div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:12px;">
+        <div style="background:#1a1a1d;border-radius:22px;padding:20px;display:flex;flex-direction:column;gap:12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:17px;font-weight:600;">오늘의 일정</span><span onClick="{{ goCal }}" style="cursor:pointer;width:30px;height:30px;border-radius:50%;background:#2a2a2e;display:flex;align-items:center;justify-content:center;font-size:13px;">↗</span></div>
+          <div style="display:flex;flex-direction:column;gap:6px;font-size:14px;">
+            <div style="display:flex;gap:12px;padding:6px 0;color:#6c6c73;"><span style="width:40px;">09:30</span><span>팀 스탠드업 · G</span></div>
+            <div style="display:flex;gap:12px;padding:6px 0;color:#6c6c73;"><span style="width:40px;">12:00</span><span>점심 약속 · 성수</span></div>
+            <div style="display:flex;flex-direction:column;gap:4px;padding:12px 14px;background:oklch(0.9 0.19 125);color:#0b0b0c;border-radius:14px;"><span style="font-size:12px;font-weight:700;">다음 · 1시간 20분 후</span><span style="font-size:16px;font-weight:700;">15:00 치과 정기검진</span><span style="font-size:12px;">강남역 3번 출구</span></div>
+            <div style="display:flex;gap:12px;padding:6px 0;"><span style="width:40px;color:#b4b4ba;">19:30</span><span style="flex:1;">러닝 크루</span><span style="color:oklch(0.9 0.19 125);font-size:12px;">비 60%</span></div>
+          </div>
+        </div>
+        <div style="background:#1a1a1d;border-radius:22px;padding:20px;display:flex;flex-direction:column;gap:6px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><span style="font-size:17px;font-weight:600;">오늘의 할일</span><span onClick="{{ goTodo }}" style="cursor:pointer;font-size:13px;color:#b4b4ba;background:#2a2a2e;padding:4px 10px;border-radius:999px;">{{ dashDone }} / 4</span></div>
+          <sc-for list="{{ dashTodos }}" as="t" hint-placeholder-count="4">
+            <div onClick="{{ t.toggle }}" style="display:flex;gap:10px;align-items:center;cursor:pointer;padding:9px 0;border-bottom:1px solid #26262a;opacity:{{ t.op }};"><span style="width:20px;height:20px;border-radius:50%;border:1.5px solid {{ t.ring }};display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;">{{ t.mark }}</span><span style="flex:1;font-size:14px;text-decoration:{{ t.deco }};">{{ t.title }}</span><span style="font-size:12px;color:{{ t.dueColor }};">{{ t.short }}</span></div>
+          </sc-for>
+        </div>
+        <div style="background:#1a1a1d;border-radius:22px;padding:20px;display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:17px;font-weight:600;">이번 주 일정 밀도</span><span style="font-size:12px;color:#8d8d94;">빈 시간 찾기</span></div>
+          <div style="display:grid;grid-template-columns:34px repeat(7,1fr);gap:4px;font-size:11px;color:#8d8d94;text-align:center;"><span></span><span>월</span><span>화</span><span style="color:#fff;font-weight:700;">수</span><span>목</span><span>금</span><span>토</span><span>일</span></div>
+          <sc-for list="{{ heat }}" as="row" hint-placeholder-count="6">
+            <div style="display:grid;grid-template-columns:34px repeat(7,1fr);gap:4px;align-items:center;"><span style="font-size:11px;color:#8d8d94;">{{ row.label }}</span><sc-for list="{{ row.cells }}" as="c" hint-placeholder-count="7"><div style="height:22px;border-radius:6px;background:{{ c }};"></div></sc-for></div>
+          </sc-for>
+        </div>
+        <div style="background:#1a1a1d;border-radius:22px;padding:20px;display:flex;flex-direction:column;gap:4px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;"><span style="font-size:17px;font-weight:600;">최근 거래</span><span onClick="{{ goLedger }}" style="cursor:pointer;font-size:12px;color:#8d8d94;">전체 →</span></div>
+          <sc-for list="{{ recentTx }}" as="x" hint-placeholder-count="5">
+            <div style="display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:7px 0;font-size:14px;"><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ x.memo }}</span><span style="font-size:12px;background:#2a2a2e;border-radius:999px;padding:3px 10px;display:flex;align-items:center;gap:5px;"><span style="width:6px;height:6px;border-radius:50%;background:{{ x.color }};"></span>{{ x.cat }}</span><span style="width:80px;text-align:right;font-weight:600;color:{{ x.amtColor }};">{{ x.amt }}</span></div>
+          </sc-for>
+        </div>
+      </div>
+      <div onClick="{{ toggleSummary }}" style="display:flex;align-items:center;gap:18px;background:#1a1a1d;border-radius:999px;padding:12px 14px 12px 22px;cursor:pointer;font-size:14px;flex-wrap:wrap;">
+        <span style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:15px;"><span style="width:8px;height:8px;border-radius:50%;background:oklch(0.55 0.22 290);"></span>이번 주 업무 요약</span>
+        <span style="color:#b4b4ba;">업무 일정 9건 · 8시간</span><span style="color:#b4b4ba;">할일 17/25</span><span style="color:oklch(0.75 0.16 25);">기한초과 1</span><span style="color:#b4b4ba;">다음 마감 · 분기 보고서 초안 (오늘)</span>
+        <span style="margin-left:auto;background:#fff;color:#000;font-weight:600;padding:7px 16px;border-radius:999px;font-size:13px;">{{ summaryLabel }}</span>
+      </div>
+      <sc-if value="{{ summaryOpen }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#161619;border:1px solid #2a2a2e;border-radius:24px;padding:22px 24px;display:flex;flex-direction:column;gap:16px;">
+          <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:20px;font-weight:700;">요일별 업무</span><span style="font-size:14px;color:#8d8d94;">10월 12일 – 18일 · 수요일 13:40 기준</span></div>
+          <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px;">
+            <sc-for list="{{ workDays }}" as="d" hint-placeholder-count="7">
+              <div style="background:{{ d.bg }};border:{{ d.border }};border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:8px;min-width:0;min-height:220px;opacity:{{ d.op }};">
+                <div style="display:flex;justify-content:space-between;align-items:baseline;"><span style="font-size:15px;font-weight:700;">{{ d.dow }} <span style="font-size:13px;color:#8d8d94;font-weight:500;">{{ d.date }}</span></span><span style="font-size:12px;color:{{ d.hoursColor }};font-weight:600;">{{ d.hours }}</span></div>
+                <div style="height:4px;background:#2a2a2e;border-radius:2px;"><div style="height:100%;width:{{ d.bar }}%;background:{{ d.barColor }};border-radius:2px;"></div></div>
+                <sc-for list="{{ d.items }}" as="it" hint-placeholder-count="2"><div style="display:flex;flex-direction:column;gap:1px;opacity:{{ it.op }};"><span style="font-size:11px;color:#8d8d94;">{{ it.time }}</span><span style="font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ it.title }}</span></div></sc-for>
+                <div style="margin-top:auto;display:flex;flex-direction:column;gap:4px;border-top:1px solid #2a2a2e;padding-top:8px;"><sc-for list="{{ d.todos }}" as="td" hint-placeholder-count="1"><span style="font-size:12px;color:{{ td.color }};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ td.label }}</span></sc-for></div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex;gap:10px;align-items:baseline;font-size:14px;color:#d6d6da;"><span style="font-size:13px;font-weight:600;color:oklch(0.78 0.15 290);white-space:nowrap;">Claude 요약</span><span style="text-wrap:pretty;">목요일에 업무가 몰려 있어요(3.5시간). 오늘 분기 보고서 초안을 끝내 두면 목요일 회의 준비가 수월합니다.</span></div>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <!-- ================= 일정 ================= -->
+  <sc-if value="{{ isCal }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="일정" style="display:flex;flex-direction:column;gap:18px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:14px;">
+          <span style="font-size:30px;font-family:'YeogiOttaeJalnan',Pretendard,sans-serif;font-weight:normal;line-height:1.3;letter-spacing:-0.01em;white-space:nowrap;">{{ calTitle }} <span style="color:#8d8d94;">{{ calSub }}</span></span>
+          <div style="display:flex;gap:6px;"><span style="width:38px;height:38px;border-radius:50%;background:#1c1c1f;display:flex;align-items:center;justify-content:center;color:#d6d6da;">‹</span><span style="width:38px;height:38px;border-radius:50%;background:#1c1c1f;display:flex;align-items:center;justify-content:center;color:#d6d6da;">›</span><span style="height:38px;border-radius:999px;border:1px solid #3a3a40;padding:0 16px;display:flex;align-items:center;font-size:14px;white-space:nowrap;">오늘</span></div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+          <div style="display:flex;gap:6px;font-size:13px;">
+            <span style="background:#1c1c1f;border-radius:999px;padding:8px 14px;display:flex;align-items:center;gap:6px;"><span style="width:7px;height:7px;border-radius:50%;background:oklch(0.9 0.19 125);"></span>할일 마감</span>
+            <span style="background:#1c1c1f;border-radius:999px;padding:8px 14px;display:flex;align-items:center;gap:6px;"><span style="width:7px;height:7px;border-radius:50%;background:#d6d6da;"></span>결제일</span>
+            <span style="background:#1c1c1f;border-radius:999px;padding:8px 14px;display:flex;align-items:center;gap:6px;"><span style="width:7px;height:7px;border-radius:50%;background:oklch(0.7 0.12 230);"></span>날씨</span>
+          </div>
+          <div style="display:flex;background:#1c1c1f;border-radius:999px;padding:5px;font-size:14px;">
+            <sc-for list="{{ calTabs }}" as="v" hint-placeholder-count="2"><span onClick="{{ v.onClick }}" style="cursor:pointer;padding:8px 18px;border-radius:999px;background:{{ v.segBg }};color:{{ v.segFg }};font-weight:{{ v.fw }};">{{ v.label }}</span></sc-for>
+          </div>
+          <span onClick="{{ openQuickEv }}" style="cursor:pointer;background:#fff;color:#000;font-size:14px;font-weight:600;padding:10px 18px;border-radius:999px;white-space:nowrap;">일정 추가 +</span>
+        </div>
+      </div>
+      <sc-if value="{{ isWeek }}" hint-placeholder-val="{{ true }}">
+        <div style="background:#111113;border-radius:22px;padding:14px 16px 16px;display:flex;flex-direction:column;gap:6px;">
+          <div style="display:grid;grid-template-columns:52px repeat(7,minmax(0,1fr));gap:6px;">
+            <span></span>
+            <sc-for list="{{ week }}" as="d" hint-placeholder-count="7">
+              <div style="display:flex;flex-direction:column;gap:6px;padding:4px 4px 8px;min-width:0;">
+                <div style="display:flex;align-items:center;gap:8px;"><span style="font-size:13px;color:#8d8d94;">{{ d.dow }}</span><span style="font-size:18px;font-weight:700;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:{{ d.dateBg }};color:{{ d.dateFg }};">{{ d.date }}</span><span style="margin-left:auto;font-size:12px;color:{{ d.wxColor }};white-space:nowrap;">{{ d.wx }}</span></div>
+                <div style="display:flex;flex-direction:column;gap:3px;min-height:44px;"><sc-for list="{{ d.marks }}" as="m" hint-placeholder-count="1"><div style="font-size:11px;background:{{ m.bg }};color:{{ m.fg }};font-weight:{{ m.fw }};border-radius:{{ m.radius }};padding:3px 8px;display:flex;align-items:center;gap:5px;white-space:nowrap;overflow:hidden;"><span style="width:6px;height:6px;border-radius:50%;flex-shrink:0;background:{{ m.dot }};"></span>{{ m.label }}</div></sc-for></div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:grid;grid-template-columns:52px repeat(7,minmax(0,1fr));gap:6px;">
+            <div style="position:relative;"><sc-for list="{{ hours }}" as="h" hint-placeholder-count="14"><div style="height:56px;font-size:11px;color:#6c6c73;transform:translateY(-7px);">{{ h }}</div></sc-for><div style="position:absolute;top:310px;left:0;font-size:11px;font-weight:700;color:oklch(0.9 0.19 125);background:#111113;">13:40</div></div>
+            <sc-for list="{{ week }}" as="d" hint-placeholder-count="7">
+              <div style="position:relative;height:784px;border-radius:12px;background:repeating-linear-gradient(180deg,#1a1a1d 0 1px,transparent 1px 56px);background-color:{{ d.colBg }};">
+                <sc-for list="{{ d.events }}" as="e" hint-placeholder-count="2">
+                  <div style="position:absolute;left:3px;right:3px;top:{{ e.top }}px;height:{{ e.height }}px;background:{{ e.bg }};color:{{ e.fg }};opacity:{{ e.op }};border-radius:10px;padding:{{ e.pad }};display:flex;flex-direction:column;gap:1px;overflow:hidden;border:{{ e.border }};cursor:grab;box-sizing:border-box;">
+                    <div style="display:flex;gap:4px;align-items:baseline;"><span style="font-size:12px;font-weight:700;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ e.title }}</span><span style="font-size:10px;opacity:0.85;white-space:nowrap;">{{ e.inlineTime }}</span><span style="font-size:10px;font-weight:700;opacity:0.8;">{{ e.g }}</span></div>
+                    <span style="font-size:11px;opacity:0.85;white-space:nowrap;">{{ e.time }}</span>
+                    <span style="font-size:11px;font-weight:600;color:oklch(0.9 0.19 125);">{{ e.note }}</span>
+                  </div>
+                </sc-for>
+                <sc-if value="{{ d.isToday }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;left:0;right:0;top:317px;height:2px;background:oklch(0.9 0.19 125);"><div style="position:absolute;left:-4px;top:-4px;width:10px;height:10px;border-radius:50%;background:oklch(0.9 0.19 125);"></div></div></sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ isMonth }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#111113;border-radius:22px;padding:14px 16px 16px;display:flex;flex-direction:column;gap:8px;">
+          <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;font-size:13px;color:#8d8d94;padding:0 8px;"><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span><span>일</span></div>
+          <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;">
+            <sc-for list="{{ month }}" as="c" hint-placeholder-count="35">
+              <div style="min-height:118px;border-radius:12px;padding:8px;display:flex;flex-direction:column;gap:4px;background:{{ c.bg }};border:{{ c.border }};opacity:{{ c.op }};min-width:0;">
+                <div style="display:flex;align-items:center;justify-content:space-between;"><span style="font-size:14px;font-weight:700;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:{{ c.numBg }};color:{{ c.numFg }};">{{ c.num }}</span><span style="font-size:11px;color:{{ c.wxColor }};">{{ c.wx }}</span></div>
+                <sc-for list="{{ c.events }}" as="e" hint-placeholder-count="2"><div style="font-size:11px;border-radius:6px;padding:2px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:{{ e.bg }};color:{{ e.fg }};border:{{ e.border }};">{{ e.label }}</div></sc-for>
+                <span style="font-size:11px;color:#8d8d94;padding-left:2px;">{{ c.more }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+      <div style="display:flex;gap:16px;font-size:12px;color:#8d8d94;flex-wrap:wrap;">
+        <span style="display:flex;align-items:center;gap:6px;"><span style="width:10px;height:10px;border-radius:3px;background:oklch(0.55 0.22 290);"></span>업무</span>
+        <span style="display:flex;align-items:center;gap:6px;"><span style="width:10px;height:10px;border-radius:3px;background:#34343a;"></span>개인</span>
+        <span style="display:flex;align-items:center;gap:6px;"><span style="width:10px;height:10px;border-radius:3px;background:oklch(0.7 0.12 230);"></span>운동</span>
+        <span style="display:flex;align-items:center;gap:6px;"><span style="width:10px;height:10px;border-radius:3px;background:oklch(0.9 0.19 125);"></span>다음 일정</span>
+        <span>G = Google 캘린더</span>
+        <span style="margin-left:auto;">드래그로 이동 · 아래 가장자리로 기간 조절</span>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ================= 할일 ================= -->
+  <sc-if value="{{ isTodo }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="할일" style="display:flex;flex-direction:column;gap:18px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+        <span style="font-size:30px;font-family:'YeogiOttaeJalnan',Pretendard,sans-serif;font-weight:normal;line-height:1.3;letter-spacing:-0.01em;">할일 <span style="color:#8d8d94;">{{ todoTitle }}</span></span>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <span style="background:#1c1c1f;border-radius:999px;padding:10px 16px;font-size:14px;color:#b4b4ba;">정렬 · 마감순</span>
+          <div style="display:flex;background:#1c1c1f;border-radius:999px;padding:5px;font-size:14px;"><sc-for list="{{ todoViewTabs }}" as="v" hint-placeholder-count="2"><span onClick="{{ v.onClick }}" style="cursor:pointer;padding:8px 18px;border-radius:999px;background:{{ v.segBg }};color:{{ v.segFg }};font-weight:{{ v.fw }};">{{ v.label }}</span></sc-for></div>
+          <span onClick="{{ openQuickTodo }}" style="cursor:pointer;background:#fff;color:#000;font-size:14px;font-weight:600;padding:10px 18px;border-radius:999px;">할일 추가 +</span>
+        </div>
+      </div>
+      <sc-if value="{{ isTodoList }}" hint-placeholder-val="{{ true }}">
+        <div style="display:grid;grid-template-columns:220px minmax(0,1fr) 340px;gap:14px;align-items:start;">
+          <div style="display:flex;flex-direction:column;gap:18px;">
+            <div style="display:flex;flex-direction:column;gap:2px;">
+              <sc-for list="{{ todoFilters }}" as="f" hint-placeholder-count="5"><div onClick="{{ f.onClick }}" style="cursor:pointer;display:flex;justify-content:space-between;padding:11px 14px;border-radius:12px;font-size:15px;background:{{ f.rowBg }};color:{{ f.rowFg }};"><span>{{ f.label }}</span><span style="font-size:13px;color:{{ f.countColor }};">{{ f.count }}</span></div></sc-for>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;padding:0 14px;">
+              <span style="font-size:12px;color:#6c6c73;letter-spacing:0.06em;">프로젝트</span>
+              <sc-for list="{{ projects }}" as="p" hint-placeholder-count="4"><div style="display:flex;align-items:center;gap:8px;font-size:14px;color:#d6d6da;padding:4px 0;"><span style="width:8px;height:8px;border-radius:3px;background:{{ p.color }};"></span>{{ p.name }}<span style="margin-left:auto;font-size:12px;color:#6c6c73;">{{ p.count }}</span></div></sc-for>
+              <span style="font-size:12px;color:#6c6c73;letter-spacing:0.06em;margin-top:10px;">태그</span>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;"><span style="font-size:12px;background:#1c1c1f;border-radius:999px;padding:4px 10px;">#집</span><span style="font-size:12px;background:#1c1c1f;border-radius:999px;padding:4px 10px;">#보고</span><span style="font-size:12px;background:#1c1c1f;border-radius:999px;padding:4px 10px;">#여행</span><span style="font-size:12px;background:#1c1c1f;border-radius:999px;padding:4px 10px;">#돈</span></div>
+              <span style="font-size:13px;color:#8d8d94;margin-top:10px;">완료 보관함 →</span>
+            </div>
+          </div>
+          <div style="background:#1a1a1d;border-radius:22px;padding:10px 20px;display:flex;flex-direction:column;">
+            <sc-for list="{{ todoList }}" as="t" hint-placeholder-count="6">
+              <div onClick="{{ t.select }}" style="cursor:pointer;display:flex;gap:14px;align-items:center;padding:14px 10px;margin:0 -10px;border-bottom:1px solid #26262a;border-radius:12px;background:{{ t.rowBg }};opacity:{{ t.op }};">
+                <span onClick="{{ t.toggle }}" style="width:22px;height:22px;border-radius:50%;border:1.5px solid {{ t.ring }};display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;">{{ t.mark }}</span>
+                <div style="flex:1;display:flex;flex-direction:column;gap:4px;min-width:0;">
+                  <span style="font-size:15px;text-decoration:{{ t.deco }};">{{ t.title }}</span>
+                  <div style="display:flex;gap:10px;font-size:12px;color:#8d8d94;align-items:center;"><span style="display:flex;align-items:center;gap:5px;"><span style="width:7px;height:7px;border-radius:2px;background:{{ t.projColor }};"></span>{{ t.proj }}</span><span>{{ t.meta }}</span></div>
+                </div>
+                <span style="font-size:12px;font-weight:700;padding:3px 9px;border-radius:999px;background:{{ t.priBg }};color:{{ t.priFg }};">{{ t.pri }}</span>
+                <span style="width:72px;text-align:right;font-size:13px;color:{{ t.dueColor }};">{{ t.dueLabel }}</span>
+              </div>
+            </sc-for>
+            <sc-if value="{{ todoEmpty }}" hint-placeholder-val="{{ false }}"><div style="padding:40px;text-align:center;color:#6c6c73;font-size:15px;">해당하는 할일이 없어요</div></sc-if>
+          </div>
+          <div style="background:#1a1a1d;border-radius:22px;padding:22px;display:flex;flex-direction:column;gap:16px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:13px;color:#8d8d94;">상세</span><span style="font-size:13px;color:#8d8d94;">일정으로 전환 ↗</span></div>
+            <span style="font-size:22px;font-weight:700;letter-spacing:-0.01em;">{{ sel.title }}</span>
+            <div style="display:grid;grid-template-columns:72px 1fr;gap:10px 12px;font-size:14px;">
+              <span style="color:#8d8d94;">마감일</span><span>{{ sel.dueFull }}</span>
+              <span style="color:#8d8d94;">우선순위</span><span>{{ sel.pri }}</span>
+              <span style="color:#8d8d94;">프로젝트</span><span>{{ sel.proj }}</span>
+              <span style="color:#8d8d94;">태그</span><span>{{ sel.tags }}</span>
+              <span style="color:#8d8d94;">반복</span><span>{{ sel.repeat }}</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;border-top:1px solid #26262a;padding-top:14px;">
+              <span style="font-size:13px;color:#8d8d94;">체크리스트</span>
+              <sc-for list="{{ sel.items }}" as="i" hint-placeholder-count="3"><div style="display:flex;gap:10px;align-items:center;font-size:14px;color:{{ i.color }};"><span style="width:16px;height:16px;border-radius:4px;border:1.5px solid #55555c;display:flex;align-items:center;justify-content:center;font-size:10px;">{{ i.mark }}</span>{{ i.text }}</div></sc-for>
+              <span style="font-size:13px;color:#6c6c73;">+ 항목 추가</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;border-top:1px solid #26262a;padding-top:14px;"><span style="font-size:13px;color:#8d8d94;">메모</span><span style="font-size:14px;color:#d6d6da;line-height:1.6;text-wrap:pretty;">{{ sel.notes }}</span></div>
+          </div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ isKanban }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;align-items:start;">
+          <sc-for list="{{ kanban }}" as="col" hint-placeholder-count="3">
+            <div style="background:#111113;border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:10px;min-height:520px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:0 4px 4px;"><span style="font-size:16px;font-weight:700;display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:{{ col.color }};"></span>{{ col.name }}</span><span style="font-size:13px;color:#8d8d94;">{{ col.count }}</span></div>
+              <sc-for list="{{ col.cards }}" as="t" hint-placeholder-count="3">
+                <div style="background:#1c1c20;border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px;cursor:grab;opacity:{{ t.op }};">
+                  <div style="display:flex;justify-content:space-between;gap:8px;"><span style="font-size:15px;font-weight:600;text-decoration:{{ t.deco }};">{{ t.title }}</span><span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;height:fit-content;background:{{ t.priBg }};color:{{ t.priFg }};">{{ t.pri }}</span></div>
+                  <div style="display:flex;justify-content:space-between;font-size:12px;color:#8d8d94;"><span style="display:flex;align-items:center;gap:5px;"><span style="width:7px;height:7px;border-radius:2px;background:{{ t.projColor }};"></span>{{ t.proj }} · {{ t.meta }}</span><span style="color:{{ t.dueColor }};">{{ t.dueLabel }}</span></div>
+                </div>
+              </sc-for>
+              <span style="font-size:13px;color:#6c6c73;padding:6px 4px;">+ 추가</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <!-- ================= 가계부 ================= -->
+  <sc-if value="{{ isLedger }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="가계부" style="display:flex;flex-direction:column;gap:18px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;">
+          <span style="font-size:30px;font-family:'YeogiOttaeJalnan',Pretendard,sans-serif;font-weight:normal;line-height:1.3;letter-spacing:-0.01em;">가계부 <span style="color:#8d8d94;">2026년 10월</span></span>
+          <div style="display:flex;background:#1c1c1f;border-radius:999px;padding:5px;font-size:14px;"><sc-for list="{{ ledgerTabs }}" as="v" hint-placeholder-count="5"><span onClick="{{ v.onClick }}" style="cursor:pointer;padding:8px 16px;border-radius:999px;background:{{ v.segBg }};color:{{ v.segFg }};font-weight:{{ v.fw }};white-space:nowrap;">{{ v.label }}</span></sc-for></div>
+        </div>
+        <span onClick="{{ openQuickTx }}" style="cursor:pointer;background:#fff;color:#000;font-size:14px;font-weight:600;padding:10px 18px;border-radius:999px;">거래 추가 +</span>
+      </div>
+
+      <sc-if value="{{ isLedList }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+            <sc-for list="{{ txTypeTabs }}" as="v" hint-placeholder-count="4"><span onClick="{{ v.onClick }}" style="cursor:pointer;padding:9px 16px;border-radius:999px;font-size:14px;background:{{ v.bg }};color:{{ v.fg }};font-weight:{{ v.fw }};">{{ v.label }}</span></sc-for>
+            <span style="width:1px;height:24px;background:#2a2a2e;margin:0 4px;"></span>
+            <span style="background:#1c1c1f;border-radius:999px;padding:9px 16px;font-size:14px;color:#b4b4ba;">기간 · 10/1–10/14</span>
+            <span style="background:#1c1c1f;border-radius:999px;padding:9px 16px;font-size:14px;color:#b4b4ba;">카테고리 · 전체</span>
+            <span style="background:#1c1c1f;border-radius:999px;padding:9px 16px;font-size:14px;color:#b4b4ba;">계좌 · 전체</span>
+            <span style="background:#1c1c1f;border-radius:999px;padding:9px 16px;font-size:14px;color:#b4b4ba;">금액 범위</span>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;">
+            <div style="background:#1a1a1d;border-radius:18px;padding:16px 20px;display:flex;flex-direction:column;gap:4px;"><span style="font-size:13px;color:#8d8d94;">수입</span><span style="font-size:26px;font-weight:700;">{{ txSum.inc }}</span></div>
+            <div style="background:#1a1a1d;border-radius:18px;padding:16px 20px;display:flex;flex-direction:column;gap:4px;"><span style="font-size:13px;color:#8d8d94;">지출</span><span style="font-size:26px;font-weight:700;">{{ txSum.exp }}</span></div>
+            <div style="background:#1a1a1d;border-radius:18px;padding:16px 20px;display:flex;flex-direction:column;gap:4px;"><span style="font-size:13px;color:#8d8d94;">필터 결과 · {{ txSum.count }}건</span><span style="font-size:26px;font-weight:700;color:oklch(0.9 0.19 125);">{{ txSum.net }}</span></div>
+          </div>
+          <div style="background:#1a1a1d;border-radius:22px;padding:8px 22px 14px;display:flex;flex-direction:column;">
+            <sc-for list="{{ txGroups }}" as="g" hint-placeholder-count="4">
+              <div style="display:flex;flex-direction:column;">
+                <div style="display:flex;justify-content:space-between;padding:16px 0 8px;font-size:13px;color:#8d8d94;border-bottom:1px solid #26262a;"><span style="font-weight:600;color:#d6d6da;">{{ g.label }}</span><span>{{ g.total }}</span></div>
+                <sc-for list="{{ g.rows }}" as="x" hint-placeholder-count="2">
+                  <div style="display:grid;grid-template-columns:140px minmax(0,1fr) 160px 120px;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid #202024;font-size:14px;">
+                    <span style="font-size:12px;background:#2a2a2e;border-radius:999px;padding:4px 10px;display:flex;align-items:center;gap:6px;width:fit-content;"><span style="width:7px;height:7px;border-radius:50%;background:{{ x.color }};"></span>{{ x.cat }}</span>
+                    <span style="display:flex;gap:8px;align-items:center;">{{ x.memo }}<span style="font-size:11px;color:#8d8d94;">{{ x.badge }}</span></span>
+                    <span style="color:#8d8d94;font-size:13px;">{{ x.acct }}</span>
+                    <span style="text-align:right;font-weight:600;color:{{ x.amtColor }};">{{ x.amt }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isLedStats }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:14px;">
+          <div style="background:#1a1a1d;border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:20px;">
+            <span style="font-size:17px;font-weight:600;">카테고리별 지출</span>
+            <div style="display:flex;gap:28px;align-items:center;flex-wrap:wrap;">
+              <div style="width:200px;height:200px;border-radius:50%;background:{{ donut }};display:flex;align-items:center;justify-content:center;flex-shrink:0;"><div style="width:130px;height:130px;border-radius:50%;background:#1a1a1d;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;"><span style="font-size:12px;color:#8d8d94;">10월 지출</span><span style="font-size:20px;font-weight:700;">164.2만</span></div></div>
+              <div style="flex:1;display:flex;flex-direction:column;gap:10px;min-width:180px;">
+                <sc-for list="{{ cats }}" as="c" hint-placeholder-count="6"><div style="display:grid;grid-template-columns:14px 1fr auto 48px;gap:8px;align-items:center;font-size:14px;"><span style="width:10px;height:10px;border-radius:3px;background:{{ c.color }};"></span><span>{{ c.name }}</span><span style="font-weight:600;">{{ c.amt }}</span><span style="text-align:right;color:#8d8d94;font-size:13px;">{{ c.pct }}</span></div></sc-for>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:14px;">
+            <div style="background:#1a1a1d;border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:16px;">
+              <div style="display:flex;justify-content:space-between;"><span style="font-size:17px;font-weight:600;">월별 지출 추이</span><span style="font-size:13px;color:#8d8d94;">단위 만원</span></div>
+              <div style="height:180px;display:grid;grid-template-columns:repeat(6,1fr);gap:16px;align-items:end;">
+                <sc-for list="{{ monthly }}" as="m" hint-placeholder-count="6"><div style="display:flex;flex-direction:column;align-items:center;gap:8px;height:100%;justify-content:flex-end;"><span style="font-size:12px;color:{{ m.labelColor }};font-weight:600;">{{ m.val }}</span><div style="width:100%;height:{{ m.h }}%;border-radius:10px;background:{{ m.bg }};"></div><span style="font-size:13px;color:#8d8d94;">{{ m.label }}</span></div></sc-for>
+              </div>
+            </div>
+            <div style="background:#1a1a1d;border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:12px;">
+              <span style="font-size:17px;font-weight:600;">전월 대비 (같은 기간 1–14일)</span>
+              <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;">
+                <div style="background:#202024;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:4px;"><span style="font-size:13px;color:#8d8d94;">전체</span><span style="font-size:20px;font-weight:700;color:oklch(0.75 0.16 25);">+8.2%</span></div>
+                <div style="background:#202024;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:4px;"><span style="font-size:13px;color:#8d8d94;">식비</span><span style="font-size:20px;font-weight:700;color:oklch(0.75 0.16 25);">+12%</span></div>
+                <div style="background:#202024;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:4px;"><span style="font-size:13px;color:#8d8d94;">쇼핑</span><span style="font-size:20px;font-weight:700;color:oklch(0.9 0.19 125);">−30%</span></div>
+                <div style="background:#202024;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:4px;"><span style="font-size:13px;color:#8d8d94;">교통</span><span style="font-size:20px;font-weight:700;">+5%</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isLedBudget }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div style="background:#1a1a1d;border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:14px;">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;"><span style="font-size:17px;font-weight:600;">10월 총예산</span><span style="font-size:14px;color:#8d8d94;">남은 17일 · 하루 32,800원 사용 가능</span></div>
+            <div style="display:flex;align-items:baseline;gap:10px;"><span style="font-size:40px;font-weight:700;letter-spacing:-0.02em;">1,642,300</span><span style="font-size:20px;color:#6c6c73;">/ 2,200,000원</span><span style="font-size:15px;color:oklch(0.9 0.19 125);font-weight:600;margin-left:8px;">74.6%</span></div>
+            <div style="height:14px;background:#2a2a2e;border-radius:7px;position:relative;overflow:hidden;"><div style="width:74.6%;height:100%;background:oklch(0.55 0.22 290);"></div><div style="position:absolute;left:80%;top:0;bottom:0;width:2px;background:#f2f2f3;"></div></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:#8d8d94;"><span>0</span><span>80% 도달 시 알림 · 100% 초과 시 알림</span><span>2,200,000</span></div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;">
+            <sc-for list="{{ budgets }}" as="b" hint-placeholder-count="5">
+              <div style="background:#1a1a1d;border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:10px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:16px;font-weight:600;display:flex;align-items:center;gap:8px;"><span style="width:9px;height:9px;border-radius:3px;background:{{ b.color }};"></span>{{ b.name }}</span><span style="font-size:12px;font-weight:700;padding:3px 9px;border-radius:999px;background:{{ b.tagBg }};color:{{ b.tagFg }};">{{ b.pct }}</span></div>
+                <div style="height:8px;background:#2a2a2e;border-radius:4px;overflow:hidden;"><div style="height:100%;width:{{ b.w }}%;background:{{ b.bar }};"></div></div>
+                <div style="display:flex;justify-content:space-between;font-size:13px;color:#8d8d94;"><span>{{ b.used }} 사용</span><span>예산 {{ b.limit }}</span></div>
+                <span style="font-size:12px;color:{{ b.noteColor }};">{{ b.note }}</span>
+              </div>
+            </sc-for>
+            <div style="border:1.5px dashed #2e2e33;border-radius:20px;padding:20px;display:flex;align-items:center;justify-content:center;font-size:14px;color:#8d8d94;min-height:130px;">+ 카테고리 예산 추가</div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isLedRecurring }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:14px;align-items:start;">
+          <div style="background:#1a1a1d;border-radius:22px;padding:10px 22px;display:flex;flex-direction:column;">
+            <div style="display:grid;grid-template-columns:minmax(0,1fr) 120px 110px 120px 110px 48px;gap:12px;font-size:12px;color:#8d8d94;padding:12px 0;border-bottom:1px solid #26262a;"><span>이름</span><span>주기</span><span>다음 결제</span><span>계좌</span><span style="text-align:right;">금액</span><span></span></div>
+            <sc-for list="{{ recurring }}" as="r" hint-placeholder-count="6">
+              <div style="display:grid;grid-template-columns:minmax(0,1fr) 120px 110px 120px 110px 48px;gap:12px;align-items:center;padding:14px 0;border-bottom:1px solid #202024;font-size:14px;opacity:{{ r.op }};">
+                <span style="display:flex;align-items:center;gap:10px;"><span style="width:8px;height:8px;border-radius:50%;background:{{ r.color }};"></span>{{ r.name }}<span style="font-size:11px;color:oklch(0.9 0.19 125);">{{ r.soon }}</span></span>
+                <span style="color:#b4b4ba;">{{ r.cycle }}</span><span>{{ r.next }}</span><span style="color:#8d8d94;">{{ r.acct }}</span>
+                <span style="text-align:right;font-weight:600;">{{ r.amt }}</span>
+                <span style="width:40px;height:22px;border-radius:999px;position:relative;background:{{ r.tgBg }};justify-self:end;"><span style="position:absolute;top:2px;left:{{ r.tgX }};width:18px;height:18px;border-radius:50%;background:#fff;"></span></span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div style="background:#1a1a1d;border-radius:22px;padding:22px;display:flex;flex-direction:column;gap:6px;"><span style="font-size:13px;color:#8d8d94;">월 고정지출 합계</span><span style="font-size:30px;font-weight:700;">806,900원</span><span style="font-size:13px;color:#8d8d94;">월 예산의 36.7% · 연간 항목 별도</span></div>
+            <div style="background:oklch(0.9 0.19 125);color:#0b0b0c;border-radius:22px;padding:20px 22px;display:flex;flex-direction:column;gap:4px;"><span style="font-size:13px;font-weight:700;">내일 결제</span><span style="font-size:20px;font-weight:700;">넷플릭스 17,000원</span><span style="font-size:13px;">신한카드 · 결제일에 거래 자동 등록</span></div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isLedAccounts }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:12px;">
+            <div style="display:flex;flex-direction:column;gap:4px;"><span style="font-size:14px;color:#8d8d94;">순자산</span><span style="font-size:44px;font-weight:700;letter-spacing:-0.02em;">4,125,300<span style="font-size:24px;color:#6c6c73;">원</span></span></div>
+            <span style="border:1px solid #3a3a40;border-radius:999px;padding:10px 18px;font-size:14px;">계좌 간 이체 ⇄</span>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;">
+            <sc-for list="{{ accounts }}" as="a" hint-placeholder-count="4">
+              <div style="background:{{ a.bg }};color:{{ a.fg }};border-radius:22px;padding:22px;display:flex;flex-direction:column;gap:30px;min-height:170px;">
+                <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="font-weight:600;">{{ a.type }}</span><span style="opacity:0.7;">{{ a.sub }}</span></div>
+                <div style="display:flex;flex-direction:column;gap:4px;margin-top:auto;"><span style="font-size:16px;font-weight:600;">{{ a.name }}</span><span style="font-size:26px;font-weight:700;">{{ a.bal }}</span></div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="background:#1a1a1d;border-radius:22px;padding:20px 22px;display:flex;flex-direction:column;gap:8px;">
+            <span style="font-size:15px;font-weight:600;">최근 이체</span>
+            <div style="display:flex;justify-content:space-between;font-size:14px;padding:8px 0;border-bottom:1px solid #26262a;"><span>카카오뱅크 → 현금</span><span style="color:#8d8d94;">10/12 · 100,000</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:14px;padding:8px 0;"><span>신한은행 → 카카오뱅크</span><span style="color:#8d8d94;">10/02 · 500,000</span></div>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <!-- ================= 알림 ================= -->
+  <sc-if value="{{ isNoti }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="알림함" style="display:flex;flex-direction:column;gap:18px;max-width:860px;width:100%;margin:0 auto;">
+      <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:30px;font-family:'YeogiOttaeJalnan',Pretendard,sans-serif;font-weight:normal;line-height:1.3;letter-spacing:-0.01em;">알림 <span style="color:#8d8d94;">{{ unreadText }}</span></span><span onClick="{{ readAll }}" style="cursor:pointer;border:1px solid #3a3a40;border-radius:999px;padding:10px 18px;font-size:14px;">모두 읽음</span></div>
+      <div style="background:#1a1a1d;border-radius:22px;padding:8px 22px;display:flex;flex-direction:column;">
+        <sc-for list="{{ notis }}" as="n" hint-placeholder-count="6">
+          <div style="display:flex;gap:16px;align-items:flex-start;padding:16px 0;border-bottom:1px solid #26262a;opacity:{{ n.op }};">
+            <span style="font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;white-space:nowrap;background:{{ n.bg }};color:{{ n.fg }};">{{ n.type }}</span>
+            <div style="flex:1;display:flex;flex-direction:column;gap:3px;"><span style="font-size:15px;font-weight:600;">{{ n.title }}</span><span style="font-size:13px;color:#8d8d94;">{{ n.body }}</span></div>
+            <span style="font-size:12px;color:#8d8d94;white-space:nowrap;">{{ n.time }}</span>
+            <span style="width:8px;height:8px;border-radius:50%;margin-top:6px;background:{{ n.dot }};"></span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ================= 검색 ================= -->
+  <sc-if value="{{ isSearch }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="통합 검색" style="display:flex;flex-direction:column;gap:18px;max-width:860px;width:100%;margin:0 auto;">
+      <div style="background:#1a1a1d;border:1px solid #3a3a40;border-radius:999px;padding:16px 24px;display:flex;align-items:center;gap:14px;font-size:18px;"><span style="width:16px;height:16px;border:2px solid #b4b4ba;border-radius:50%;"></span><span>치과</span><span style="margin-left:auto;font-size:13px;color:#8d8d94;">3개 결과</span></div>
+      <div style="display:flex;gap:8px;"><span style="background:#fff;color:#000;font-weight:600;border-radius:999px;padding:8px 16px;font-size:14px;">전체</span><span style="background:#1c1c1f;color:#b4b4ba;border-radius:999px;padding:8px 16px;font-size:14px;">일정 1</span><span style="background:#1c1c1f;color:#b4b4ba;border-radius:999px;padding:8px 16px;font-size:14px;">할일 1</span><span style="background:#1c1c1f;color:#b4b4ba;border-radius:999px;padding:8px 16px;font-size:14px;">거래 1</span></div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <span style="font-size:13px;color:#8d8d94;">일정</span>
+        <div style="background:#1a1a1d;border-radius:18px;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;"><div style="display:flex;flex-direction:column;gap:3px;"><span style="font-size:15px;font-weight:600;">치과 정기검진</span><span style="font-size:13px;color:#8d8d94;">10월 14일(수) 15:00 · 강남역 3번 출구</span></div><span style="font-size:12px;background:oklch(0.9 0.19 125);color:#0b0b0c;font-weight:700;border-radius:999px;padding:3px 10px;">오늘</span></div>
+        <span style="font-size:13px;color:#8d8d94;margin-top:8px;">할일</span>
+        <div style="background:#1a1a1d;border-radius:18px;padding:16px 20px;display:flex;flex-direction:column;gap:3px;"><span style="font-size:15px;font-weight:600;">치과 보험 청구서 제출</span><span style="font-size:13px;color:#8d8d94;">마감 10월 20일 · 생활</span></div>
+        <span style="font-size:13px;color:#8d8d94;margin-top:8px;">거래</span>
+        <div style="background:#1a1a1d;border-radius:18px;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;"><div style="display:flex;flex-direction:column;gap:3px;"><span style="font-size:15px;font-weight:600;">치과 스케일링</span><span style="font-size:13px;color:#8d8d94;">4월 8일 · 의료 · 신한카드</span></div><span style="font-weight:600;">−18,500</span></div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ================= 설정 ================= -->
+  <sc-if value="{{ isSettings }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="설정" style="display:grid;grid-template-columns:230px minmax(0,1fr);gap:20px;align-items:start;">
+      <div style="display:flex;flex-direction:column;gap:2px;">
+        <span style="font-size:30px;font-family:'YeogiOttaeJalnan',Pretendard,sans-serif;font-weight:normal;line-height:1.3;letter-spacing:-0.01em;padding:0 0 14px 4px;">설정</span>
+        <sc-for list="{{ setTabs }}" as="s" hint-placeholder-count="7"><div onClick="{{ s.onClick }}" style="cursor:pointer;padding:11px 14px;border-radius:12px;font-size:15px;background:{{ s.rowBg }};color:{{ s.rowFg }};display:flex;justify-content:space-between;"><span>{{ s.label }}</span><span style="font-size:11px;color:#6c6c73;">{{ s.tag }}</span></div></sc-for>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px;padding-top:56px;">
+
+        <sc-if value="{{ isSetProfile }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#1a1a1d;border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:18px;">
+            <span style="font-size:18px;font-weight:600;">프로필 · 화면</span>
+            <div style="display:grid;grid-template-columns:160px 1fr;gap:16px 20px;align-items:center;font-size:14px;">
+              <span style="color:#8d8d94;">이름</span><span style="background:#202024;border-radius:12px;padding:12px 14px;">김지민</span>
+              <span style="color:#8d8d94;">이메일</span><span style="background:#202024;border-radius:12px;padding:12px 14px;color:#b4b4ba;">me@example.com · Google 로그인</span>
+              <span style="color:#8d8d94;">시간대</span><span style="background:#202024;border-radius:12px;padding:12px 14px;">Asia/Seoul (UTC+9)</span>
+              <span style="color:#8d8d94;">테마</span><div style="display:flex;background:#202024;border-radius:999px;padding:4px;width:fit-content;"><span style="padding:7px 16px;color:#8d8d94;">라이트</span><span style="padding:7px 16px;background:#3a3a40;border-radius:999px;font-weight:600;">다크</span><span style="padding:7px 16px;color:#8d8d94;">시스템</span></div>
+              <span style="color:#8d8d94;">주 시작 요일</span><div style="display:flex;background:#202024;border-radius:999px;padding:4px;width:fit-content;"><span style="padding:7px 16px;background:#3a3a40;border-radius:999px;font-weight:600;">월요일</span><span style="padding:7px 16px;color:#8d8d94;">일요일</span></div>
+              <span style="color:#8d8d94;">기본 시작 화면</span><span style="background:#202024;border-radius:12px;padding:12px 14px;">대시보드</span>
+            </div>
+          </div>
+          <div style="background:#1a1a1d;border-radius:22px;padding:20px 24px;display:flex;justify-content:space-between;align-items:center;font-size:14px;"><span style="color:#8d8d94;">비밀번호 변경 · 로그아웃</span><span style="color:oklch(0.75 0.16 25);">계정 삭제</span></div>
+        </sc-if>
+
+        <sc-if value="{{ isSetCats }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#1a1a1d;border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:18px;">
+            <span style="font-size:18px;font-weight:600;">카테고리 · 태그</span>
+            <div style="display:flex;flex-direction:column;gap:10px;"><span style="font-size:13px;color:#8d8d94;">가계부 · 지출</span><div style="display:flex;flex-wrap:wrap;gap:8px;"><sc-for list="{{ cats }}" as="c" hint-placeholder-count="6"><span style="background:#202024;border-radius:999px;padding:7px 14px;font-size:14px;display:flex;align-items:center;gap:7px;"><span style="width:8px;height:8px;border-radius:50%;background:{{ c.color }};"></span>{{ c.name }}</span></sc-for><span style="border:1px dashed #3a3a40;border-radius:999px;padding:7px 14px;font-size:14px;color:#8d8d94;">+ 추가</span></div></div>
+            <div style="display:flex;flex-direction:column;gap:10px;"><span style="font-size:13px;color:#8d8d94;">가계부 · 수입</span><div style="display:flex;flex-wrap:wrap;gap:8px;"><span style="background:#202024;border-radius:999px;padding:7px 14px;font-size:14px;">급여</span><span style="background:#202024;border-radius:999px;padding:7px 14px;font-size:14px;">부수입</span><span style="background:#202024;border-radius:999px;padding:7px 14px;font-size:14px;">이자</span></div></div>
+            <div style="display:flex;flex-direction:column;gap:10px;"><span style="font-size:13px;color:#8d8d94;">일정 분류</span><div style="display:flex;flex-wrap:wrap;gap:8px;"><span style="background:#202024;border-radius:999px;padding:7px 14px;font-size:14px;display:flex;align-items:center;gap:7px;"><span style="width:8px;height:8px;border-radius:50%;background:oklch(0.55 0.22 290);"></span>업무 · G</span><span style="background:#202024;border-radius:999px;padding:7px 14px;font-size:14px;display:flex;align-items:center;gap:7px;"><span style="width:8px;height:8px;border-radius:50%;background:#55555c;"></span>개인</span><span style="background:#202024;border-radius:999px;padding:7px 14px;font-size:14px;display:flex;align-items:center;gap:7px;"><span style="width:8px;height:8px;border-radius:50%;background:oklch(0.7 0.12 230);"></span>운동</span></div></div>
+            <div style="display:flex;flex-direction:column;gap:10px;"><span style="font-size:13px;color:#8d8d94;">할일 프로젝트</span><div style="display:flex;flex-wrap:wrap;gap:8px;"><sc-for list="{{ projects }}" as="p" hint-placeholder-count="4"><span style="background:#202024;border-radius:999px;padding:7px 14px;font-size:14px;display:flex;align-items:center;gap:7px;"><span style="width:8px;height:8px;border-radius:3px;background:{{ p.color }};"></span>{{ p.name }}</span></sc-for></div></div>
+            <span style="font-size:12px;color:#6c6c73;">거래가 있는 카테고리는 삭제 대신 보관됩니다</span>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isSetNoti }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#1a1a1d;border-radius:22px;padding:10px 24px;display:flex;flex-direction:column;">
+            <sc-for list="{{ notiSettings }}" as="n" hint-placeholder-count="6">
+              <div onClick="{{ n.toggle }}" style="cursor:pointer;display:flex;align-items:center;gap:16px;padding:16px 0;border-bottom:1px solid #26262a;">
+                <div style="flex:1;display:flex;flex-direction:column;gap:3px;"><span style="font-size:15px;font-weight:600;">{{ n.label }}</span><span style="font-size:13px;color:#8d8d94;">{{ n.desc }}</span></div>
+                <span style="width:44px;height:24px;border-radius:999px;position:relative;background:{{ n.tgBg }};"><span style="position:absolute;top:3px;left:{{ n.tgX }};width:18px;height:18px;border-radius:50%;background:#fff;"></span></span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="background:#1a1a1d;border-radius:22px;padding:20px 24px;display:grid;grid-template-columns:160px 1fr;gap:14px 20px;align-items:center;font-size:14px;">
+            <span style="color:#8d8d94;">채널</span><div style="display:flex;gap:8px;"><span style="background:#fff;color:#000;font-weight:600;border-radius:999px;padding:6px 14px;">앱 내</span><span style="background:#fff;color:#000;font-weight:600;border-radius:999px;padding:6px 14px;">웹 푸시</span><span style="background:#202024;color:#6c6c73;border-radius:999px;padding:6px 14px;">이메일 (준비 중)</span></div>
+            <span style="color:#8d8d94;">기본 알림 시간</span><span>일정 10분 전 · 할일 마감 당일 09:00</span>
+            <span style="color:#8d8d94;">방해금지</span><span>23:00 – 07:00</span>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isSetGoogle }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#1a1a1d;border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:18px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+              <div style="display:flex;align-items:center;gap:14px;"><span style="width:44px;height:44px;border-radius:50%;background:#fff;color:#000;font-weight:700;display:flex;align-items:center;justify-content:center;">G</span><div style="display:flex;flex-direction:column;gap:2px;"><span style="font-size:16px;font-weight:600;">me@gmail.com</span><span style="font-size:13px;color:oklch(0.9 0.19 125);">연결됨 · 마지막 동기화 오늘 13:32</span></div></div>
+              <div style="display:flex;gap:8px;"><span style="background:#fff;color:#000;font-weight:600;border-radius:999px;padding:10px 18px;font-size:14px;">지금 동기화</span><span style="border:1px solid #3a3a40;border-radius:999px;padding:10px 18px;font-size:14px;color:oklch(0.75 0.16 25);">연결 해제</span></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px;border-top:1px solid #26262a;padding-top:16px;">
+              <span style="font-size:14px;font-weight:600;">동기화 방향</span>
+              <div style="display:flex;background:#202024;border-radius:999px;padding:4px;width:fit-content;font-size:14px;"><sc-for list="{{ gdirTabs }}" as="v" hint-placeholder-count="2"><span onClick="{{ v.onClick }}" style="cursor:pointer;padding:8px 18px;border-radius:999px;background:{{ v.segBg }};color:{{ v.segFg }};font-weight:{{ v.fw }};">{{ v.label }}</span></sc-for></div>
+              <span style="font-size:13px;color:#8d8d94;">{{ gdirDesc }}</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px;border-top:1px solid #26262a;padding-top:16px;">
+              <span style="font-size:14px;font-weight:600;margin-bottom:4px;">동기화할 캘린더</span>
+              <div style="display:flex;align-items:center;gap:12px;font-size:14px;padding:6px 0;"><span style="width:18px;height:18px;border-radius:5px;background:oklch(0.9 0.19 125);color:#000;font-size:11px;display:flex;align-items:center;justify-content:center;">✓</span>업무<span style="margin-left:auto;font-size:12px;color:#8d8d94;">142개 일정</span></div>
+              <div style="display:flex;align-items:center;gap:12px;font-size:14px;padding:6px 0;"><span style="width:18px;height:18px;border-radius:5px;background:oklch(0.9 0.19 125);color:#000;font-size:11px;display:flex;align-items:center;justify-content:center;">✓</span>개인 (me@gmail.com)<span style="margin-left:auto;font-size:12px;color:#8d8d94;">88개 일정</span></div>
+              <div style="display:flex;align-items:center;gap:12px;font-size:14px;padding:6px 0;"><span style="width:18px;height:18px;border-radius:5px;background:oklch(0.9 0.19 125);color:#000;font-size:11px;display:flex;align-items:center;justify-content:center;">✓</span>대한민국 공휴일<span style="margin-left:auto;font-size:12px;color:#8d8d94;">읽기 전용</span></div>
+              <div style="display:flex;align-items:center;gap:12px;font-size:14px;padding:6px 0;color:#8d8d94;"><span style="width:18px;height:18px;border-radius:5px;border:1.5px solid #55555c;"></span>가족</div>
+            </div>
+            <div style="background:#202024;border-radius:14px;padding:14px 16px;font-size:13px;color:#b4b4ba;line-height:1.6;">주기 동기화 15분 · 앱 진입 시 자동. 충돌 시 최근 수정된 쪽을 채택하고 덮어쓴 내용은 기록에 남깁니다. 할일·가계부는 동기화하지 않습니다.</div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isSetWeather }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#1a1a1d;border-radius:22px;padding:24px;display:grid;grid-template-columns:160px 1fr;gap:16px 20px;align-items:center;font-size:14px;">
+            <span style="font-size:18px;font-weight:600;grid-column:1 / -1;">날씨</span>
+            <span style="color:#8d8d94;">기본 지역</span><div style="display:flex;gap:8px;"><span style="flex:1;background:#202024;border-radius:12px;padding:12px 14px;">서울 강남구</span><span style="border:1px solid #3a3a40;border-radius:12px;padding:12px 14px;white-space:nowrap;">현재 위치</span></div>
+            <span style="color:#8d8d94;">온도 단위</span><div style="display:flex;background:#202024;border-radius:999px;padding:4px;width:fit-content;"><span style="padding:7px 16px;background:#3a3a40;border-radius:999px;font-weight:600;">℃</span><span style="padding:7px 16px;color:#8d8d94;">℉</span></div>
+            <span style="color:#8d8d94;">캘린더에 표시</span><span>월간 · 주간 · 일간 (7일 예보 범위)</span>
+            <span style="color:#8d8d94;">우천 알림</span><span>위치가 있는 일정 · 강수확률 60% 이상</span>
+            <span style="color:#8d8d94;">데이터</span><span style="color:#8d8d94;">마지막 업데이트 13:10 · 30분마다 갱신</span>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isSetMcp }}" hint-placeholder-val="{{ true }}">
+          <div style="background:#1a1a1d;border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:16px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;"><div style="display:flex;flex-direction:column;gap:3px;"><span style="font-size:18px;font-weight:600;">MCP 연결 · Claude</span><span style="font-size:13px;color:#8d8d94;">Claude에서 일정·할일·가계부를 말로 조회하고 기록합니다</span></div><span style="background:#fff;color:#000;font-weight:600;border-radius:999px;padding:10px 18px;font-size:14px;">새 토큰 발급 +</span></div>
+            <div style="background:#0f0f11;border-radius:14px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:13px;"><span style="color:#d6d6da;">https://myproject.functions.supabase.co/mcp</span><span style="font-family:Pretendard,sans-serif;color:#8d8d94;">복사</span></div>
+            <div style="display:flex;flex-direction:column;">
+              <div style="display:grid;grid-template-columns:minmax(0,1fr) 110px 110px 110px 120px 60px;gap:10px;font-size:12px;color:#8d8d94;padding:10px 0;border-bottom:1px solid #26262a;"><span>토큰</span><span>일정</span><span>할일</span><span>가계부</span><span>마지막 사용</span><span></span></div>
+              <sc-for list="{{ tokens }}" as="k" hint-placeholder-count="3">
+                <div style="display:grid;grid-template-columns:minmax(0,1fr) 110px 110px 110px 120px 60px;gap:10px;align-items:center;padding:14px 0;border-bottom:1px solid #202024;font-size:14px;opacity:{{ k.op }};">
+                  <span style="display:flex;flex-direction:column;gap:2px;"><span style="font-weight:600;">{{ k.name }}</span><span style="font-size:12px;color:#8d8d94;font-family:ui-monospace,monospace;">{{ k.hint }}</span></span>
+                  <span style="font-size:12px;color:{{ k.c1 }};">{{ k.s1 }}</span><span style="font-size:12px;color:{{ k.c2 }};">{{ k.s2 }}</span><span style="font-size:12px;color:{{ k.c3 }};">{{ k.s3 }}</span>
+                  <span style="font-size:13px;color:#b4b4ba;">{{ k.last }}</span>
+                  <span style="font-size:13px;color:{{ k.actColor }};text-align:right;">{{ k.act }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="background:#1a1a1d;border-radius:22px;padding:22px 24px;display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;justify-content:space-between;"><span style="font-size:16px;font-weight:600;">호출 이력</span><span style="font-size:13px;color:#8d8d94;">오늘 6회 · 한도 60회/분</span></div>
+            <sc-for list="{{ mcpLogs }}" as="l" hint-placeholder-count="6">
+              <div style="display:grid;grid-template-columns:60px 190px minmax(0,1fr) 70px;gap:12px;align-items:center;font-size:13px;padding:8px 0;border-bottom:1px solid #202024;">
+                <span style="color:#8d8d94;">{{ l.time }}</span><span style="font-family:ui-monospace,monospace;color:{{ l.color }};">{{ l.tool }}</span><span style="color:#b4b4ba;">{{ l.input }}</span><span style="text-align:right;font-size:12px;color:{{ l.stColor }};">{{ l.status }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ isSetBackup }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#1a1a1d;border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:16px;">
+            <span style="font-size:18px;font-weight:600;">백업 · 내보내기</span>
+            <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;">
+              <div style="background:#202024;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:10px;"><span style="font-size:15px;font-weight:600;">일정</span><span style="font-size:13px;color:#8d8d94;">CSV · Excel</span><span style="border:1px solid #3a3a40;border-radius:999px;padding:7px 14px;font-size:13px;width:fit-content;">내보내기</span></div>
+              <div style="background:#202024;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:10px;"><span style="font-size:15px;font-weight:600;">할일</span><span style="font-size:13px;color:#8d8d94;">CSV · Excel</span><span style="border:1px solid #3a3a40;border-radius:999px;padding:7px 14px;font-size:13px;width:fit-content;">내보내기</span></div>
+              <div style="background:#202024;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:10px;"><span style="font-size:15px;font-weight:600;">거래</span><span style="font-size:13px;color:#8d8d94;">CSV · Excel · 가져오기 지원</span><div style="display:flex;gap:6px;"><span style="border:1px solid #3a3a40;border-radius:999px;padding:7px 14px;font-size:13px;">내보내기</span><span style="border:1px solid #3a3a40;border-radius:999px;padding:7px 14px;font-size:13px;">가져오기</span></div></div>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</sc-if>
+
+<!-- ================= 빠른 추가 모달 ================= -->
+<sc-if value="{{ quickOpen }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ closeQuick }}" style="position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:10;padding:20px;">
+    <div onClick="{{ stop }}" style="width:540px;max-width:100%;max-height:92vh;overflow-y:auto;background:#161619;border:1px solid #2a2a2e;border-radius:28px;padding:26px;display:flex;flex-direction:column;gap:18px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div style="display:flex;background:#202024;border-radius:999px;padding:4px;font-size:14px;"><sc-for list="{{ quickTabs }}" as="v" hint-placeholder-count="3"><span onClick="{{ v.onClick }}" style="cursor:pointer;padding:8px 18px;border-radius:999px;background:{{ v.segBg }};color:{{ v.segFg }};font-weight:{{ v.fw }};">{{ v.label }}</span></sc-for></div>
+        <span onClick="{{ closeQuick }}" style="cursor:pointer;width:34px;height:34px;border-radius:50%;background:#202024;display:flex;align-items:center;justify-content:center;color:#b4b4ba;">✕</span>
+      </div>
+      <sc-if value="{{ qTx }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <div style="display:flex;align-items:baseline;gap:8px;border-bottom:1px solid #2a2a2e;padding-bottom:12px;"><span style="font-size:44px;font-weight:700;letter-spacing:-0.02em;">12,000</span><span style="font-size:22px;color:#6c6c73;">원</span></div>
+          <div style="display:flex;gap:6px;"><span style="background:#fff;color:#000;font-weight:600;border-radius:999px;padding:7px 16px;font-size:14px;">지출</span><span style="background:#202024;color:#b4b4ba;border-radius:999px;padding:7px 16px;font-size:14px;">수입</span><span style="background:#202024;color:#b4b4ba;border-radius:999px;padding:7px 16px;font-size:14px;">이체</span></div>
+          <div style="display:flex;flex-direction:column;gap:8px;"><span style="font-size:13px;color:#8d8d94;">카테고리 · 최근 사용</span><div style="display:flex;flex-wrap:wrap;gap:6px;"><span style="background:oklch(0.9 0.19 125);color:#000;font-weight:600;border-radius:999px;padding:7px 14px;font-size:14px;">식비</span><span style="background:#202024;border-radius:999px;padding:7px 14px;font-size:14px;">교통</span><span style="background:#202024;border-radius:999px;padding:7px 14px;font-size:14px;">쇼핑</span><span style="background:#202024;border-radius:999px;padding:7px 14px;font-size:14px;">문화</span><span style="background:#202024;border-radius:999px;padding:7px 14px;font-size:14px;">기타</span></div></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:14px;"><div style="background:#202024;border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:2px;"><span style="font-size:12px;color:#8d8d94;">계좌</span>신한카드</div><div style="background:#202024;border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:2px;"><span style="font-size:12px;color:#8d8d94;">날짜</span>오늘 · 10월 14일</div></div>
+          <div style="background:#202024;border-radius:14px;padding:12px 14px;font-size:14px;display:flex;flex-direction:column;gap:2px;"><span style="font-size:12px;color:#8d8d94;">메모</span>점심</div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ qEv }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:12px;font-size:14px;">
+          <div style="font-size:24px;font-weight:600;border-bottom:1px solid #2a2a2e;padding-bottom:12px;">{{ evTitle }}</div>
+          <div onClick="{{ toggleAllDay }}" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;background:#202024;border-radius:14px;padding:12px 14px;"><span style="display:flex;flex-direction:column;gap:2px;"><span>종일</span><span style="font-size:12px;color:#8d8d94;">{{ allDayHint }}</span></span><span style="width:44px;height:24px;border-radius:999px;position:relative;background:{{ adBg }};"><span style="position:absolute;top:3px;left:{{ adX }};width:18px;height:18px;border-radius:50%;background:#fff;"></span></span></div>
+          <sc-if value="{{ allDayOff }}" hint-placeholder-val="{{ true }}">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"><div style="background:#202024;border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:2px;"><span style="font-size:12px;color:#8d8d94;">시작</span>10월 15일 (목) 15:00</div><div style="background:#202024;border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:2px;"><span style="font-size:12px;color:#8d8d94;">종료</span>10월 15일 (목) 16:00</div></div>
+          </sc-if>
+          <sc-if value="{{ allDayOn }}" hint-placeholder-val="{{ false }}">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"><div style="background:#202024;border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:2px;"><span style="font-size:12px;color:#8d8d94;">시작일</span>10월 17일 (토)</div><div style="background:#202024;border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:2px;"><span style="font-size:12px;color:#8d8d94;">종료일</span>10월 18일 (일) · 2일</div></div>
+          </sc-if>
+          <div style="background:#202024;border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:2px;"><span style="font-size:12px;color:#8d8d94;">장소</span>{{ evPlace }}</div>
+          <div style="display:flex;flex-direction:column;gap:8px;"><span style="font-size:13px;color:#8d8d94;">알림</span><sc-if value="{{ allDayOff }}" hint-placeholder-val="{{ true }}"><div style="display:flex;gap:6px;flex-wrap:wrap;"><span style="background:#202024;border-radius:999px;padding:7px 14px;">정시</span><span style="background:#202024;border-radius:999px;padding:7px 14px;">10분 전</span><span style="background:oklch(0.9 0.19 125);color:#000;font-weight:600;border-radius:999px;padding:7px 14px;">1시간 전</span><span style="background:oklch(0.9 0.19 125);color:#000;font-weight:600;border-radius:999px;padding:7px 14px;">1일 전</span></div></sc-if><sc-if value="{{ allDayOn }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:6px;flex-wrap:wrap;"><span style="background:oklch(0.9 0.19 125);color:#000;font-weight:600;border-radius:999px;padding:7px 14px;">당일 09:00</span><span style="background:oklch(0.9 0.19 125);color:#000;font-weight:600;border-radius:999px;padding:7px 14px;">1일 전 20:00</span><span style="background:#202024;border-radius:999px;padding:7px 14px;">1주 전</span></div></sc-if></div>
+          <div style="display:flex;flex-direction:column;gap:10px;background:#1c1c20;border-radius:16px;padding:14px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:13px;color:#8d8d94;">반복</span><span style="font-size:12px;color:oklch(0.9 0.19 125);">{{ repSummary }}</span></div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;"><sc-for list="{{ repTabs }}" as="r" hint-placeholder-count="5"><span onClick="{{ r.onClick }}" style="cursor:pointer;border-radius:999px;padding:7px 14px;background:{{ r.bg }};color:{{ r.fg }};font-weight:{{ r.fw }};">{{ r.label }}</span></sc-for></div>
+            <sc-if value="{{ repWeekly }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;gap:6px;"><sc-for list="{{ repDays }}" as="d" hint-placeholder-count="7"><span onClick="{{ d.onClick }}" style="cursor:pointer;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:{{ d.bg }};color:{{ d.fg }};font-weight:{{ d.fw }};">{{ d.label }}</span></sc-for></div>
+            </sc-if>
+            <sc-if value="{{ repOn }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-top:1px solid #2a2a2e;padding-top:10px;">
+                <span style="font-size:13px;color:#8d8d94;">종료</span>
+                <div style="display:flex;background:#202024;border-radius:999px;padding:3px;"><sc-for list="{{ repEndTabs }}" as="e" hint-placeholder-count="3"><span onClick="{{ e.onClick }}" style="cursor:pointer;padding:6px 14px;border-radius:999px;background:{{ e.segBg }};color:{{ e.segFg }};font-weight:{{ e.fw }};">{{ e.label }}</span></sc-for></div>
+                <span style="margin-left:auto;background:#202024;border-radius:12px;padding:8px 12px;">{{ repEndValue }}</span>
+              </div>
+              <span style="font-size:12px;color:#6c6c73;">수정 시 "이번만 / 이후 전체 / 전체" 중에서 선택합니다</span>
+            </sc-if>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;"><span style="color:#8d8d94;">분류</span><span style="background:#202024;border-radius:999px;padding:7px 14px;display:flex;align-items:center;gap:7px;"><span style="width:8px;height:8px;border-radius:50%;background:#55555c;"></span>개인</span></div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ qTodo }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:12px;font-size:14px;">
+          <div style="font-size:24px;font-weight:600;border-bottom:1px solid #2a2a2e;padding-bottom:12px;">여행 짐 리스트 만들기</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"><div style="background:#202024;border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:2px;"><span style="font-size:12px;color:#8d8d94;">마감일</span>10월 23일 (금)</div><div style="background:#202024;border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:2px;"><span style="font-size:12px;color:#8d8d94;">프로젝트</span>여행</div></div>
+          <div style="display:flex;flex-direction:column;gap:8px;"><span style="font-size:13px;color:#8d8d94;">우선순위</span><div style="display:flex;gap:6px;"><span style="background:#202024;border-radius:999px;padding:7px 16px;">상</span><span style="background:#fff;color:#000;font-weight:600;border-radius:999px;padding:7px 16px;">중</span><span style="background:#202024;border-radius:999px;padding:7px 16px;">하</span></div></div>
+          <div style="background:#202024;border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:2px;"><span style="font-size:12px;color:#8d8d94;">태그</span>#여행</div>
+        </div>
+      </sc-if>
+      <div style="display:flex;gap:8px;justify-content:flex-end;"><span onClick="{{ closeQuick }}" style="cursor:pointer;border:1px solid #3a3a40;border-radius:999px;padding:11px 20px;font-size:14px;">취소</span><span onClick="{{ closeQuick }}" style="cursor:pointer;background:#fff;color:#000;font-weight:700;border-radius:999px;padding:11px 24px;font-size:14px;">저장</span></div>
+    </div>
+  </div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const L = 'oklch(0.9 0.19 125)', P = 'oklch(0.55 0.22 290)', R = 'oklch(0.75 0.16 25)', B = 'oklch(0.7 0.12 230)';
+const fmt = (n) => n.toLocaleString('ko-KR');
+const TODOS = [
+  { id: 1, title: '관리비 이체', due: 'over', dueLabel: '어제', dueFull: '10월 13일 (화)', pri: '상', proj: '생활', tags: '#집 #돈', repeat: '매월 13일', status: 'todo', meta: '반복 · 매월', notes: '관리사무소 계좌로 이체. 영수증은 가계부 주거 카테고리에 첨부.', items: [] },
+  { id: 2, title: '분기 보고서 초안', due: 'today', dueLabel: '오늘', dueFull: '10월 14일 (수)', pri: '상', proj: '업무', tags: '#보고', repeat: '없음', status: 'doing', meta: '체크 2/4', notes: '목요일 10시 분기 보고 회의 전에 팀장님께 공유. 3분기 지표는 대시보드 캡처 사용.', items: [['3분기 지표 정리', 1], ['목차 구성', 1], ['리스크 섹션 작성', 0], ['팀장님 공유', 0]] },
+  { id: 3, title: '세탁물 찾기', due: 'today', dueLabel: '오늘', dueFull: '10월 14일 (수)', pri: '중', proj: '생활', tags: '-', repeat: '없음', status: 'todo', meta: '', notes: '19시 전까지.', items: [] },
+  { id: 4, title: '우산 챙기기', due: 'today', dueLabel: '오늘', dueFull: '10월 14일 (수)', pri: '하', proj: '생활', tags: '-', repeat: '없음', status: 'done', meta: '날씨 알림에서 생성', notes: '저녁 비 60% 예보.', items: [] },
+  { id: 5, title: '회의 자료 출력', due: 'later', dueLabel: '10/15', dueFull: '10월 15일 (목)', pri: '중', proj: '업무', tags: '#보고', repeat: '없음', status: 'todo', meta: '', notes: '10부.', items: [] },
+  { id: 6, title: '세금계산서 발행', due: 'later', dueLabel: '10/16', dueFull: '10월 16일 (금)', pri: '상', proj: '업무', tags: '#돈', repeat: '매월 16일', status: 'todo', meta: '반복 · 매월', notes: '거래처 3곳.', items: [] },
+  { id: 7, title: '주간 회고 작성', due: 'later', dueLabel: '10/16', dueFull: '10월 16일 (금)', pri: '중', proj: '업무', tags: '-', repeat: '매주 금요일', status: 'todo', meta: '반복 · 매주', notes: '', items: [] },
+  { id: 8, title: '제주 숙소 예약', due: 'later', dueLabel: '10/20', dueFull: '10월 20일 (화)', pri: '중', proj: '여행', tags: '#여행', repeat: '없음', status: 'doing', meta: '체크 1/3', notes: '애월 쪽, 2박.', items: [['후보 3곳 비교', 1], ['날짜 확정', 0], ['결제', 0]] },
+  { id: 9, title: '운동화 교체 알아보기', due: 'none', dueLabel: '-', dueFull: '없음', pri: '하', proj: '운동', tags: '-', repeat: '없음', status: 'todo', meta: '', notes: '', items: [] },
+  { id: 10, title: '기획 리뷰 자료 정리', due: 'past', dueLabel: '10/12', dueFull: '10월 12일 (월)', pri: '중', proj: '업무', tags: '-', repeat: '없음', status: 'done', meta: '', notes: '', items: [] },
+  { id: 11, title: '경비 정산 제출', due: 'past', dueLabel: '10/12', dueFull: '10월 12일 (월)', pri: '중', proj: '업무', tags: '#돈', repeat: '없음', status: 'done', meta: '', notes: '', items: [] },
+];
+const PROJ = { 업무: P, 생활: '#8d8d94', 여행: L, 운동: B };
+const PRI = { 상: [R, '#1a0d0a'], 중: ['#3a3a40', '#f2f2f3'], 하: ['#26262a', '#b4b4ba'] };
+const CATC = { 주거: P, 식비: 'oklch(0.68 0.17 290)', 쇼핑: L, 교통: B, 문화: 'oklch(0.45 0.14 290)', 기타: '#55555c', 수입: '#d6d6da', 이체: '#8d8d94' };
+const TX = [
+  ['10월 14일 (수)', '점심', '식비', '신한카드', 12000, 'exp', 'Claude'], ['10월 14일 (수)', '스타벅스', '식비', '신한카드', 5500, 'exp'],
+  ['10월 13일 (화)', '프리랜스 정산', '수입', '카카오뱅크', 350000, 'inc'], ['10월 13일 (화)', '무신사', '쇼핑', '신한카드', 89000, 'exp'], ['10월 13일 (화)', '지하철', '교통', '카카오뱅크', 1550, 'exp'],
+  ['10월 12일 (월)', '마트 장보기', '식비', '신한카드', 46200, 'exp'], ['10월 12일 (월)', '카카오뱅크 → 현금', '이체', '카카오뱅크', 100000, 'tr'],
+  ['10월 10일 (토)', '영화 · 용산', '문화', '신한카드', 28000, 'exp'], ['10월 10일 (토)', '택시', '교통', '신한카드', 14300, 'exp'],
+];
+const WEEKRAW = [
+  ['월', 12, '맑음 20°', [], [['스탠드업', '09:30', '10:00', 'w', 'G'], ['기획 리뷰', '14:00', '15:30', 'w'], ['PT', '19:00', '20:00', 'x']]],
+  ['화', 13, '구름 19°', [['관리비 이체 · 초과', R]], [['스탠드업', '09:30', '10:00', 'w', 'G'], ['1:1 미팅', '11:00', '12:00', 'w', 'G'], ['저녁 · 친구', '18:30', '20:30', 'p']]],
+  ['수', 14, '비 60%', [['분기 보고서 초안', L]], [['스탠드업', '09:30', '10:00', 'w', 'G'], ['점심 · 성수', '12:00', '13:00', 'p'], ['치과 정기검진', '15:00', '16:00', 'n'], ['러닝 크루 · 한강', '19:30', '21:00', 'x', '', '비 60% · 야외']]],
+  ['목', 15, '비 80%', [['넷플릭스 17,000', '#d6d6da']], [['스탠드업', '09:30', '10:00', 'w', 'G'], ['분기 보고 회의', '10:00', '12:00', 'w', 'G'], ['외부 미팅 · 판교', '16:00', '17:00', 'w']]],
+  ['금', 16, '구름 17°', [['세금계산서 발행', L]], [['스탠드업', '09:30', '10:00', 'w', 'G'], ['팀 점심', '13:00', '14:00', 'p'], ['회식 · 을지로', '19:00', '22:00', 'p']]],
+  ['토', 17, '맑음 18°', [['종일 · 가족 여행 · 가평', 'ad']], [['요가', '10:00', '11:30', 'x'], ['전시 관람', '15:00', '18:00', 'p']]],
+  ['일', 18, '맑음 19°', [['종일 · 가족 여행 (2/2)', 'ad']], [['가족 브런치', '11:00', '13:00', 'p']]],
+];
+const EVC = { w: [P, '#fff'], p: ['#34343a', '#fff'], x: [B, '#0b0b0c'], n: [L, '#0b0b0c'] };
+const seg = (items, cur, set) => items.map(([k, label]) => ({ label, onClick: () => set(k), segBg: k === cur ? '#3a3a40' : 'transparent', segFg: k === cur ? '#fff' : '#8d8d94', fw: k === cur ? 600 : 400 }));
+
+class Component extends DCLogic {
+  state = { page: 'dash', calView: 'week', todoView: 'list', todoFilter: 'today', selId: 2, ledTab: 'list', txType: 'all', setTab: 'mcp', gdir: 'import', quick: null, summaryOpen: false, read: false,
+    status: Object.fromEntries(TODOS.map(t => [t.id, t.status])),
+    noti: { ev: true, todo: true, budget: true, pay: true, rain: true, sync: true } };
+  go = (page) => () => this.setState({ page });
+  toggleTodo = (id) => (e) => { e && e.stopPropagation && e.stopPropagation(); this.setState(s => ({ status: { ...s.status, [id]: s.status[id] === 'done' ? 'todo' : 'done' } })); };
+  todoRow(t) {
+    const st = this.state.status[t.id], done = st === 'done';
+    const dueColor = done ? '#6c6c73' : t.due === 'over' ? R : t.due === 'today' ? L : '#8d8d94';
+    return { ...t, mark: done ? '✓' : '', deco: done ? 'line-through' : 'none', op: done ? 0.45 : 1,
+      ring: t.due === 'over' && !done ? R : '#55555c', dueColor, projColor: PROJ[t.proj], priBg: PRI[t.pri][0], priFg: PRI[t.pri][1],
+      short: t.due === 'over' ? '초과' : t.pri, toggle: this.toggleTodo(t.id),
+      select: () => this.setState({ selId: t.id }), rowBg: this.state.selId === t.id ? '#232327' : 'transparent' };
+  }
+  renderVals() {
+    const s = this.state, pg = s.page;
+    const NAV = [['dash', '대시보드'], ['cal', '일정'], ['todo', '할일'], ['ledger', '가계부'], ['settings', '설정']];
+    const st = s.status;
+    const filt = { today: t => t.due === 'today' || t.due === 'over', upcoming: t => t.due === 'later', overdue: t => t.due === 'over' && st[t.id] !== 'done', all: t => st[t.id] !== 'done', done: t => st[t.id] === 'done' };
+    const FL = [['today', '오늘'], ['upcoming', '예정'], ['overdue', '기한초과'], ['all', '전체'], ['done', '완료']];
+    const todoList = TODOS.filter(filt[s.todoFilter]).map(t => this.todoRow(t));
+    const selT = TODOS.find(t => t.id === s.selId) || TODOS[1];
+    const dashT = TODOS.filter(t => t.id <= 4).map(t => this.todoRow(t));
+    const H = 56, now = 13 + 40 / 60, tt = (x) => { const [h, m] = x.split(':').map(Number); return h + m / 60; };
+    const week = WEEKRAW.map(([dow, date, wx, marks, evs], i) => ({
+      dow, date: String(date), wx, isToday: i === 2,
+      wxColor: wx.startsWith('비') ? 'oklch(0.75 0.12 230)' : '#8d8d94',
+      dateBg: i === 2 ? L : 'transparent', dateFg: i === 2 ? '#0b0b0c' : i < 2 ? '#6c6c73' : '#f2f2f3', colBg: i === 2 ? '#17171a' : 'transparent',
+      marks: marks.map(([label, dot]) => dot === 'ad' ? { label, dot: '#fff', bg: P, fg: '#fff', fw: 600, radius: '6px' } : { label, dot, bg: '#1f1f23', fg: '#f2f2f3', fw: 400, radius: '999px' }),
+      events: evs.map(([title, a, b, k, g, note]) => {
+        const A = tt(a), Bv = tt(b), short = Bv - A < 0.75;
+        return { title, g: g || '', note: note || '', time: short ? '' : `${a} – ${b}`, inlineTime: short ? a : '',
+          top: Math.round((A - 8) * H) + 3, height: Math.round((Bv - A) * H) - 5, pad: short ? '3px 8px' : '6px 8px',
+          bg: EVC[k][0], fg: EVC[k][1], op: i < 2 || (i === 2 && Bv <= now) ? 0.4 : 1, border: note ? '1.5px dashed ' + L : 'none' };
+      }),
+    }));
+    const MEV = { 2: [['월세 650,000', 'pay']], 5: [['추석 연휴', 'p']], 7: [['프로젝트 킥오프', 'w']], 9: [['한글날', 'p']], 12: [['기획 리뷰', 'w'], ['PT', 'x']], 13: [['1:1 미팅', 'w'], ['저녁 · 친구', 'p']], 14: [['치과 15:00', 'n'], ['러닝 크루', 'x'], ['점심 · 성수', 'p'], ['스탠드업', 'w']], 15: [['분기 보고 회의', 'w'], ['넷플릭스 17,000', 'pay'], ['외부 미팅', 'w']], 16: [['회식 · 을지로', 'p'], ['팀 점심', 'p']], 17: [['전시 관람', 'p']], 18: [['가족 브런치', 'p']], 21: [['통신비 59,000', 'pay']], 22: [['제주 여행', 'p']], 23: [['제주 여행', 'p']], 24: [['제주 여행', 'p']], 28: [['건강검진', 'p']], 30: [['월말 정산', 'w']] };
+    const MWX = { 14: '비 60%', 15: '비 80%', 16: '17°', 17: '18°', 18: '19°', 19: '18°', 20: '16°' };
+    const month = Array.from({ length: 35 }, (_, i) => {
+      const d = i - 2, inM = d >= 1 && d <= 31, num = inM ? d : d < 1 ? 30 + d : d - 31, evs = inM ? (MEV[d] || []) : [];
+      return { num: String(num), op: inM ? (d < 14 ? 0.6 : 1) : 0.25, bg: d === 14 ? '#1c1c20' : '#161618', border: d === 14 ? '1px solid ' + L : '1px solid transparent',
+        numBg: d === 14 ? L : 'transparent', numFg: d === 14 ? '#0b0b0c' : '#f2f2f3', wx: inM ? (MWX[d] || '') : '', wxColor: (MWX[d] || '').startsWith('비') ? 'oklch(0.75 0.12 230)' : '#8d8d94',
+        events: evs.slice(0, 3).map(([label, k]) => k === 'pay' ? { label, bg: 'transparent', fg: '#d6d6da', border: '1px solid #3a3a40' } : { label, bg: EVC[k][0], fg: EVC[k][1], border: '1px solid transparent' }),
+        more: evs.length > 3 ? `+${evs.length - 3}개` : '' };
+    });
+    const txF = TX.filter(x => s.txType === 'all' || x[5] === s.txType);
+    const grp = {}; txF.forEach(x => (grp[x[0]] = grp[x[0]] || []).push(x));
+    const sumOf = (k) => txF.filter(x => x[5] === k).reduce((a, x) => a + x[4], 0);
+    const CATS = [['주거', 650000], ['식비', 482000], ['쇼핑', 214000], ['교통', 128400], ['문화', 96000], ['기타', 71900]];
+    let acc = 0; const donut = 'conic-gradient(' + CATS.map(([n, v]) => { const a = acc; acc += v / 1642300 * 100; return `${CATC[n]} ${a}% ${acc}%`; }).join(',') + ')';
+    const BUD = [['식비', 482000, 550000], ['쇼핑', 214000, 200000], ['교통', 128400, 150000], ['문화', 96000, 150000], ['기타', 71900, 150000]];
+    const notisRaw = [['예산', '쇼핑 예산을 초과했어요', '214,000 / 200,000원 · 107%', '12:45', R, '#1a0d0a'], ['우천', '오늘 19시 비 60% 예보', '러닝 크루 · 한강 반포 (야외 일정)', '07:00', B, '#0b0b0c'], ['결제', '내일 넷플릭스 결제 예정', '17,000원 · 신한카드', '어제 20:00', '#d6d6da', '#0b0b0c'], ['할일', '관리비 이체 기한이 지났어요', '어제 마감 · 상', '어제 09:00', R, '#1a0d0a'], ['일정', '1:1 미팅 10분 전', '11:00 · 회의실 B', '화 10:50', P, '#fff'], ['동기화', 'Google 캘린더 동기화 완료', '새 일정 3개 · 변경 1개', '월 09:12', '#3a3a40', '#f2f2f3']];
+    const NS = [['ev', '일정 시작', '기본 10분 전 · 일정별 변경 가능'], ['todo', '할일 마감', '마감 당일 09:00'], ['budget', '예산 80% · 100% 도달', '총예산과 카테고리 예산'], ['pay', '결제 예정', '고정지출 결제 하루 전 20:00'], ['rain', '우천 예보', '위치 있는 일정 · 강수확률 60% 이상'], ['sync', '동기화 오류', '토큰 만료 · 권한 철회 시 재연결 안내']];
+    const SETT = [['profile', '프로필 · 화면', ''], ['cats', '카테고리 · 태그', ''], ['noti', '알림', ''], ['google', 'Google 캘린더', '연결됨'], ['weather', '날씨', ''], ['mcp', 'MCP 연결', '2개'], ['backup', '백업 · 내보내기', '']];
+    const sc = (v) => v === 'rw' ? ['읽기·쓰기', L] : v === 'r' ? ['읽기', '#b4b4ba'] : ['없음', '#55555c'];
+    const TOK = [['Claude 데스크톱', 'lm_••••3f9a · 9/02 발급', 'rw', 'rw', 'rw', '12:41', 0], ['Claude 모바일', 'lm_••••a71c · 9/20 발급', 'r', 'r', 'rw', '어제 21:08', 0], ['테스트용', 'lm_••••0be2 · 8/11 폐기', 'r', 'none', 'none', '8/11', 1]];
+    const LOGS = [['12:41', 'add_transaction', '점심 12,000원 · 식비 · 신한카드', 'ok'], ['08:52', 'create_event', '치과 정기검진 10/14 15:00', 'ok'], ['08:51', 'find_free_time', '10/14 · 60분', 'ok'], ['08:50', 'get_today_overview', '오늘', 'ok'], ['08:49', 'get_weather', '서울', 'ok'], ['08:47', 'add_transaction', '카테고리 "간식" 모호 → 후보 반환', 'err']];
+    const unread = s.read ? 0 : 3;
+    return {
+      isLogin: pg === 'login', isApp: pg !== 'login',
+      goDash: this.go('dash'), goCal: this.go('cal'), goTodo: this.go('todo'), goLedger: this.go('ledger'), goSearch: this.go('search'), goNoti: this.go('noti'), goLogin: this.go('login'),
+      nav: NAV.map(([k, label]) => ({ label, onClick: this.go(k), bg: pg === k ? '#fff' : '#1c1c1f', fg: pg === k ? '#000' : '#b4b4ba', fw: pg === k ? 600 : 400 })),
+      hasUnread: unread > 0, unreadCount: String(unread), unreadText: unread ? `읽지 않음 ${unread}` : '모두 읽음', readAll: () => this.setState({ read: true }),
+      isDash: pg === 'dash', isCal: pg === 'cal', isTodo: pg === 'todo', isLedger: pg === 'ledger', isNoti: pg === 'noti', isSearch: pg === 'search', isSettings: pg === 'settings',
+      dashTodos: dashT, dashDone: String(dashT.filter(t => st[t.id] === 'done').length),
+      heat: (() => { const pal = ['#221d33', '#2a2340', '#4b3aa0', '#7350e6', '#a68cf5']; const m = [[2,1,1,3,1,0,0],[1,2,3,2,3,0,0],[1,3,2,3,3,1,0],[2,2,4,3,2,0,1],[1,1,1,2,4,2,1],[0,1,2,1,2,3,2]]; return ['09시','12시','15시','17시','19시','21시'].map((label, i) => ({ label, cells: m[i].map(v => pal[v]) })); })(),
+      recentTx: TX.slice(0, 5).map(([, memo, cat, , amt, type]) => ({ memo, cat, color: CATC[cat], amt: (type === 'inc' ? '+' : type === 'tr' ? '' : '−') + fmt(amt), amtColor: type === 'inc' ? L : '#f2f2f3' })),
+      summaryOpen: s.summaryOpen, summaryLabel: s.summaryOpen ? '접기 ⌄' : '펼치기 ⌃', toggleSummary: () => this.setState(x => ({ summaryOpen: !x.summaryOpen })),
+      workDays: [
+        ['월', '10/12', 2, [['09:30', '스탠드업'], ['14:00', '기획 리뷰']], [['✓ 기획 리뷰 자료 정리', 1], ['✓ 경비 정산 제출', 1]]],
+        ['화', '10/13', 1.5, [['09:30', '스탠드업'], ['11:00', '1:1 미팅']], [['관리비 이체 · 초과', 2]]],
+        ['수', '10/14', 0.5, [['09:30', '스탠드업'], ['13:40–', '집중 작업 가능']], [['분기 보고서 초안 · 오늘', 3]]],
+        ['목', '10/15', 3.5, [['09:30', '스탠드업'], ['10:00', '분기 보고 회의'], ['16:00', '외부 미팅 · 판교']], [['회의 자료 출력', 0]]],
+        ['금', '10/16', 0.5, [['09:30', '스탠드업']], [['세금계산서 발행', 0], ['주간 회고 작성', 0]]],
+        ['토', '10/17', 0, [], [['업무 없음', 4]]], ['일', '10/18', 0, [], [['업무 없음', 4]]],
+      ].map(([dow, date, h, items, todos], i) => ({ dow, date, hours: h ? h + 'h' : '휴무', hoursColor: i === 2 ? L : '#b4b4ba', bar: Math.round(h / 3.5 * 100), barColor: i === 2 ? L : P,
+        bg: i === 2 ? '#202025' : '#1b1b1f', border: i === 2 ? '1px solid ' + L : '1px solid transparent', op: i > 4 ? 0.55 : 1,
+        items: items.map(([time, title]) => ({ time, title, op: i < 2 || (i === 2 && time === '09:30') ? 0.5 : 1 })),
+        todos: todos.map(([label, k]) => ({ label, color: ['#d6d6da', '#8d8d94', R, L, '#6c6c73'][k] })) })),
+      calTitle: s.calView === 'week' ? '10월 12일 – 18일' : '2026년 10월', calSub: s.calView === 'week' ? '42주차' : '일정 31개',
+      calTabs: seg([['week', '주간'], ['month', '월간']], s.calView, v => this.setState({ calView: v })),
+      isWeek: s.calView === 'week', isMonth: s.calView === 'month', week, month,
+      hours: ['08','09','10','11','12','13','14','15','16','17','18','19','20','21'],
+      todoTitle: FL.find(f => f[0] === s.todoFilter)[1],
+      todoViewTabs: seg([['list', '목록'], ['kanban', '칸반']], s.todoView, v => this.setState({ todoView: v })),
+      isTodoList: s.todoView === 'list', isKanban: s.todoView === 'kanban',
+      todoFilters: FL.map(([k, label]) => ({ label, count: String(TODOS.filter(filt[k]).length), onClick: () => this.setState({ todoFilter: k }), rowBg: s.todoFilter === k ? '#1c1c1f' : 'transparent', rowFg: s.todoFilter === k ? '#fff' : '#b4b4ba', countColor: k === 'overdue' ? R : '#6c6c73' })),
+      projects: Object.keys(PROJ).map(name => ({ name, color: PROJ[name], count: String(TODOS.filter(t => t.proj === name && st[t.id] !== 'done').length) })),
+      todoList, todoEmpty: todoList.length === 0,
+      sel: { ...selT, items: selT.items.length ? selT.items.map(([text, d]) => ({ text, mark: d ? '✓' : '', color: d ? '#6c6c73' : '#f2f2f3' })) : [{ text: '체크리스트 없음', mark: '', color: '#6c6c73' }], notes: selT.notes || '메모 없음' },
+      kanban: [['todo', '대기', '#8d8d94'], ['doing', '진행 중', P], ['done', '완료', L]].map(([k, name, color]) => { const cards = TODOS.filter(t => st[t.id] === k).map(t => this.todoRow(t)); return { name, color, count: String(cards.length), cards }; }),
+      ledgerTabs: seg([['list', '내역'], ['stats', '통계'], ['budget', '예산'], ['recurring', '고정지출'], ['accounts', '계좌']], s.ledTab, v => this.setState({ ledTab: v })),
+      isLedList: s.ledTab === 'list', isLedStats: s.ledTab === 'stats', isLedBudget: s.ledTab === 'budget', isLedRecurring: s.ledTab === 'recurring', isLedAccounts: s.ledTab === 'accounts',
+      txTypeTabs: [['all', '전체'], ['exp', '지출'], ['inc', '수입'], ['tr', '이체']].map(([k, label]) => ({ label, onClick: () => this.setState({ txType: k }), bg: s.txType === k ? '#fff' : '#1c1c1f', fg: s.txType === k ? '#000' : '#b4b4ba', fw: s.txType === k ? 600 : 400 })),
+      txSum: { inc: fmt(sumOf('inc')) + '원', exp: fmt(sumOf('exp')) + '원', count: String(txF.length), net: (sumOf('inc') - sumOf('exp') >= 0 ? '+' : '−') + fmt(Math.abs(sumOf('inc') - sumOf('exp'))) + '원' },
+      txGroups: Object.entries(grp).map(([label, rows]) => ({ label, total: '지출 ' + fmt(rows.filter(x => x[5] === 'exp').reduce((a, x) => a + x[4], 0)),
+        rows: rows.map(([, memo, cat, acct, amt, type, badge]) => ({ memo, cat, acct, badge: badge ? '· ' + badge + '에서 기록' : '', color: CATC[cat], amt: (type === 'inc' ? '+' : type === 'tr' ? '⇄ ' : '−') + fmt(amt), amtColor: type === 'inc' ? L : type === 'tr' ? '#8d8d94' : '#f2f2f3' })) })),
+      donut, cats: CATS.map(([name, v]) => ({ name, color: CATC[name], amt: fmt(v), pct: (v / 1642300 * 100).toFixed(1) + '%' })),
+      monthly: [['5월', 171], ['6월', 158], ['7월', 192], ['8월', 214], ['9월', 176], ['10월', 164]].map(([label, v], i) => ({ label, val: String(v), h: Math.round(v / 214 * 85), bg: i === 5 ? L : i === 3 ? P : '#2e2a40', labelColor: i === 5 ? L : '#b4b4ba' })),
+      budgets: BUD.map(([name, used, limit]) => { const p = used / limit * 100; return { name, color: CATC[name], used: fmt(used), limit: fmt(limit), pct: Math.round(p) + '%', w: Math.min(100, p),
+        bar: p >= 100 ? R : p >= 80 ? L : P, tagBg: p >= 100 ? R : p >= 80 ? L : '#2a2a2e', tagFg: p >= 80 ? '#0b0b0c' : '#d6d6da',
+        note: p >= 100 ? `${fmt(used - limit)}원 초과` : p >= 80 ? '80% 도달 · 알림 보냄' : `${fmt(limit - used)}원 남음`, noteColor: p >= 100 ? R : p >= 80 ? L : '#8d8d94' }; }),
+      recurring: [['넷플릭스', '매월 15일', '10/15', '신한카드', 17000, '문화', 1, '내일'], ['통신비', '매월 21일', '10/21', '신한카드', 59000, '기타', 1], ['월세', '매월 1일', '11/01', '신한은행', 650000, '주거', 1], ['유튜브 프리미엄', '매월 3일', '11/03', '신한카드', 14900, '문화', 1], ['헬스장', '매월 5일', '11/05', '카카오뱅크', 66000, '기타', 1], ['클라우드 저장소', '매년 3월 2일', '2027/03/02', '신한카드', 29000, '기타', 0]]
+        .map(([name, cycle, next, acct, amt, cat, on, soon]) => ({ name, cycle, next, acct, amt: fmt(amt), color: CATC[cat], soon: soon || '', op: on ? 1 : 0.5, tgBg: on ? L : '#3a3a40', tgX: on ? '20px' : '2px' })),
+      accounts: [['은행', '주거래', '신한은행', 2840000, P, '#fff'], ['은행', '비상금', '카카오뱅크', 1712500, '#1c1c20', '#f2f2f3'], ['현금', '지갑', '현금', 128000, '#1c1c20', '#f2f2f3'], ['카드', '10월 사용 · 11/14 결제', '신한카드', -555200, L, '#0b0b0c']]
+        .map(([type, sub, name, bal, bg, fg]) => ({ type, sub, name, bg, fg, bal: (bal < 0 ? '−' : '') + fmt(Math.abs(bal)) + '원' })),
+      notis: notisRaw.map(([type, title, body, time, bg, fg], i) => { const un = !s.read && i < 3; return { type, title, body, time, bg, fg, op: un ? 1 : 0.6, dot: un ? L : 'transparent' }; }),
+      setTabs: SETT.map(([k, label, tag]) => ({ label, tag, onClick: () => this.setState({ setTab: k }), rowBg: s.setTab === k ? '#1c1c1f' : 'transparent', rowFg: s.setTab === k ? '#fff' : '#b4b4ba' })),
+      isSetProfile: s.setTab === 'profile', isSetCats: s.setTab === 'cats', isSetNoti: s.setTab === 'noti', isSetGoogle: s.setTab === 'google', isSetWeather: s.setTab === 'weather', isSetMcp: s.setTab === 'mcp', isSetBackup: s.setTab === 'backup',
+      notiSettings: NS.map(([k, label, desc]) => ({ label, desc, tgBg: s.noti[k] ? L : '#3a3a40', tgX: s.noti[k] ? '23px' : '3px', toggle: () => this.setState(x => ({ noti: { ...x.noti, [k]: !x.noti[k] } })) })),
+      gdirTabs: seg([['import', '가져오기만'], ['both', '양방향']], s.gdir, v => this.setState({ gdir: v })),
+      gdirDesc: s.gdir === 'import' ? 'Google 일정을 앱으로 가져오기만 합니다. 앱에서 만든 일정은 Google에 반영되지 않습니다.' : '앱에서 만들고 수정·삭제한 일정도 Google에 반영합니다. Google 일정 삭제 시 확인 창을 띄웁니다.',
+      tokens: TOK.map(([name, hint, a, b, c, last, rev]) => { const [s1, c1] = sc(a), [s2, c2] = sc(b), [s3, c3] = sc(c); return { name, hint, s1, c1, s2, c2, s3, c3, last, op: rev ? 0.45 : 1, act: rev ? '폐기됨' : '폐기', actColor: rev ? '#6c6c73' : R }; }),
+      mcpLogs: LOGS.map(([time, tool, input, stt]) => ({ time, tool, input, color: tool.startsWith('get') || tool.startsWith('find') || tool.startsWith('list') ? '#b4b4ba' : 'oklch(0.78 0.15 290)', status: stt === 'ok' ? '성공' : '오류', stColor: stt === 'ok' ? '#8d8d94' : R })),
+      quickOpen: !!s.quick, closeQuick: () => this.setState({ quick: null }), stop: (e) => e.stopPropagation(),
+      openQuickTx: () => this.setState({ quick: 'tx' }), openQuickEv: () => this.setState({ quick: 'ev' }), openQuickTodo: () => this.setState({ quick: 'todo' }),
+      quickTabs: seg([['tx', '지출'], ['ev', '일정'], ['todo', '할일']], s.quick, v => this.setState({ quick: v })),
+      ...(() => {
+        const freq = s.repFreq || 'none', days = s.repDays || [1, 3], end = s.repEnd || 'date';
+        const F = [['none', '안 함'], ['daily', '매일'], ['weekly', '매주'], ['monthly', '매월'], ['yearly', '매년']];
+        const DN = ['월', '화', '수', '목', '금', '토', '일'];
+        const base = { daily: '매일', weekly: '매주 ' + (days.length ? [...days].sort().map(i => DN[i]).join('·') : '요일 선택'), monthly: s.allDay ? '매월 17일' : '매월 15일', yearly: s.allDay ? '매년 10월 17일' : '매년 10월 15일' }[freq];
+        const endTxt = { never: '계속', date: '2026년 12월 31일까지', count: '10회' }[end];
+        return {
+          repTabs: F.map(([k, label]) => ({ label, onClick: () => this.setState({ repFreq: k }), bg: freq === k ? '#fff' : '#202024', fg: freq === k ? '#000' : '#d6d6da', fw: freq === k ? 600 : 400 })),
+          repWeekly: freq === 'weekly', repOn: freq !== 'none',
+          repDays: DN.map((label, i) => { const on = days.includes(i); return { label, bg: on ? L : '#202024', fg: on ? '#0b0b0c' : '#b4b4ba', fw: on ? 700 : 400, onClick: () => this.setState({ repDays: on ? days.filter(x => x !== i) : [...days, i] }) }; }),
+          repEndTabs: seg([['never', '없음'], ['date', '날짜'], ['count', '횟수']], end, v => this.setState({ repEnd: v })),
+          repEndValue: end === 'never' ? '종료 없음' : end === 'date' ? '2026. 12. 31' : '10회 반복',
+          repSummary: freq === 'none' ? '반복 안 함' : base + ' · ' + endTxt,
+        };
+      })(),
+      allDayOn: !!s.allDay, allDayOff: !s.allDay, toggleAllDay: () => this.setState(x => ({ allDay: !x.allDay })), adBg: s.allDay ? L : '#3a3a40', adX: s.allDay ? '23px' : '3px', allDayHint: s.allDay ? '시간 없이 날짜만 · 여러 날 가능' : '시간을 지정하는 일정', evTitle: s.allDay ? '가족 여행 · 가평' : '치과 정기검진', evPlace: s.allDay ? '가평 펜션' : '강남역 3번 출구',
+      qTx: s.quick === 'tx', qEv: s.quick === 'ev', qTodo: s.quick === 'todo',
+    };
+  }
+}
+</script>
+</body>
+</html>
