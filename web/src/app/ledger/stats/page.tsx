@@ -1,5 +1,5 @@
-import { PagePlaceholder } from "@/components/layout/PagePlaceholder";
+import { LedgerStats } from "@/features/ledger/components/LedgerStats";
 
 export default function Page() {
-  return <PagePlaceholder title="통계" />;
+  return <LedgerStats />;
 }

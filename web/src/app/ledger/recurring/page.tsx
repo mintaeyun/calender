@@ -1,5 +1,5 @@
-import { PagePlaceholder } from "@/components/layout/PagePlaceholder";
+import { LedgerRecurring } from "@/features/ledger/components/LedgerRecurring";
 
 export default function Page() {
-  return <PagePlaceholder title="고정지출 · 구독" />;
+  return <LedgerRecurring />;
 }
