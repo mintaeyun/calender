@@ -6,9 +6,16 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "db:start": "supabase start --workdir ..",
+    "db:reset": "supabase db reset --workdir ..",
+    "db:types": "node scripts/db-types.mjs",
+    "db:test": "supabase db query --local --workdir .. -f ../supabase/tests/rls.sql"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.117.3",
+    "@tanstack/react-query": "^5.104.2",
     "next": "^15.5.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
@@ -18,6 +25,7 @@
     "@types/node": "^22.0.0",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
+    "supabase": "^2.120.0",
     "tailwindcss": "^4.1.0",
     "typescript": "^5.7.0"
   }

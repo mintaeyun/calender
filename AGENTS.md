@@ -4,11 +4,14 @@ AI 코딩 에이전트(Claude Code, Codex 등)가 이 저장소에서 작업할 
 
 ## 프로젝트 상태
 
-기획 단계 + 프론트엔드 목업. 문서 2개와 `web/`(Next.js 프론트엔드)가 있다. 백엔드(Supabase)는 아직 없고 `web/`은 샘플 데이터로 동작한다. git 저장소는 아니다.
+기획 문서 + 기반(스키마·인증·앱 셸) 구축 단계. `supabase/`(마이그레이션·RLS·테스트·Edge Function 공용 코드)와 `web/`(Next.js)가 있다. 각 영역 화면은 껍데기이며 기능은 영역별 세션이 채운다(진행 방식은 `docs/agents/00-overview.md`).
 
 - `design/` — Claude Design에서 내려받은 원본(`Life Manager App.dc.html`, `support.js`). 참고용이며 수정하지 않는다.
-- `web/` — 위 디자인을 옮긴 Next.js(App Router) + TypeScript 앱. 프레임워크는 Next.js로 확정(PRD §14-3). 화면은 `src/components/screens/`, 샘플 데이터는 `src/lib/data.ts`. 현재 스타일은 디자인과 같은 인라인 스타일이며 Tailwind는 설정만 되어 있다.
-- 명령(`web/`에서 실행): `npm run dev` 개발 서버, `npm run build` 빌드, `npm run lint` 타입 검사(`tsc --noEmit`). 테스트 도구는 아직 없다.
+- `web/` — 위 디자인을 옮긴 Next.js(App Router) + TypeScript 앱. 프레임워크는 Next.js로 확정(PRD §14-3). 라우트는 `src/app/`(미들웨어가 비로그인을 `/login`으로 보냄), 공통 레이아웃·빠른 추가 모달은 `src/components/layout/`, supabase 클라이언트·타입은 `src/lib/supabase/`, 시간 유틸 `src/lib/time.ts`, 프로필 훅 `src/lib/profile.ts`. 영역 코드는 `src/features/<영역>/`. 목업 화면(`src/components/screens/`)과 샘플 데이터(`src/lib/data.ts`)는 이식 참고용이며 이식하면서 지운다. 색은 `globals.css`의 CSS 변수/Tailwind 토큰(`bg-surface`, `text-lime` 등).
+- 명령(`web/`에서 실행): `npm run dev` 개발 서버, `npm run build` 빌드, `npm run lint` 타입 검사(`tsc --noEmit`).
+- DB 명령(`web/`에서 실행, Docker 필요): `npm run db:start`(로컬 Supabase 시작, 출력된 URL·anon key를 `web/.env.local`에 — 형식은 `web/.env.example`), `npm run db:reset`(마이그레이션 전체 재적용), `npm run db:types`(`database.types.ts` 재생성, 마이그레이션을 바꾸면 반드시 실행), `npm run db:test`(`supabase/tests/rls.sql`: RLS·제약·기본 데이터 검증).
+- 마이그레이션은 `supabase/migrations/`에 새 파일만 추가한다(`YYYYMMDDHHMMSS_<세션>_<설명>.sql`). 초기 스키마 `*_init_*`는 수정하지 않는다.
+- Google 로그인은 `supabase/config.toml`의 `[auth.external.google]`을 켜고 `supabase/.env`에 클라이언트 ID/secret을 넣어야 동작한다.
 
 - `PRD.md` — 요구사항(ID: AUTH-, DASH-, CAL-, TODO-, LED-, WX-, GCAL-, MCP-, NOTI-), P0/P1/P2 우선순위, 데이터 모델, 마일스톤(M1–M6), 오픈 이슈(§14)
 - `Sitemap.md` — 메뉴 구조와 기능 개요
