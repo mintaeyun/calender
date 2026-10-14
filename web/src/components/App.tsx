@@ -1,10 +1,10 @@
+// 레거시 목업 셸(더 이상 마운트되지 않음). 각 화면 이식이 끝나면 08 통합 세션이 삭제한다. Nav 타입은 screens/* 가 아직 참조한다.
 "use client";
 
 import { useState } from "react";
 import { P, TODOS } from "@/lib/data";
 import type { StatusMap } from "@/lib/todo";
 import { display } from "./ui";
-import { Login } from "./screens/Login";
 import { Dashboard } from "./screens/Dashboard";
 import { Calendar } from "./screens/Calendar";
 import { TodoScreen } from "./screens/Todo";
@@ -28,7 +28,6 @@ export function App() {
   const nav: Nav = { go: setPage, openQuick: setQuick };
   const unread = read ? 0 : 3;
 
-  if (page === "login") return <Login onEnter={() => setPage("dash")} />;
 
   return (
     <div style={{ minHeight: "100vh", background: "#000", color: "#f2f2f3" }}>
