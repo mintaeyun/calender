@@ -90,7 +90,7 @@ function Form() {
 
         {!configured && (
           <p role="alert" className="rounded-xl bg-surface-3 px-4 py-3 text-sm text-danger">
-            Supabase 환경변수(NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY)가 설정되지 않았습니다. web/.env.local 을 확인하세요.
+            Supabase 환경변수(NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY)가 설정되지 않았습니다. web/.env.local 을 확인하세요.
           </p>
         )}
 
