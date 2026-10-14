@@ -1,5 +1,10 @@
-import { PagePlaceholder } from "@/components/layout/PagePlaceholder";
+import { Suspense } from "react";
+import { LedgerList } from "@/features/ledger/components/LedgerList";
 
 export default function Page() {
-  return <PagePlaceholder title="가계부" />;
+  return (
+    <Suspense>
+      <LedgerList />
+    </Suspense>
+  );
 }

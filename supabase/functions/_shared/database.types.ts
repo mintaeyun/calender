@@ -59,6 +59,8 @@ export type Database = {
           month: string
           category_id: string | null
           amount: number
+          alerted_80_at: string | null
+          alerted_100_at: string | null
           created_at: string
           updated_at: string
         }
@@ -68,6 +70,8 @@ export type Database = {
           month: string
           category_id?: string | null
           amount: number
+          alerted_80_at?: string | null
+          alerted_100_at?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -77,6 +81,8 @@ export type Database = {
           month?: string
           category_id?: string | null
           amount?: number
+          alerted_80_at?: string | null
+          alerted_100_at?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -874,6 +880,7 @@ export type Database = {
           to_account_id: string | null
           memo: string | null
           recurring_id: string | null
+          source: string
           created_at: string
           updated_at: string
         }
@@ -888,6 +895,7 @@ export type Database = {
           to_account_id?: string | null
           memo?: string | null
           recurring_id?: string | null
+          source?: string
           created_at?: string
           updated_at?: string
         }
@@ -902,6 +910,7 @@ export type Database = {
           to_account_id?: string | null
           memo?: string | null
           recurring_id?: string | null
+          source?: string
           created_at?: string
           updated_at?: string
         }
@@ -979,6 +988,18 @@ export type Database = {
       }
     }
     Functions: {
+      budget_usage: {
+        Args: { p_user?: string; p_month?: string }
+        Returns: { category_id: string | null; budget: number; spent: number; ratio: number }[]
+      }
+      run_recurring_payments: {
+        Args: { p_today?: string }
+        Returns: number
+      }
+      next_pay_date: {
+        Args: { p_cycle: string; p_pay_day: number; p_pay_month: number; p_after: string }
+        Returns: string
+      }
       delete_my_account: {
         Args: never
         Returns: undefined
