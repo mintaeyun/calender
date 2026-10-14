@@ -12,6 +12,7 @@ AI 코딩 에이전트(Claude Code, Codex 등)가 이 저장소에서 작업할 
 - 테스트(`web/`에서 실행): `npm test` 전체(vitest), 단일 파일은 `npx vitest run src/features/calendar/lib/recurrence.test.ts`, 이름 필터는 `npx vitest run -t "이후 전체"`. 테스트는 `src/**/*.test.ts`(순수 로직 위주).
 - DB 명령(`web/`에서 실행, Docker 필요): `npm run db:start`(로컬 Supabase 시작, 출력된 URL·anon key를 `web/.env.local`에 — 형식은 `web/.env.example`), `npm run db:reset`(마이그레이션 전체 재적용), `npm run db:types`(`database.types.ts` 재생성, 마이그레이션을 바꾸면 반드시 실행), `npm run db:test`(`supabase/tests/rls.sql`: RLS·제약·기본 데이터 검증).
 - 단위 테스트(`web/`에서 실행, vitest): `npm test` 전체, `npx vitest run src/features/todo/lib/due.test.ts` 단일 파일, `npx vitest run -t "이름"` 단일 케이스. 순수 로직은 `features/<영역>/lib/*.test.ts`.
+- Edge Function 순수 로직 테스트(`web/`에서 실행, Deno 불필요): `npm run test:functions`(`supabase/functions/**/*.test.ts`). Edge 엔트리(`index.ts`)는 Deno 전용이라 Node에서 실행하지 않는다.
 - 마이그레이션은 `supabase/migrations/`에 새 파일만 추가한다(`YYYYMMDDHHMMSS_<세션>_<설명>.sql`). 초기 스키마 `*_init_*`는 수정하지 않는다.
 - Google 로그인은 `supabase/config.toml`의 `[auth.external.google]`을 켜고 `supabase/.env`에 클라이언트 ID/secret을 넣어야 동작한다.
 

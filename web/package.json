@@ -11,7 +11,8 @@
     "db:reset": "supabase db reset --workdir ..",
     "db:types": "node scripts/db-types.mjs",
     "db:test": "supabase db query --local --workdir .. -f ../supabase/tests/rls.sql",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:functions": "vitest run -c vitest.functions.config.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
