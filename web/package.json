@@ -10,7 +10,9 @@
     "db:start": "supabase start --workdir ..",
     "db:reset": "supabase db reset --workdir ..",
     "db:types": "node scripts/db-types.mjs",
-    "db:test": "supabase db query --local --workdir .. -f ../supabase/tests/rls.sql"
+    "db:test": "supabase db query --local --workdir .. -f ../supabase/tests/rls.sql",
+    "test": "vitest run",
+    "test:functions": "vitest run -c vitest.functions.config.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
@@ -27,6 +29,7 @@
     "@types/react-dom": "^19.1.0",
     "supabase": "^2.120.0",
     "tailwindcss": "^4.1.0",
-    "typescript": "^5.7.0"
+    "typescript": "^5.7.0",
+    "vitest": "^5.0.4"
   }
 }
