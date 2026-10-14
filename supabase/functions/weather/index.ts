@@ -6,37 +6,8 @@
 import { requireUser } from "../_shared/auth.ts";
 import { handleCors, json } from "../_shared/cors.ts";
 import { badRequest, errorResponse, HttpError } from "../_shared/errors.ts";
-import { adminClient } from "../_shared/supabase.ts";
-import { OpenMeteoProvider, type NormalizedForecast, type WeatherProvider } from "./provider.ts";
-import { getForecast, WeatherUnavailable, type CacheStore } from "./service.ts";
-
-export function createProvider(): WeatherProvider {
-  const name = Deno.env.get("WEATHER_PROVIDER") ?? "open-meteo";
-  switch (name) {
-    case "open-meteo":
-      return new OpenMeteoProvider();
-    default:
-      // 기상청 등은 WeatherProvider 구현체를 추가하고 여기에 등록한다.
-      throw new Error(`지원하지 않는 WEATHER_PROVIDER: ${name}`);
-  }
-}
-
-export function dbCacheStore(): CacheStore {
-  const db = adminClient();
-  return {
-    async get(key) {
-      const { data, error } = await db.from("weather_cache").select("payload, fetched_at").eq("location_key", key).maybeSingle();
-      if (error) throw error;
-      return data ? { payload: data.payload as unknown as NormalizedForecast, fetched_at: data.fetched_at } : null;
-    },
-    async put(key, payload, fetchedAt) {
-      const { error } = await db
-        .from("weather_cache")
-        .upsert({ location_key: key, payload: payload as never, fetched_at: fetchedAt }, { onConflict: "location_key" });
-      if (error) throw error;
-    },
-  };
-}
+import { createProvider, dbCacheStore } from "./deps.ts";
+import { getForecast, WeatherUnavailable } from "./service.ts";
 
 const num = (v: string | null, min: number, max: number, name: string) => {
   const n = Number(v);
@@ -62,9 +33,7 @@ Deno.serve(async (req) => {
     const lon = num(url.searchParams.get("lon"), -180, 180, "lon");
     return json(await getForecast({ provider, store: dbCacheStore() }, lat, lon));
   } catch (e) {
-    if (e instanceof WeatherUnavailable) {
-      return errorResponse(new HttpError(503, e.code, e.message));
-    }
+    if (e instanceof WeatherUnavailable) return errorResponse(new HttpError(503, e.code, e.message));
     return errorResponse(e);
   }
 });
