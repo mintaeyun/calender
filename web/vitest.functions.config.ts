@@ -5,5 +5,6 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   root: "../supabase/functions",
   cacheDir: fileURLToPath(new URL("./node_modules/.vite-functions", import.meta.url)),
+  resolve: { alias: { "@": fileURLToPath(new URL("./src", import.meta.url)), rrule: fileURLToPath(new URL("./node_modules/rrule", import.meta.url)) } },
   test: { include: ["**/*.test.ts"] },
 });
