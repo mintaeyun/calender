@@ -2,7 +2,7 @@
 // "오늘" 판정에만 사용자 시간대를 쓴다.
 
 export type TodoStatus = "todo" | "doing" | "done";
-export type Priority = "high" | "mid" | "low";
+export type Priority = "high" | "medium" | "low";
 export type DueKind = "over" | "today" | "later" | "none" | "past";
 export type TodoFilter = "today" | "upcoming" | "overdue" | "all" | "done";
 export type TodoSort = "due" | "priority" | "created";
@@ -36,7 +36,7 @@ export function matchesFilter(t: DueFields, filter: TodoFilter, today: string): 
   }
 }
 
-const PRI_RANK: Record<Priority, number> = { high: 0, mid: 1, low: 2 };
+const PRI_RANK: Record<Priority, number> = { high: 0, medium: 1, low: 2 };
 
 /** 정렬 비교 함수. 마감 없음은 뒤로. 같은 키면 마감 → 우선순위 → 생성일 순. */
 export function compareTodos(sort: TodoSort) {

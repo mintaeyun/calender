@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { addDays, compareTodos, dueKind, dueLabel, matchesFilter, todayIn, type SortFields } from "./due";
 
 const T = "2026-10-14";
-const mk = (o: Partial<SortFields>): SortFields => ({ due_date: null, status: "todo", priority: "mid", created_at: "2026-10-01T00:00:00Z", ...o });
+const mk = (o: Partial<SortFields>): SortFields => ({ due_date: null, status: "todo", priority: "medium", created_at: "2026-10-01T00:00:00Z", ...o });
 
 describe("todayIn", () => {
   it("UTC 15:30은 서울에서는 다음 날", () => {

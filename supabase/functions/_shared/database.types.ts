@@ -815,6 +815,7 @@ export type Database = {
           status: string
           completed_at: string | null
           recurrence_rule: string | null
+          recurrence_source_id: string | null
           position: number
           deleted_at: string | null
           created_at: string
@@ -831,6 +832,7 @@ export type Database = {
           status?: string
           completed_at?: string | null
           recurrence_rule?: string | null
+          recurrence_source_id?: string | null
           position?: number
           deleted_at?: string | null
           created_at?: string
@@ -847,6 +849,7 @@ export type Database = {
           status?: string
           completed_at?: string | null
           recurrence_rule?: string | null
+          recurrence_source_id?: string | null
           position?: number
           deleted_at?: string | null
           created_at?: string
@@ -979,6 +982,10 @@ export type Database = {
       }
     }
     Functions: {
+      complete_todo: {
+        Args: { p_id: string; p_next_due?: string; p_next_rule?: string; p_user?: string }
+        Returns: string
+      }
       delete_my_account: {
         Args: never
         Returns: undefined

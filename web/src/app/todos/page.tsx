@@ -1,5 +1,5 @@
-import { PagePlaceholder } from "@/components/layout/PagePlaceholder";
+import { TodoPage } from "@/features/todo/components/TodoPage";
 
 export default function Page() {
-  return <PagePlaceholder title="할일" />;
+  return <TodoPage />;
 }
