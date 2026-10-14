@@ -7,7 +7,52 @@
   font-display: swap;
 }
 
+/* 색 토큰. 값은 디자인 목업(lib/data.ts)과 동일. 다크 우선이며 라이트(P1)는 아래 [data-theme="light"]에서 덮어쓴다. */
+:root {
+  --lime: oklch(0.9 0.19 125);      /* 포인트 */
+  --purple: oklch(0.55 0.22 290);   /* 업무 */
+  --danger: oklch(0.75 0.16 25);    /* 경고·초과 */
+  --sky: oklch(0.7 0.12 230);       /* 운동·날씨 */
+
+  --bg: #000;
+  --surface: #1a1a1d;
+  --surface-2: #1c1c1f;
+  --surface-3: #202024;
+  --border: #26262a;
+  --fg: #f2f2f3;
+  --fg-muted: #b4b4ba;
+  --fg-subtle: #8d8d94;
+}
+
+/* TODO(P1, SET-1): 라이트 테마 값. 현재는 구조만 둔다. */
+[data-theme="light"] {
+  --bg: #fff;
+  --surface: #f4f4f6;
+  --surface-2: #ececef;
+  --surface-3: #e4e4e8;
+  --border: #d8d8dd;
+  --fg: #0b0b0c;
+  --fg-muted: #4a4a52;
+  --fg-subtle: #6c6c73;
+}
+
+@theme inline {
+  --color-lime: var(--lime);
+  --color-purple: var(--purple);
+  --color-danger: var(--danger);
+  --color-sky: var(--sky);
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-border: var(--border);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-fg-subtle: var(--fg-subtle);
+  --font-display: "YeogiOttaeJalnan", Pretendard, sans-serif;
+}
+
 * { box-sizing: border-box; }
-body { margin: 0; background: #000; color: #f2f2f3; font-family: Pretendard, "Noto Sans KR", sans-serif; }
-a { color: oklch(0.9 0.19 125); text-decoration: none; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: Pretendard, "Noto Sans KR", sans-serif; }
+a { color: var(--lime); text-decoration: none; }
 a:hover { text-decoration: underline; }

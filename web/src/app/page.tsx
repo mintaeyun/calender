@@ -1,5 +1,5 @@
-import { App } from "@/components/App";
+import { PagePlaceholder } from "@/components/layout/PagePlaceholder";
 
 export default function Page() {
-  return <App />;
+  return <PagePlaceholder title="대시보드" />;
 }
