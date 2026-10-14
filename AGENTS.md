@@ -9,6 +9,7 @@ AI 코딩 에이전트(Claude Code, Codex 등)가 이 저장소에서 작업할 
 - `design/` — Claude Design에서 내려받은 원본(`Life Manager App.dc.html`, `support.js`). 참고용이며 수정하지 않는다.
 - `web/` — 위 디자인을 옮긴 Next.js(App Router) + TypeScript 앱. 프레임워크는 Next.js로 확정(PRD §14-3). 라우트는 `src/app/`(미들웨어가 비로그인을 `/login`으로 보냄), 공통 레이아웃·빠른 추가 모달은 `src/components/layout/`, supabase 클라이언트·타입은 `src/lib/supabase/`, 시간 유틸 `src/lib/time.ts`, 프로필 훅 `src/lib/profile.ts`. 영역 코드는 `src/features/<영역>/`. 목업 화면(`src/components/screens/`)과 샘플 데이터(`src/lib/data.ts`)는 이식 참고용이며 이식하면서 지운다. 색은 `globals.css`의 CSS 변수/Tailwind 토큰(`bg-surface`, `text-lime` 등).
 - 명령(`web/`에서 실행): `npm run dev` 개발 서버, `npm run build` 빌드, `npm run lint` 타입 검사(`tsc --noEmit`).
+- 테스트(`web/`에서 실행): `npm test` 전체(vitest), 단일 파일은 `npx vitest run src/features/calendar/lib/recurrence.test.ts`, 이름 필터는 `npx vitest run -t "이후 전체"`. 테스트는 `src/**/*.test.ts`(순수 로직 위주).
 - DB 명령(`web/`에서 실행, Docker 필요): `npm run db:start`(로컬 Supabase 시작, 출력된 URL·anon key를 `web/.env.local`에 — 형식은 `web/.env.example`), `npm run db:reset`(마이그레이션 전체 재적용), `npm run db:types`(`database.types.ts` 재생성, 마이그레이션을 바꾸면 반드시 실행), `npm run db:test`(`supabase/tests/rls.sql`: RLS·제약·기본 데이터 검증).
 - 마이그레이션은 `supabase/migrations/`에 새 파일만 추가한다(`YYYYMMDDHHMMSS_<세션>_<설명>.sql`). 초기 스키마 `*_init_*`는 수정하지 않는다.
 - Google 로그인은 `supabase/config.toml`의 `[auth.external.google]`을 켜고 `supabase/.env`에 클라이언트 ID/secret을 넣어야 동작한다.
