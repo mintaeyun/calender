@@ -821,6 +821,7 @@ export type Database = {
           status: string
           completed_at: string | null
           recurrence_rule: string | null
+          recurrence_source_id: string | null
           position: number
           deleted_at: string | null
           created_at: string
@@ -837,6 +838,7 @@ export type Database = {
           status?: string
           completed_at?: string | null
           recurrence_rule?: string | null
+          recurrence_source_id?: string | null
           position?: number
           deleted_at?: string | null
           created_at?: string
@@ -853,6 +855,7 @@ export type Database = {
           status?: string
           completed_at?: string | null
           recurrence_rule?: string | null
+          recurrence_source_id?: string | null
           position?: number
           deleted_at?: string | null
           created_at?: string
@@ -998,6 +1001,10 @@ export type Database = {
       }
       next_pay_date: {
         Args: { p_cycle: string; p_pay_day: number; p_pay_month: number; p_after: string }
+        Returns: string
+      }
+      complete_todo: {
+        Args: { p_id: string; p_next_due?: string; p_next_rule?: string; p_user?: string }
         Returns: string
       }
       delete_my_account: {
