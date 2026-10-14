@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import type { Database } from "./database.types";
+import { SUPABASE_KEY, SUPABASE_URL } from "./env";
 
 /** 로그인 없이 접근할 수 있는 경로 */
 const PUBLIC_PATHS = ["/login", "/auth"];
@@ -13,8 +14,8 @@ const isPublic = (path: string) => PUBLIC_PATHS.some((p) => path === p || path.s
  */
 export async function updateSession(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const url = SUPABASE_URL;
+  const key = SUPABASE_KEY;
 
   const redirect = (to: string) => {
     const dest = request.nextUrl.clone();
