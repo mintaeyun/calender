@@ -4,6 +4,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { useProfile, useTimezone } from "@/lib/profile";
+import { useDailyWeather } from "@/features/weather/hooks";
+import { ICON_EMOJI } from "@/features/weather/lib/format";
 import { formatDateKo, formatTime, todayKey, zonedToUtc } from "@/lib/time";
 import {
   eventsQueryOptions, useCalendars, useEventMutations, useEvents, useRecurringPayments, useTodoDeadlines,
@@ -19,19 +21,20 @@ import { Modal, ScopeDialog, btnGhost } from "./Dialogs";
 import { EventDialog } from "./EventDialog";
 import { MonthView, type DayMarker } from "./MonthView";
 import { TimeGrid } from "./TimeGrid";
+import { SearchPanel } from "./SearchPanel";
 
 const VIEWS: [ViewKind, string][] = [["day", "일간"], ["week", "주간"], ["month", "월간"]];
 const OVERLAY_KEY = "calendar.overlays";
-type Overlays = { todo: boolean; pay: boolean };
+type Overlays = { todo: boolean; pay: boolean; weather: boolean };
 
 function readOverlays(): Overlays {
   try {
     const v = JSON.parse(localStorage.getItem(OVERLAY_KEY) ?? "null");
-    if (v && typeof v.todo === "boolean" && typeof v.pay === "boolean") return v;
+    if (v && typeof v.todo === "boolean" && typeof v.pay === "boolean") return { todo: v.todo, pay: v.pay, weather: v.weather !== false };
   } catch {
     /* 저장소를 못 쓰는 환경 */
   }
-  return { todo: true, pay: true };
+  return { todo: true, pay: true, weather: true };
 }
 
 type Editing = { instance?: EventInstance; defaultStart?: Date } | null;
@@ -83,7 +86,7 @@ export function CalendarScreen() {
   }, []);
 
   // 오버레이 토글 (localStorage 는 마운트 후에만 읽어 하이드레이션 불일치를 피한다)
-  const [overlays, setOverlays] = useState<Overlays>({ todo: true, pay: true });
+  const [overlays, setOverlays] = useState<Overlays>({ todo: true, pay: true, weather: true });
   useEffect(() => setOverlays(readOverlays()), []);
   const toggleOverlay = (k: keyof Overlays) =>
     setOverlays((cur) => {
@@ -108,6 +111,21 @@ export function CalendarScreen() {
     return map;
   }, [overlays, todos, payments, days]);
 
+  const dailyWeather = useDailyWeather();
+  const renderWeather = useCallback(
+    (d: string) => {
+      const w = overlays.weather ? dailyWeather.get(d) : undefined;
+      if (!w) return null;
+      const rainy = w.icon === "rain" || w.icon === "drizzle" || w.icon === "thunder" || w.icon === "snow";
+      return (
+        <span className="whitespace-nowrap text-[11px]" style={{ color: rainy ? "oklch(0.75 0.12 230)" : "#8d8d94" }} title={w.label}>
+          <span aria-hidden>{ICON_EMOJI[w.icon]}</span> {w.text}
+        </span>
+      );
+    },
+    [overlays.weather, dailyWeather],
+  );
+
   const nextKey = useMemo(() => nextUpcomingKey(instances, now), [instances, now]);
   const masterOf = useCallback(
     (i?: EventInstance) => (i?.masterId ? rows?.find((r) => r.id === i.masterId) ?? null : null),
@@ -116,6 +134,7 @@ export function CalendarScreen() {
 
   const [editing, setEditing] = useState<Editing>(null);
   const [dayList, setDayList] = useState<string | null>(null);
+  const [searching, setSearching] = useState(false);
   const [pendingMove, setPendingMove] = useState<PendingMove>(null);
   const [moveError, setMoveError] = useState<string | null>(null);
 
@@ -164,13 +183,12 @@ export function CalendarScreen() {
         </div>
         <div className="flex flex-wrap items-center gap-2.5">
           <div className="flex gap-1.5 text-[13px]">
-            {([["todo", "할일 마감", LIME], ["pay", "결제일", "#d6d6da"]] as const).map(([k, label, c]) => (
+            {([["todo", "할일 마감", LIME], ["pay", "결제일", "#d6d6da"], ["weather", "날씨", SKY]] as const).map(([k, label, c]) => (
               <button key={k} aria-pressed={overlays[k]} onClick={() => toggleOverlay(k)}
                 className="flex items-center gap-1.5 rounded-full bg-surface-2 px-3.5 py-2" style={{ opacity: overlays[k] ? 1 : 0.5 }}>
                 <span className="h-[7px] w-[7px] rounded-full" style={{ background: c }} />{label}
               </button>
             ))}
-            {/* TODO(05): 날씨 칩 + renderWeather — useWeather(range) 훅이 생기면 연결 (CAL-10) */}
           </div>
           <div className="flex rounded-full bg-surface-2 p-[5px] text-sm" role="tablist">
             {VIEWS.map(([k, label]) => (
@@ -180,6 +198,7 @@ export function CalendarScreen() {
               </button>
             ))}
           </div>
+          <button onClick={() => setSearching((v) => !v)} aria-pressed={searching} className="whitespace-nowrap rounded-full border border-[#3a3a40] px-4 py-2.5 text-sm">검색</button>
           <button onClick={() => openCreate(today, Math.min(21, new Date().getHours() + 1))} className="whitespace-nowrap rounded-full bg-white px-[18px] py-2.5 text-sm font-semibold text-black">
             일정 추가 +
           </button>
@@ -189,6 +208,19 @@ export function CalendarScreen() {
       {error && <p role="alert" className="rounded-xl bg-surface-3 px-4 py-3 text-sm text-danger">일정을 불러오지 못했습니다. 새로고침해 주세요.</p>}
       {moveError && <p role="alert" className="rounded-xl bg-surface-3 px-4 py-3 text-sm text-danger">{moveError}</p>}
 
+      {searching && (
+        <SearchPanel
+          onClose={() => setSearching(false)}
+          onPick={(row, key) => {
+            setUrl({ date: key });
+            if (!row.rrule) {
+              const i: EventInstance = { key: `${row.id}@${row.start_at}`, event: row, start: new Date(row.start_at), end: new Date(row.end_at), recurring: false, masterId: null, isException: false, originalStart: null };
+              setEditing({ instance: i });
+            }
+          }}
+        />
+      )}
+
       <div style={{ opacity: isLoading ? 0.6 : 1 }}>
         {view === "month" ? (
           <MonthView
@@ -197,6 +229,7 @@ export function CalendarScreen() {
             onCreate={(d) => openCreate(d)}
             onOpen={(i) => setEditing({ instance: i })}
             onShowDay={setDayList}
+            renderWeather={renderWeather}
             onDropOn={(i, d) => {
               const delta = diffDays(instanceDate(i, tz), d);
               if (delta !== 0) requestMove(i, moveRange(i.start, i.end, delta, 0, tz));
@@ -209,6 +242,7 @@ export function CalendarScreen() {
             onCreateAt={openCreate}
             onOpen={(i) => setEditing({ instance: i })}
             onChangeRange={requestMove}
+            renderWeather={renderWeather}
           />
         )}
       </div>
