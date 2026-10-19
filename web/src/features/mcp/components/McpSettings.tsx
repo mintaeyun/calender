@@ -5,6 +5,7 @@ import { Seg } from "@/features/settings/components/Seg";
 import { useTimezone } from "@/lib/profile";
 import { formatDateTimeKo } from "@/lib/time";
 import { MCP_URL, type McpToken } from "../api";
+import { ConnectGuide } from "./ConnectGuide";
 import { useCreateToken, useMcpLogs, useMcpTokens, useRevokeToken } from "../hooks";
 import {
   hasAnyAccess, LEVELS, LOG_STATUS, lastUsedLabel, levelLabel, RATE_LIMIT_PER_MIN, SERVICES, tokenHint,
@@ -50,22 +51,19 @@ export function McpSettings() {
     <div className="flex flex-col gap-3.5">
       <section className={card} aria-labelledby="mcp-title">
         <div className="flex flex-col gap-1">
-          <h2 id="mcp-title" className="text-lg font-semibold">MCP 연결 · Claude</h2>
-          <span className="text-[13px] text-fg-subtle">Claude에서 일정·할일·가계부를 말로 조회하고 기록합니다</span>
+          <h2 id="mcp-title" className="text-lg font-semibold">MCP 연결 · Claude · ChatGPT</h2>
+          <span className="text-[13px] text-fg-subtle">Claude와 ChatGPT에서 일정·할일·가계부를 말로 조회하고 기록합니다</span>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <code className="min-w-0 flex-1 truncate rounded-xl bg-surface-3 px-3.5 py-3 text-sm" aria-label="서버 주소">{MCP_URL ?? "서버 주소를 알 수 없어요"}</code>
           {MCP_URL && <CopyButton value={MCP_URL} label="주소 복사" />}
         </div>
-        <p className="text-xs text-fg-subtle">
-          Claude의 <b>커스텀 커넥터 추가</b>에서 위 주소를 입력하고, 인증은 <b>로그인 안 함</b>으로 둔 뒤 <b>요청 헤더</b>에
-          <code className="mx-1">authorization</code> 값 <code>Bearer lm_…</code>(아래에서 발급한 토큰)을 넣으세요. 자세한 단계는 docs/mcp-connector.md를 참고하세요.
-        </p>
+        <ConnectGuide url={MCP_URL} />
       </section>
 
       <section className={card} aria-labelledby="mcp-tokens">
         <div className="flex items-center justify-between">
-          <h2 id="mcp-tokens" className="text-base font-semibold">API 토큰 {tokens.data ? `· ${tokens.data.length}개` : ""}</h2>
+          <h2 id="mcp-tokens" className="text-base font-semibold">연결 목록 {tokens.data ? `· ${tokens.data.length}개` : ""}</h2>
           <button className={primary} onClick={() => setCreating(true)}>새 토큰 발급</button>
         </div>
         {tokens.isLoading && <p className="text-sm text-fg-subtle">불러오는 중…</p>}
@@ -76,7 +74,7 @@ export function McpSettings() {
             <li key={t.id} className="flex flex-wrap items-center gap-x-4 gap-y-2 py-3 text-sm">
               <div className="flex min-w-[140px] flex-1 flex-col">
                 <span className="font-semibold">{t.name}</span>
-                <span className="text-xs text-fg-subtle">{tokenHint(t.token_prefix)} · {lastUsedLabel(t.last_used_at)}</span>
+                <span className="text-xs text-fg-subtle">{t.source === "oauth" ? `OAuth 연결${t.client_name ? ` · ${t.client_name}` : ""}` : `직접 발급 ${tokenHint(t.token_prefix)}`} · {lastUsedLabel(t.last_used_at)}</span>
               </div>
               <div className="flex flex-wrap gap-1.5 text-xs">
                 {SERVICES.map(([k, name]) => (
@@ -85,11 +83,11 @@ export function McpSettings() {
                   </span>
                 ))}
               </div>
-              <button className="rounded-full px-3 py-1.5 text-danger-ink" onClick={() => setRevoking(t)}>폐기</button>
+              <button className="rounded-full px-3 py-1.5 text-danger-ink" onClick={() => setRevoking(t)}>{t.source === "oauth" ? "연결 끊기" : "폐기"}</button>
             </li>
           ))}
         </ul>
-        <p className="text-xs text-fg-subtle">호출 한도는 토큰당 분당 {RATE_LIMIT_PER_MIN}회입니다. 삭제는 항상 Claude가 먼저 확인을 묻고, 일괄 삭제는 지원하지 않습니다.</p>
+        <p className="text-xs text-fg-subtle">호출 한도는 연결(토큰)당 분당 {RATE_LIMIT_PER_MIN}회입니다. 삭제는 항상 Claude가 먼저 확인을 묻고, 일괄 삭제는 지원하지 않습니다.</p>
       </section>
 
       <section className={card} aria-labelledby="mcp-logs">
@@ -113,8 +111,8 @@ export function McpSettings() {
 
       {creating && <CreateTokenModal onClose={() => setCreating(false)} />}
       {revoking && (
-        <Modal title="토큰 폐기" onClose={() => setRevoking(null)}>
-          <p className="text-sm"><b>{revoking.name}</b> 토큰을 폐기할까요? 이 토큰을 쓰는 Claude 연결은 즉시 끊기고 되돌릴 수 없어요.</p>
+        <Modal title={revoking.source === "oauth" ? "연결 끊기" : "토큰 폐기"} onClose={() => setRevoking(null)}>
+          <p className="text-sm"><b>{revoking.name}</b> {revoking.source === "oauth" ? "연결을 끊을까요?" : "토큰을 폐기할까요?"} 이 연결을 쓰는 앱은 즉시 접근할 수 없게 되고 되돌릴 수 없어요. 앱에서 다시 연결하면 새로 승인할 수 있어요.</p>
           {revoke.isError && <p role="alert" className="text-sm text-danger-ink">{(revoke.error as Error).message}</p>}
           <div className="flex justify-end gap-2">
             <button className={btn} onClick={() => setRevoking(null)}>취소</button>

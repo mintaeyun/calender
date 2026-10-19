@@ -130,3 +130,24 @@ test("summary: 합계·그룹·예산·월 범위", () => {
   assert.deepEqual(monthRange("2026-02"), { start: "2026-02-01", end: "2026-02-28" });
   assert.equal(monthRange("2026-13"), null);
 });
+
+test("도구 주석: 읽기=readOnly, 삭제=destructive, 날씨만 openWorld", async () => {
+  const { TOOLS, annotationsOf } = await import("./tools-schema.ts");
+  for (const t of TOOLS) {
+    const a = annotationsOf(t);
+    assert.equal(a.readOnlyHint, t.access === "read", t.name);
+    assert.equal(a.destructiveHint, t.name.startsWith("delete_"), t.name);
+    if (a.readOnlyHint) assert.equal(a.destructiveHint, false);
+  }
+  assert.deepEqual(TOOLS.filter((t) => annotationsOf(t).openWorldHint).map((t) => t.name), ["get_weather", "get_today_overview"]);
+  assert.equal(annotationsOf(TOOLS.find((t) => t.name === "create_event")!).idempotentHint, false);
+});
+
+test("initialize 응답에 서버 안내(instructions): 삭제 확인 문구가 앞 512자 안에 있다", async () => {
+  const { SERVER_INSTRUCTIONS } = await import("./protocol.ts");
+  assert.ok(SERVER_INSTRUCTIONS.slice(0, 512).includes("삭제는"));
+  assert.ok(SERVER_INSTRUCTIONS.slice(0, 512).includes("확인"));
+  const h = { listTools: () => [], callTool: async () => ({ content: [] }) };
+  const init: any = await handleRpc({ jsonrpc: "2.0", id: 1, method: "initialize", params: {} }, h);
+  assert.equal(init.result.instructions, SERVER_INSTRUCTIONS);
+});

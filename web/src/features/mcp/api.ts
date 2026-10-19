@@ -3,7 +3,11 @@ import { createClient } from "@/lib/supabase/client";
 import { SUPABASE_URL } from "@/lib/supabase/env";
 import { normalizeScopes, serverUrl, type Scopes } from "./lib/mcp";
 
-export type McpToken = { id: string; name: string; token_prefix: string | null; scopes: Scopes; last_used_at: string | null; created_at: string };
+export type McpToken = {
+  id: string; name: string; token_prefix: string | null; scopes: Scopes; last_used_at: string | null; created_at: string;
+  /** manual = 직접 발급, oauth = Claude·ChatGPT 등의 OAuth 연결 */
+  source: "manual" | "oauth"; client_name: string | null; expires_at: string | null;
+};
 export type McpLog = { id: string; called_at: string; tool: string; input_summary: string | null; status: string; error: string | null };
 
 export const MCP_URL = serverUrl(SUPABASE_URL);

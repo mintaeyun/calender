@@ -165,4 +165,23 @@ export function toolAllowed(tool: ToolDef, scopes: Scopes): boolean {
   return RANK[scopes[tool.service]] >= (tool.access === "write" ? 2 : 1);
 }
 
+export type ToolAnnotations = { title: string; readOnlyHint: boolean; destructiveHint: boolean; idempotentHint: boolean; openWorldHint: boolean };
+
+/**
+ * MCP 도구 주석. 클라이언트(ChatGPT·Claude)가 읽기 도구는 확인 없이, 쓰기·삭제 도구는 확인을 거쳐 실행하도록 돕는다.
+ * 주석이 없으면 ChatGPT 는 모든 도구를 쓰기로 보고 매번 확인을 요구한다.
+ * 삭제 도구는 destructiveHint=true. openWorldHint 는 외부 서비스(날씨 제공처)를 부르는 도구만 true.
+ */
+export function annotationsOf(tool: ToolDef): ToolAnnotations {
+  const readOnly = tool.access === "read";
+  const isDelete = tool.name.startsWith("delete_");
+  return {
+    title: tool.name,
+    readOnlyHint: readOnly,
+    destructiveHint: isDelete,
+    idempotentHint: readOnly || isDelete || tool.name.startsWith("update_") || tool.name === "complete_todo",
+    openWorldHint: tool.name === "get_weather" || tool.name === "get_today_overview",
+  };
+}
+
 export const visibleTools = (scopes: Scopes): ToolDef[] => TOOLS.filter((t) => toolAllowed(t, scopes));

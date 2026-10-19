@@ -5,7 +5,8 @@ import { SUPABASE_KEY, SUPABASE_URL } from "./env";
 
 /** 로그인 없이 접근할 수 있는 경로 */
 // PWA 설치·오프라인 폴백은 비로그인 상태에서도 동작해야 한다(manifest, offline.html).
-const PUBLIC_PATHS = ["/login", "/auth", "/manifest.webmanifest", "/offline.html"];
+// MCP OAuth: 외부 앱이 인가 서버 메타데이터를 읽고 승인 화면(로그인 안내를 직접 표시)을 열 수 있어야 한다.
+const PUBLIC_PATHS = ["/login", "/auth", "/manifest.webmanifest", "/offline.html", "/.well-known", "/oauth/authorize"];
 const isPublic = (path: string) => PUBLIC_PATHS.some((p) => path === p || path.startsWith(p + "/"));
 
 /**

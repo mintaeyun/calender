@@ -6,12 +6,14 @@ import { requireUser } from "../_shared/auth.ts";
 import { adminClient } from "../_shared/supabase.ts";
 import { DEFAULT_TIMEZONE } from "../_shared/time.ts";
 import { generateToken, parseBearer, safeEqual, sha256Hex } from "./lib/token.ts";
+import { tokenUsable } from "./lib/oauth-flow.ts";
+import { challengeHeader, oauthEnv, oauthRoute } from "./oauth-routes.ts";
 import { scoped } from "./lib/scoped.ts";
 import { decideRate } from "./lib/rate-limit.ts";
 import { handleRpc, type RpcResponse } from "./lib/protocol.ts";
 import { callTool, summarizeInput, type ToolHandler } from "./lib/dispatch.ts";
 import { validate, type Schema } from "./lib/validate.ts";
-import { visibleTools, type Scopes } from "./lib/tools-schema.ts";
+import { annotationsOf, visibleTools, type Scopes } from "./lib/tools-schema.ts";
 import type { Ctx, WeatherAccess } from "./tools/context.ts";
 import { listTodos } from "./tools/todos.ts";
 import { findFreeTimeTool, listEvents, searchEvents } from "./tools/events.ts";
@@ -53,14 +55,15 @@ function normalizeScopes(raw: unknown): Scopes {
   return { calendar: pick("calendar"), todo: pick("todo"), ledger: pick("ledger") };
 }
 
-const rpcHeaders = { "WWW-Authenticate": 'Bearer realm="life-manager"' };
 // 날씨는 05 의 provider·캐시를 재사용한다(요청 시점에 생성해 환경변수 오류가 다른 도구에 영향을 주지 않게 함).
 const weatherAccess: WeatherAccess = {
   forecast: (lat, lon) => getForecast({ provider: createProvider(), store: dbCacheStore() }, lat, lon),
   geocode: (q) => createProvider().geocode(q),
 };
 
-const reject401 = () => json({ error: { code: "unauthorized", message: "유효하지 않은 토큰입니다." } }, 401, rpcHeaders);
+// 401: OAuth 클라이언트가 메타데이터를 찾을 수 있게 resource_metadata 를 알린다(토큰이 만료·무효면 invalid_token 도 표시).
+const reject401 = (invalidToken = false) =>
+  json({ error: { code: "unauthorized", message: "유효하지 않은 토큰입니다." } }, 401, { "WWW-Authenticate": challengeHeader(oauthEnv(), invalidToken) });
 
 Deno.serve(async (req) => {
   const pre = handleCors(req);
@@ -69,6 +72,8 @@ Deno.serve(async (req) => {
     const path = new URL(req.url).pathname.replace(/^\/(functions\/v1\/)?mcp/, "").replace(/\/+$/, "") || "/";
     if (path === "/health") return json({ ok: true });
     if (path === "/tokens" || path.startsWith("/tokens/")) return await tokenRoutes(req, path);
+    const oauth = await oauthRoute(req, path, oauthEnv());
+    if (oauth) return oauth;
     if (path !== "/") throw notFound();
     if (req.method !== "POST") {
       // 서버 발신 스트림(SSE)은 제공하지 않는다. stateless JSON 응답만.
@@ -91,10 +96,10 @@ async function mcpRoute(req: Request): Promise<Response> {
   const hash = await sha256Hex(raw);
   const { data: tok } = await admin
     .from("mcp_tokens")
-    .select("id,user_id,token_hash,scopes,revoked_at")
+    .select("id,user_id,token_hash,scopes,revoked_at,expires_at")
     .eq("token_hash", hash) // 토큰 해시 조회만 user_id 조건 없이 허용되는 유일한 쿼리
     .maybeSingle();
-  if (!tok || !safeEqual(tok.token_hash, hash) || tok.revoked_at) return reject401();
+  if (!tok || !safeEqual(tok.token_hash, hash) || !tokenUsable(tok)) return reject401(true);
 
   const userId: string = tok.user_id;
   const scopes = normalizeScopes(tok.scopes);
@@ -137,7 +142,7 @@ async function mcpRoute(req: Request): Promise<Response> {
   }
 
   const handlers = {
-    listTools: () => visibleTools(scopes).map((t) => ({ name: t.name, description: t.description, inputSchema: t.inputSchema })),
+    listTools: () => visibleTools(scopes).map((t) => ({ name: t.name, description: t.description, inputSchema: t.inputSchema, annotations: annotationsOf(t) })),
     callTool: async (name: string, args: unknown) => {
       const t0 = Date.now();
       const out = await callTool(name, args, scopes, ctx, HANDLERS);
@@ -174,7 +179,7 @@ async function tokenRoutes(req: Request, path: string): Promise<Response> {
 
   if (path === "/tokens" && req.method === "GET") {
     const { data, error } = await db
-      .from("mcp_tokens").select("id,name,token_prefix,scopes,last_used_at,revoked_at,created_at")
+      .from("mcp_tokens").select("id,name,token_prefix,scopes,last_used_at,revoked_at,created_at,source,client_name,expires_at")
       .is("revoked_at", null).order("created_at", { ascending: false });
     if (error) throw new HttpError(500, "internal", "토큰 목록을 불러오지 못했습니다.");
     return json({ tokens: data });
