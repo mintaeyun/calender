@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { useProfile } from "@/lib/profile";
-import { fetchWeather } from "./api";
+import { fetchAir, fetchWeather } from "./api";
 import { dailyMap } from "./lib/format";
 import type { DailyWeather, WeatherLocation } from "./types";
 
@@ -41,4 +41,17 @@ export function useDailyWeather(): Map<string, DailyWeather> {
   const { data } = useWeather();
   const unit = useTempUnit();
   return dailyMap(data, unit);
+}
+
+/** 미세먼지 등급(WX-6). 서버에 키가 없거나 장애면 null — 호출하는 쪽은 아무것도 그리지 않으면 된다. */
+export function useAirQuality() {
+  const loc = useWeatherLocation();
+  const q = useQuery({
+    queryKey: ["weather", "air", loc ? `${loc.lat.toFixed(2)},${loc.lon.toFixed(2)}` : "none"],
+    queryFn: () => fetchAir(loc!.lat, loc!.lon),
+    enabled: !!loc,
+    staleTime: 30 * 60_000,
+    retry: false,
+  });
+  return q.data && q.data.enabled && q.data.grade ? q.data : null;
 }

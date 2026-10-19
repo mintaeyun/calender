@@ -1,6 +1,6 @@
 // `weather` Edge Function 호출. 외부 날씨 API는 브라우저에서 직접 부르지 않는다.
 import { createClient } from "@/lib/supabase/client";
-import type { GeocodeResult, WeatherData } from "./types";
+import type { AirData, GeocodeResult, WeatherData } from "./types";
 
 async function call<T>(query: string): Promise<T> {
   const { data, error } = await createClient().functions.invoke(`weather?${query}`, { method: "GET" });
@@ -19,3 +19,5 @@ export async function searchCities(q: string): Promise<GeocodeResult[]> {
   const r = await call<{ results: GeocodeResult[] }>(`action=geocode&q=${encodeURIComponent(q)}`);
   return r.results;
 }
+
+export const fetchAir = (lat: number, lon: number) => call<AirData>(`action=air&lat=${lat}&lon=${lon}`);
