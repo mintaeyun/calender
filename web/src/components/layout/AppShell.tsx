@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
+import { GoogleAutoSync } from "@/features/google/components/GoogleAutoSync";
 import { Header } from "./Header";
 import { useUnreadCount } from "./useUnreadCount";
 
@@ -17,6 +18,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen bg-bg text-fg">
       <div className="mx-auto flex max-w-[1340px] flex-col gap-6 px-7 pb-12 pt-[26px]">
+        <GoogleAutoSync />
         <Header unreadCount={unread} />
         <main>{children}</main>
       </div>

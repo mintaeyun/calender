@@ -15,6 +15,7 @@ AI 코딩 에이전트(Claude Code, Codex 등)가 이 저장소에서 작업할 
 - 원격(Supabase 클라우드, Docker 불필요; `supabase login`·`supabase link` 된 체크아웃에서): `npm run db:types:remote`(원격 기준 타입 재생성, 실패 시 기존 파일 유지), `npm run db:test:remote`(RLS 테스트를 원격에서 실행 — 트랜잭션 안에서 돌고 rollback 하므로 데이터가 남지 않는다). 마이그레이션 적용은 `npx supabase db push --workdir ..` (원격 변경이므로 사용자 승인 후).
 - 단위 테스트(`web/`에서 실행, vitest): `npm test` 전체, `npx vitest run src/features/todo/lib/due.test.ts` 단일 파일, `npx vitest run -t "이름"` 단일 케이스. 순수 로직은 `features/<영역>/lib/*.test.ts`.
 - Edge Function 순수 로직 테스트(`web/`에서 실행, Deno 불필요): `npm run test:functions`(`supabase/functions/**/*.test.ts`). Edge 엔트리(`index.ts`)는 Deno 전용이라 Node에서 실행하지 않는다.
+- gcal-sync 함수: 순수 로직 테스트는 위 `npm run test:functions`(`supabase/functions/gcal-sync/lib/*.test.ts`), 타입 점검은 저장소 루트에서 `web/node_modules/.bin/tsc -p supabase/functions/gcal-sync/typecheck/tsconfig.json`. 배포는 `npx supabase functions deploy gcal-sync`(secrets: GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, TOKEN_ENC_KEY=`openssl rand -base64 32`, 선택 ALLOWED_RETURN_ORIGINS). 구글 콘솔 리디렉션 URI: `<SUPABASE_URL>/functions/v1/gcal-sync/oauth/callback`. 실제 연결·동기화 검증은 배포 후.
 - 마이그레이션은 `supabase/migrations/`에 새 파일만 추가한다(`YYYYMMDDHHMMSS_<세션>_<설명>.sql`). 초기 스키마 `*_init_*`는 수정하지 않는다.
 - Google 로그인은 `supabase/config.toml`의 `[auth.external.google]`을 켜고 `supabase/.env`에 클라이언트 ID/secret을 넣어야 동작한다.
 
