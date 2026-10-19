@@ -22,7 +22,7 @@ export function UpdatePasswordForm() {
 
   return (
     <div className="flex min-h-screen items-center justify-center p-10">
-      <form onSubmit={onSubmit} className="flex w-[420px] max-w-full flex-col gap-[18px] rounded-[28px] border border-border bg-[#141416] px-9 py-10">
+      <form onSubmit={onSubmit} className="flex w-[420px] max-w-full flex-col gap-[18px] rounded-[28px] border border-border bg-surface px-9 py-10">
         <h1 className="font-display text-[26px] leading-[1.3]">새 비밀번호</h1>
         <label className="flex flex-col gap-1.5">
           <span className="text-[13px] text-fg-muted">새 비밀번호 (6자 이상)</span>
@@ -33,11 +33,11 @@ export function UpdatePasswordForm() {
             autoComplete="new-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="rounded-[14px] border-0 bg-[#1f1f23] px-4 py-3.5 text-[15px] text-fg outline-none focus:ring-2 focus:ring-lime/60"
+            className="rounded-[14px] border-0 bg-surface-3 px-4 py-3.5 text-[15px] text-fg outline-none focus:ring-2 focus:ring-lime/60"
           />
         </label>
-        {error && <p role="alert" className="text-sm text-danger">{error}</p>}
-        <button type="submit" disabled={busy} className="rounded-full bg-white p-[15px] text-[15px] font-bold text-black disabled:opacity-50">
+        {error && <p role="alert" className="text-sm text-danger-ink">{error}</p>}
+        <button type="submit" disabled={busy} className="rounded-full bg-fg p-[15px] text-[15px] font-bold text-bg disabled:opacity-50">
           {busy ? "처리 중…" : "비밀번호 변경"}
         </button>
       </form>

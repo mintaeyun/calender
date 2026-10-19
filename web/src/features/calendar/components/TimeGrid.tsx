@@ -105,7 +105,7 @@ export function TimeGrid({
   const template = `52px repeat(${days.length}, minmax(0, 1fr))`;
 
   return (
-    <div className="flex flex-col gap-1.5 rounded-[22px] bg-[#111113] px-4 pb-4 pt-3.5">
+    <div className="flex flex-col gap-1.5 rounded-[22px] bg-surface-sunken px-4 pb-4 pt-3.5">
       {/* 날짜 머리글 + 종일/마커 행 */}
       <div className="grid gap-1.5" style={{ gridTemplateColumns: template }}>
         <span />
@@ -120,7 +120,7 @@ export function TimeGrid({
                 <span className="text-[13px] text-fg-subtle">{WEEKDAYS_KO[wd]}</span>
                 <span
                   className="flex h-8 w-8 items-center justify-center rounded-full text-lg font-bold"
-                  style={{ background: isToday ? LIME : "transparent", color: isToday ? "#0b0b0c" : d < today ? "#6c6c73" : "#f2f2f3" }}
+                  style={{ background: isToday ? LIME : "transparent", color: isToday ? "var(--on-accent)" : d < today ? "var(--fg-dim)" : "var(--fg)" }}
                 >
                   {+d.slice(8, 10)}
                 </span>
@@ -144,10 +144,10 @@ export function TimeGrid({
                 {marks.map((m) => (
                   <div
                     key={m.id}
-                    className="flex items-center gap-1.5 truncate rounded-full bg-[#1f1f23] px-2 py-[3px] text-[11px]"
+                    className="flex items-center gap-1.5 truncate rounded-full bg-surface-3 px-2 py-[3px] text-[11px]"
                     title={m.label}
                   >
-                    <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: m.kind === "todo" ? LIME : "#d6d6da" }} />
+                    <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: m.kind === "todo" ? LIME : "var(--fg-muted)" }} />
                     <span className="truncate">{m.label}</span>
                   </div>
                 ))}
@@ -161,12 +161,12 @@ export function TimeGrid({
       <div className="grid gap-1.5" style={{ gridTemplateColumns: template }}>
         <div className="relative">
           {HOURS.map((h) => (
-            <div key={h} className="text-[11px] text-[#6c6c73]" style={{ height: HOUR_PX, transform: "translateY(-7px)" }}>
+            <div key={h} className="text-[11px] text-fg-dim" style={{ height: HOUR_PX, transform: "translateY(-7px)" }}>
               {String(h).padStart(2, "0")}
             </div>
           ))}
           {showNow && (
-            <div className="absolute left-0 bg-[#111113] text-[11px] font-bold" style={{ top: minToY(nowMin) - 7, color: LIME }}>
+            <div className="absolute left-0 bg-surface-sunken text-[11px] font-bold" style={{ top: minToY(nowMin) - 7, color: "var(--lime-ink)" }}>
               {String(nowParts.hour).padStart(2, "0")}:{String(nowParts.minute).padStart(2, "0")}
             </div>
           )}
@@ -194,8 +194,8 @@ export function TimeGrid({
                   className="relative rounded-xl"
                   style={{
                     height: GRID_H,
-                    background: `repeating-linear-gradient(180deg,#1a1a1d 0 1px,transparent 1px ${HOUR_PX}px)`,
-                    backgroundColor: d === today ? "#17171a" : "transparent",
+                    background: `repeating-linear-gradient(180deg,var(--border) 0 1px,transparent 1px ${HOUR_PX}px)`,
+                    backgroundColor: d === today ? "var(--surface-2)" : "transparent",
                   }}
                   onClick={(e) => {
                     const y = e.clientY - e.currentTarget.getBoundingClientRect().top;

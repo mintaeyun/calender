@@ -7,8 +7,8 @@ import { useGoogleActions, useGoogleCalendars, useGoogleConnection } from "../ho
 import { classifyGoogleError, lastSyncedLabel, oauthReturnMessage } from "../lib/errors";
 
 const card = "flex flex-col gap-[18px] rounded-[22px] bg-surface p-6";
-const primaryBtn = "rounded-full bg-white px-[18px] py-2.5 text-sm font-semibold text-black disabled:opacity-50";
-const ghostBtn = "rounded-full border border-[#3a3a40] px-[18px] py-2.5 text-sm disabled:opacity-50";
+const primaryBtn = "rounded-full bg-fg px-[18px] py-2.5 text-sm font-semibold text-bg disabled:opacity-50";
+const ghostBtn = "rounded-full border border-border-strong px-[18px] py-2.5 text-sm disabled:opacity-50";
 
 function Panel() {
   const router = useRouter();
@@ -45,7 +45,7 @@ function Panel() {
       <div className={card}>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3.5">
-            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-white font-bold text-black">G</span>
+            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-fg font-bold text-bg">G</span>
             <div className="flex flex-col gap-0.5">
               <span className="text-base font-semibold">Google 캘린더</span>
               <span className="text-[13px] text-fg-subtle">연결되지 않음</span>
@@ -55,8 +55,8 @@ function Panel() {
             {act.connect.isPending ? "이동 중…" : "Google 계정 연결"}
           </button>
         </div>
-        {notice && <p role={notice.ok ? "status" : "alert"} className={`text-sm ${notice.ok ? "text-lime" : "text-danger"}`}>{notice.text}</p>}
-        {act.connect.isError && <p role="alert" className="text-sm text-danger">{(act.connect.error as Error).message}</p>}
+        {notice && <p role={notice.ok ? "status" : "alert"} className={`text-sm ${notice.ok ? "text-lime-ink" : "text-danger-ink"}`}>{notice.text}</p>}
+        {act.connect.isError && <p role="alert" className="text-sm text-danger-ink">{(act.connect.error as Error).message}</p>}
         <p className="rounded-[14px] bg-surface-3 px-4 py-3.5 text-[13px] leading-relaxed text-fg-muted">
           Google 캘린더의 일정을 앱으로 가져옵니다(가져오기 전용). 연결하면 과거 1개월 ~ 미래 1년의 일정이 들어오고, 이후 변경·삭제는 15분마다 또는 앱을 열 때 반영돼요.
           요청하는 권한은 캘린더 일정 읽기·쓰기와 캘린더 목록 읽기뿐이며, 할일·가계부는 동기화하지 않아요.
@@ -69,29 +69,29 @@ function Panel() {
     <div className={card}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3.5">
-          <span className="flex h-11 w-11 items-center justify-center rounded-full bg-white font-bold text-black">G</span>
+          <span className="flex h-11 w-11 items-center justify-center rounded-full bg-fg font-bold text-bg">G</span>
           <div className="flex flex-col gap-0.5">
             <span className="text-base font-semibold">{connection.google_email}</span>
-            <span className="text-[13px]" style={{ color: errorInfo ? "var(--danger)" : "var(--lime)" }}>
+            <span className="text-[13px]" style={{ color: errorInfo ? "var(--danger-ink)" : "var(--lime-ink)" }}>
               {errorInfo ? "오류" : "연결됨"} · 마지막 동기화 {lastSyncedLabel(connection.last_synced_at, new Date(), tz)}
             </span>
           </div>
         </div>
         <div className="flex gap-2">
           <button className={primaryBtn} disabled={busy} onClick={() => act.sync.mutate()}>{busy ? "동기화 중…" : "지금 동기화"}</button>
-          <button className={`${ghostBtn} text-danger`} onClick={() => setConfirmDisconnect(true)}>연결 해제</button>
+          <button className={`${ghostBtn} text-danger-ink`} onClick={() => setConfirmDisconnect(true)}>연결 해제</button>
         </div>
       </div>
 
-      {notice && <p role={notice.ok ? "status" : "alert"} className={`text-sm ${notice.ok ? "text-lime" : "text-danger"}`}>{notice.text}</p>}
-      {act.sync.isError && <p role="alert" className="text-sm text-danger">{(act.sync.error as Error).message}</p>}
+      {notice && <p role={notice.ok ? "status" : "alert"} className={`text-sm ${notice.ok ? "text-lime-ink" : "text-danger-ink"}`}>{notice.text}</p>}
+      {act.sync.isError && <p role="alert" className="text-sm text-danger-ink">{(act.sync.error as Error).message}</p>}
       {syncMsg && syncMsg.status === "partial" && <p role="status" className="text-sm text-fg-muted">일정이 많아 일부만 가져왔어요. 다시 동기화하면 이어서 가져옵니다.</p>}
       {syncMsg && syncMsg.status === "locked" && <p role="status" className="text-sm text-fg-muted">이미 동기화 중이에요. 잠시 후 다시 확인해 주세요.</p>}
       {syncMsg && syncMsg.status === "no_calendars" && <p role="status" className="text-sm text-fg-muted">동기화할 캘린더를 아래에서 선택해 주세요.</p>}
 
       {errorInfo && (
         <div role="alert" className="flex flex-col gap-2 rounded-[14px] border border-danger/50 bg-surface-3 px-4 py-3.5">
-          <span className="text-sm font-semibold text-danger">{errorInfo.title}</span>
+          <span className="text-sm font-semibold text-danger-ink">{errorInfo.title}</span>
           <span className="text-[13px] leading-relaxed text-fg-muted">{errorInfo.hint}</span>
           {errorInfo.reconnect && (
             <button className={`${primaryBtn} w-fit`} disabled={act.connect.isPending} onClick={() => act.connect.mutate()}>다시 연결</button>
@@ -102,7 +102,7 @@ function Panel() {
       <div className="flex flex-col gap-2.5 border-t border-border pt-4">
         <span className="text-sm font-semibold">동기화 방향</span>
         <div role="radiogroup" aria-label="동기화 방향" className="flex w-fit rounded-full bg-surface-3 p-1">
-          <button role="radio" aria-checked={true} className="rounded-full bg-[#3a3a40] px-4 py-[7px] text-sm font-semibold text-white">가져오기만</button>
+          <button role="radio" aria-checked={true} className="rounded-full bg-surface-5 px-4 py-[7px] text-sm font-semibold text-fg">가져오기만</button>
           <button role="radio" aria-checked={false} disabled title="준비 중" className="rounded-full px-4 py-[7px] text-sm text-fg-subtle opacity-60">양방향 (준비 중)</button>
         </div>
         <span className="text-[13px] text-fg-subtle">Google 일정을 앱으로 가져오기만 합니다. 앱에서 만든 일정은 Google에 반영되지 않아요.</span>
@@ -115,7 +115,7 @@ function Panel() {
             {act.refreshList.isPending ? "불러오는 중…" : "목록 새로고침"}
           </button>
         </div>
-        {act.refreshList.isError && <p role="alert" className="text-sm text-danger">{(act.refreshList.error as Error).message}</p>}
+        {act.refreshList.isError && <p role="alert" className="text-sm text-danger-ink">{(act.refreshList.error as Error).message}</p>}
         {calendars.data?.length === 0 && <span className="text-sm text-fg-subtle">캘린더가 없어요. 목록을 새로고침해 보세요.</span>}
         {calendars.data?.map((c) => (
           <label key={c.id} className="flex cursor-pointer items-center gap-3 py-1.5 text-sm" style={{ color: c.sync_enabled ? undefined : "var(--fg-subtle)" }}>
@@ -139,18 +139,18 @@ function Panel() {
 
       {confirmDisconnect && (
         <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/70 p-5" role="dialog" aria-modal="true" onClick={() => setConfirmDisconnect(false)}>
-          <div className="flex w-[420px] max-w-full flex-col gap-4 rounded-[28px] border border-[#2a2a2e] bg-[#161619] p-6" onClick={(e) => e.stopPropagation()}>
+          <div className="flex w-[420px] max-w-full flex-col gap-4 rounded-[28px] border border-surface-4 bg-surface-modal p-6" onClick={(e) => e.stopPropagation()}>
             <h2 className="font-display text-[22px]">Google 연결을 해제할까요?</h2>
             <p className="text-sm text-fg-muted">저장된 토큰을 즉시 삭제하고 Google 쪽 접근 권한도 취소합니다.</p>
             <label className="flex items-center gap-2.5 text-sm">
               <input type="checkbox" checked={deleteEvents} onChange={(e) => setDeleteEvents(e.target.checked)} className="h-[18px] w-[18px] accent-[var(--lime)]" />
               가져온 일정도 앱에서 삭제 (기본: 유지)
             </label>
-            {act.disconnect.isError && <p role="alert" className="text-sm text-danger">{(act.disconnect.error as Error).message}</p>}
+            {act.disconnect.isError && <p role="alert" className="text-sm text-danger-ink">{(act.disconnect.error as Error).message}</p>}
             <div className="flex justify-end gap-2">
               <button className={ghostBtn} onClick={() => setConfirmDisconnect(false)}>취소</button>
               <button
-                className="rounded-full bg-danger px-6 py-[11px] text-sm font-bold text-[#1a0d0a] disabled:opacity-50"
+                className="rounded-full bg-danger px-6 py-[11px] text-sm font-bold text-on-accent disabled:opacity-50"
                 disabled={act.disconnect.isPending}
                 onClick={() => act.disconnect.mutate(deleteEvents, { onSuccess: () => { setConfirmDisconnect(false); setDeleteEvents(false); } })}
               >

@@ -4,7 +4,8 @@ import type { Database } from "./database.types";
 import { SUPABASE_KEY, SUPABASE_URL } from "./env";
 
 /** 로그인 없이 접근할 수 있는 경로 */
-const PUBLIC_PATHS = ["/login", "/auth"];
+// PWA 설치·오프라인 폴백은 비로그인 상태에서도 동작해야 한다(manifest, offline.html).
+const PUBLIC_PATHS = ["/login", "/auth", "/manifest.webmanifest", "/offline.html"];
 const isPublic = (path: string) => PUBLIC_PATHS.some((p) => path === p || path.startsWith(p + "/"));
 
 /**

@@ -8,7 +8,7 @@ import { authErrorMessage } from "@/lib/auth";
 type Mode = "signin" | "signup" | "forgot";
 
 const input =
-  "rounded-[14px] border-0 bg-[#1f1f23] px-4 py-3.5 text-[15px] text-fg outline-none focus:ring-2 focus:ring-lime/60";
+  "rounded-[14px] border-0 bg-surface-3 px-4 py-3.5 text-[15px] text-fg outline-none focus:ring-2 focus:ring-lime/60";
 
 const COPY: Record<Mode, { title: string; sub: string; submit: string }> = {
   signin: { title: "다시 오셨네요", sub: "일정 · 할일 · 가계부를 한곳에서", submit: "로그인" },
@@ -77,7 +77,7 @@ function Form() {
     <div className="flex min-h-screen items-center justify-center p-10">
       <form
         onSubmit={onSubmit}
-        className="flex w-[420px] max-w-full flex-col gap-[18px] rounded-[28px] border border-border bg-[#141416] px-9 py-10"
+        className="flex w-[420px] max-w-full flex-col gap-[18px] rounded-[28px] border border-border bg-surface px-9 py-10"
       >
         <div className="flex items-center gap-3">
           <div className="h-10 w-10 rounded-full bg-purple" />
@@ -89,7 +89,7 @@ function Form() {
         </div>
 
         {!configured && (
-          <p role="alert" className="rounded-xl bg-surface-3 px-4 py-3 text-sm text-danger">
+          <p role="alert" className="rounded-xl bg-surface-3 px-4 py-3 text-sm text-danger-ink">
             Supabase 환경변수(NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY)가 설정되지 않았습니다. web/.env.local 을 확인하세요.
           </p>
         )}
@@ -121,29 +121,29 @@ function Form() {
           </label>
         )}
 
-        {error && <p role="alert" className="text-sm text-danger">{error}</p>}
-        {info && <p role="status" className="text-sm text-lime">{info}</p>}
+        {error && <p role="alert" className="text-sm text-danger-ink">{error}</p>}
+        {info && <p role="status" className="text-sm text-lime-ink">{info}</p>}
 
         <button
           type="submit"
           disabled={busy || !configured}
-          className="mt-1.5 rounded-full bg-white p-[15px] text-[15px] font-bold text-black disabled:opacity-50"
+          className="mt-1.5 rounded-full bg-fg p-[15px] text-[15px] font-bold text-bg disabled:opacity-50"
         >
           {busy ? "처리 중…" : c.submit}
         </button>
 
         {mode !== "forgot" && (
           <>
-            <div className="flex items-center gap-3 text-xs text-[#6c6c73]">
+            <div className="flex items-center gap-3 text-xs text-fg-dim">
               <div className="h-px flex-1 bg-border" />또는<div className="h-px flex-1 bg-border" />
             </div>
             <button
               type="button"
               onClick={onGoogle}
               disabled={!configured}
-              className="flex items-center justify-center gap-2.5 rounded-full border border-[#3a3a40] p-3.5 text-[15px] disabled:opacity-50"
+              className="flex items-center justify-center gap-2.5 rounded-full border border-border-strong p-3.5 text-[15px] disabled:opacity-50"
             >
-              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white text-xs font-bold text-black">G</span>
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-fg text-xs font-bold text-bg">G</span>
               Google로 계속하기
             </button>
           </>
@@ -156,7 +156,7 @@ function Form() {
             <button type="button" onClick={() => switchMode("signin")} className="text-fg underline">로그인으로 돌아가기</button>
           )}
         </div>
-        <span className="text-center text-xs text-[#6c6c73]">허용된 이메일만 가입할 수 있습니다</span>
+        <span className="text-center text-xs text-fg-dim">허용된 이메일만 가입할 수 있습니다</span>
       </form>
     </div>
   );

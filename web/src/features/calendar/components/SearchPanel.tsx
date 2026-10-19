@@ -44,7 +44,7 @@ export function SearchPanel({ onClose, onPick }: Props) {
 
   const input = "rounded-xl bg-surface-3 px-3 py-2 text-sm text-fg outline-none [color-scheme:dark]";
   return (
-    <section className="flex flex-col gap-3 rounded-[22px] bg-[#111113] p-4" aria-label="일정 검색">
+    <section className="flex flex-col gap-3 rounded-[22px] bg-surface-sunken p-4" aria-label="일정 검색">
       <div className="flex flex-wrap items-center gap-2">
         <input
           autoFocus
@@ -66,7 +66,7 @@ export function SearchPanel({ onClose, onPick }: Props) {
 
       {debounced === "" && <span className="text-sm text-fg-subtle">검색어를 입력하세요.</span>}
       {q.isLoading && <span className="text-sm text-fg-subtle">검색 중…</span>}
-      {q.isError && <span role="alert" className="text-sm text-danger">검색하지 못했습니다.</span>}
+      {q.isError && <span role="alert" className="text-sm text-danger-ink">검색하지 못했습니다.</span>}
       {q.data && q.data.length === 0 && <span className="text-sm text-fg-subtle">결과가 없습니다.</span>}
       <ul className="flex max-h-72 flex-col gap-1.5 overflow-y-auto">
         {q.data?.map((r) => {
