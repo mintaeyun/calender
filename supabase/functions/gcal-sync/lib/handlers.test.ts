@@ -1,7 +1,8 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { decryptToken, keyRingFromEnv, signState } from "./crypto.ts";
 import { FakeGoogle, FakeStore } from "./fake.ts";
-import { disconnect, oauthCallback, oauthStart, refreshCalendars, type HandlerDeps } from "./handlers.ts";
+import { createGoogleApi } from "./google.ts";
+import { diag, disconnect, oauthCallback, oauthStart, refreshCalendars, STATE_TTL_SEC, stateErrorMessage, type HandlerDeps } from "./handlers.ts";
 
 const NOW = new Date("2026-10-14T03:00:00Z");
 const ring = keyRingFromEnv((n) => (n === "TOKEN_ENC_KEY" ? btoa(String.fromCharCode(...new Uint8Array(32).fill(5))) : undefined));
@@ -124,5 +125,43 @@ describe("refreshCalendars / disconnect", () => {
   it("이미 해제된 상태에서 다시 호출해도 안전", async () => {
     expect(await disconnect("user-1", false, deps)).toEqual({ ok: true, had_connection: false });
     expect(api.revoked).toEqual([]);
+  });
+});
+
+describe("state 왕복·진단", () => {
+  it("실제 authUrl 을 거쳐 콜백 쿼리로 돌아온 state 가 검증된다", async () => {
+    const real = createGoogleApi({ clientId: "cid", clientSecret: "secret" });
+    const d = { ...deps, api: Object.assign(api, { authUrl: real.authUrl }) };
+    const { url } = await oauthStart("user-1", "http://localhost:3000/settings/google", d);
+    const state = new URL(url).searchParams.get("state")!;
+    // 구글은 state 를 퍼센트 인코딩된 쿼리로 되돌려 준다
+    const callback = new URL(`${d.redirectUri}?code=abc&scope=x&state=${encodeURIComponent(state)}`);
+    const r = await oauthCallback(callback.searchParams, d);
+    expect(r).toEqual({ redirect: "http://localhost:3000/settings/google?google=connected" });
+  });
+
+  it("30분 안에는 유효하고 지나면 expired 안내", async () => {
+    const s = await stateFor("u", "http://localhost:3000/", Math.floor(NOW.getTime() / 1000) + STATE_TTL_SEC);
+    const ok = await oauthCallback(new URLSearchParams({ code: "c", state: s }), { ...deps, now: () => new Date(NOW.getTime() + (STATE_TTL_SEC - 5) * 1000) });
+    expect(ok).toHaveProperty("redirect");
+    const late = await oauthCallback(new URLSearchParams({ code: "c", state: s }), { ...deps, now: () => new Date(NOW.getTime() + (STATE_TTL_SEC + 5) * 1000) });
+    expect(late).toEqual({ error: stateErrorMessage("expired") });
+    expect((late as { error: string }).error).toContain("[state_expired]");
+  });
+
+  it("실패 이유가 사용자 메시지에 코드로 드러난다", async () => {
+    const missing = await oauthCallback(new URLSearchParams({ code: "c" }), deps);
+    expect((missing as { error: string }).error).toContain("[state_missing]");
+    const forged = await oauthCallback(new URLSearchParams({ code: "c", state: "aaaa.bbbb" }), deps);
+    expect((forged as { error: string }).error).toContain("[state_signature]");
+    const bad = await oauthCallback(new URLSearchParams({ code: "c", state: "nodot" }), deps);
+    expect((bad as { error: string }).error).toContain("[state_format]");
+  });
+
+  it("diag 는 서명·왕복·만료 감지를 점검하고 비밀값을 담지 않는다", async () => {
+    const real = createGoogleApi({ clientId: "cid", clientSecret: "secret" });
+    const r = await diag({ ...deps, api: Object.assign(api, { authUrl: real.authUrl }) });
+    expect(r).toMatchObject({ sign_verify: "ok", url_roundtrip: "ok", expiry_detected: true, key_version: "v1", target_calendar: "mycal" });
+    expect(JSON.stringify(r)).not.toMatch(/secret|token|key=/i);
   });
 });

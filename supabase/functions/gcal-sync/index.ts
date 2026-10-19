@@ -10,7 +10,7 @@ import { adminClient } from "../_shared/supabase.ts";
 import { keyRingFromEnv } from "./lib/crypto.ts";
 import { DbStore } from "./lib/db.ts";
 import { createGoogleApi } from "./lib/google.ts";
-import { disconnect, oauthCallback, oauthStart, refreshCalendars, runSync, runSyncAll, type HandlerDeps } from "./lib/handlers.ts";
+import { diag, disconnect, oauthCallback, oauthStart, refreshCalendars, runSync, runSyncAll, type HandlerDeps } from "./lib/handlers.ts";
 
 function env(name: string): string {
   const v = Deno.env.get(name);
@@ -56,6 +56,11 @@ Deno.serve(async (req) => {
     switch (route) {
       case "health":
         return json({ ok: true });
+
+      case "diag": {
+        const { deps } = makeDeps(null);
+        return json(await diag(deps));
+      }
 
       case "oauth/start": {
         const { userId } = await requireUser(req);

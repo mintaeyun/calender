@@ -1,6 +1,6 @@
 // HTTP 경로별 처리(oauth/start, oauth/callback, calendars, sync, sync-all, disconnect). 모든 외부 의존성은 주입한다.
 import { badRequest, HttpError } from "../../_shared/errors.ts";
-import { decryptToken, encryptToken, signState, verifyState, type KeyRing } from "./crypto.ts";
+import { decryptToken, encryptToken, signState, verifyStateDetailed, type KeyRing, type StateFailure } from "./crypto.ts";
 import { GoogleApiError, type GoogleApi, type GoogleCalendarEntry } from "./google.ts";
 import { syncAll, syncUser, type RunDeps } from "./run.ts";
 import { isTargetCalendar, TARGET_CALENDAR_NAME } from "./target.ts";
@@ -45,7 +45,19 @@ export type HandlerDeps = {
   targetName?: string;
 };
 
-const STATE_TTL_SEC = 600;
+/** 구글 동의 화면에서 머물 수 있는 시간(검증 안 된 앱 경고·계정 선택 등을 거치는 시간 포함) */
+export const STATE_TTL_SEC = 1800;
+
+/** state 검증 실패 이유 → 사용자에게 보일 한국어 안내 (끝의 코드는 로그와 대조용, 민감값 아님) */
+export function stateErrorMessage(reason: StateFailure): string {
+  const code = `[state_${reason}]`;
+  switch (reason) {
+    case "missing": return `연결 요청에 state 값이 없습니다(주소의 쿼리가 잘렸을 수 있어요). 설정에서 다시 연결해 주세요. ${code}`;
+    case "expired": return `연결 시간이 지났어요(${STATE_TTL_SEC / 60}분 제한). 설정에서 다시 연결해 주세요. ${code}`;
+    case "signature": return `연결 요청을 확인하지 못했어요(서명 불일치). 서버 설정이 바뀌었거나 주소가 변형되었을 수 있어요. 설정에서 다시 연결해 주세요. ${code}`;
+    default: return `연결 요청을 해석하지 못했어요. 설정에서 다시 연결해 주세요. ${code}`;
+  }
+}
 
 function checkReturnTo(returnTo: string, allowed: string[]): string {
   let u: URL;
@@ -74,8 +86,13 @@ export async function oauthStart(userId: string, returnTo: string, d: HandlerDep
 /** GET oauth/callback?code&state — 구글이 브라우저를 되돌려 보낸다. 항상 앱으로 리다이렉트할 URL 을 돌려준다. */
 export async function oauthCallback(params: URLSearchParams, d: HandlerDeps): Promise<{ redirect: string } | { error: string }> {
   const state = params.get("state");
-  const payload = state ? await verifyState(state, d.ring, Math.floor(d.now().getTime() / 1000)) : null;
-  if (!payload) return { error: "state 가 올바르지 않거나 만료되었습니다. 설정에서 다시 연결해 주세요." };
+  const verified = await verifyStateDetailed(state, d.ring, Math.floor(d.now().getTime() / 1000));
+  if (!verified.ok) {
+    // 값 자체는 남기지 않고 이유와 길이만 기록한다.
+    console.error(`oauth callback: state rejected reason=${verified.reason}${verified.detail ? ` (${verified.detail})` : ""} stateLen=${state?.length ?? 0} hasCode=${params.has("code")}`);
+    return { error: stateErrorMessage(verified.reason) };
+  }
+  const payload = verified.payload;
   const back = (status: string) => ({ redirect: withParam(payload.r, "google", status) });
 
   if (params.get("error")) return back(params.get("error") === "access_denied" ? "denied" : "error");
@@ -133,4 +150,29 @@ export async function disconnect(userId: string, deleteEvents: boolean, d: Handl
   }
   await d.admin.disconnectCalendars(userId, deleteEvents);
   return { ok: true as const, had_connection: Boolean(enc) };
+}
+
+/**
+ * 배포 환경 자가 점검(GET diag, 인증 없음): 이 런타임에서 state 를 서명→구글 URL 왕복→검증이 되는지와 설정 상태를 알려 준다.
+ * 비밀값·토큰은 반환하지 않는다(키 버전과 불리언만).
+ */
+export async function diag(d: HandlerDeps) {
+  const nowSec = Math.floor(d.now().getTime() / 1000);
+  const state = await signState({ u: "diag", r: "http://localhost:3000/", e: nowSec + STATE_TTL_SEC }, d.ring);
+  // 구글이 되돌려 줄 때와 같은 경로: authUrl 의 state 파라미터 → 콜백 쿼리 문자열 → URLSearchParams
+  const url = new URL(d.api.authUrl({ redirectUri: d.redirectUri, state }));
+  const echoed = new URLSearchParams(`state=${encodeURIComponent(url.searchParams.get("state") ?? "")}`).get("state");
+  const direct = await verifyStateDetailed(state, d.ring, nowSec);
+  const roundtrip = await verifyStateDetailed(echoed, d.ring, nowSec);
+  const expired = await verifyStateDetailed(state, d.ring, nowSec + STATE_TTL_SEC + 1);
+  return {
+    key_version: d.ring.current,
+    state_ttl_sec: STATE_TTL_SEC,
+    sign_verify: direct.ok ? "ok" : direct.reason,
+    url_roundtrip: roundtrip.ok ? "ok" : roundtrip.reason,
+    expiry_detected: !expired.ok && expired.reason === "expired",
+    redirect_uri: d.redirectUri,
+    allowed_return_origins: d.allowedReturnOrigins,
+    target_calendar: d.targetName ?? TARGET_CALENDAR_NAME,
+  };
 }

@@ -74,16 +74,39 @@ export async function signState(payload: Omit<StatePayload, "n">, ring: KeyRing)
   return `${body}.${b64urlEncode(sig)}`;
 }
 
+export type StateFailure = "missing" | "format" | "signature" | "payload" | "expired" | "error";
+export type StateResult = { ok: true; payload: StatePayload } | { ok: false; reason: StateFailure; detail?: string };
+
+/**
+ * 서명·만료를 검증하고 실패 이유를 구분해 돌려준다(값 자체는 담지 않는다).
+ *  missing=state 없음, format=형식 오류, signature=서명 불일치(키가 다르거나 값이 변형됨), payload=내용 해석 실패,
+ *  expired=만료, error=검증 중 예외(detail 에 예외 이름).
+ */
+export async function verifyStateDetailed(state: string | null | undefined, ring: KeyRing, nowSec: number): Promise<StateResult> {
+  if (!state) return { ok: false, reason: "missing" };
+  const parts = state.split(".");
+  if (parts.length !== 2 || !parts[0] || !parts[1]) return { ok: false, reason: "format", detail: `parts=${parts.length}` };
+  const [body, sig] = parts;
+  let valid: boolean;
+  try {
+    valid = await crypto.subtle.verify("HMAC", await hmacKey(ring), b64urlDecode(sig) as BufferSource, enc.encode(body));
+  } catch (e) {
+    return { ok: false, reason: "error", detail: e instanceof Error ? e.name : "unknown" };
+  }
+  if (!valid) return { ok: false, reason: "signature" };
+  let p: StatePayload;
+  try {
+    p = JSON.parse(dec.decode(b64urlDecode(body))) as StatePayload;
+  } catch {
+    return { ok: false, reason: "payload" };
+  }
+  if (typeof p.e !== "number" || typeof p.u !== "string" || typeof p.r !== "string") return { ok: false, reason: "payload" };
+  if (p.e <= nowSec) return { ok: false, reason: "expired", detail: `late=${nowSec - p.e}s` };
+  return { ok: true, payload: p };
+}
+
 /** 서명·만료를 검증하고 payload 를 돌려준다. 실패하면 null. */
 export async function verifyState(state: string, ring: KeyRing, nowSec: number): Promise<StatePayload | null> {
-  const [body, sig] = state.split(".");
-  if (!body || !sig) return null;
-  try {
-    const ok = await crypto.subtle.verify("HMAC", await hmacKey(ring), b64urlDecode(sig) as BufferSource, enc.encode(body));
-    if (!ok) return null;
-    const p = JSON.parse(dec.decode(b64urlDecode(body))) as StatePayload;
-    return p.e > nowSec ? p : null;
-  } catch {
-    return null;
-  }
+  const r = await verifyStateDetailed(state, ring, nowSec);
+  return r.ok ? r.payload : null;
 }
