@@ -3,6 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as api from "./api";
 import type { TxFilter } from "./api";
+import * as receipts from "./receipts";
 
 // 쿼리 키: ['ledger', 대상, 파라미터]
 export const ledgerKeys = {
@@ -51,3 +52,11 @@ export const useCopyBudgets = () => useLedgerMutation(({ from, to }: { from: str
 export const useCreateRecurring = () => useLedgerMutation(api.createRecurring);
 export const useUpdateRecurring = () => useLedgerMutation(({ id, patch }: { id: string; patch: Parameters<typeof api.updateRecurring>[1] }) => api.updateRecurring(id, patch));
 export const useDeleteRecurring = () => useLedgerMutation(api.deleteRecurring);
+
+// ── 영수증 (LED-9) ─────────────────────────────────────
+export const useReceipts = (transactionId: string | undefined) =>
+  useQuery({ queryKey: ["ledger", "receipts", transactionId], queryFn: () => receipts.listReceipts(transactionId!), enabled: !!transactionId, staleTime: 30 * 60_000 });
+export const useReceiptCounts = (ids: string[]) =>
+  useQuery({ queryKey: ["ledger", "receipt-counts", ids.length, ids[0], ids[ids.length - 1]], queryFn: () => receipts.receiptCounts(ids), enabled: ids.length > 0 });
+export const useAddReceipt = () => useLedgerMutation(({ transactionId, file, count }: { transactionId: string; file: File; count: number }) => receipts.addReceipt(transactionId, file, count));
+export const useDeleteReceipt = () => useLedgerMutation(receipts.deleteReceipt);

@@ -6,6 +6,7 @@ import type { TxType } from "./lib/money";
 import { validateTransfer } from "./lib/money";
 import { payDateIn } from "./lib/recurring";
 import { summarize, type Summary } from "./lib/summary";
+import { removeReceiptFilesOfTransaction } from "./receipts";
 
 export type Transaction = Omit<Tables<"transactions">, "type" | "source"> & { type: TxType; source: "web" | "mcp" };
 export type Account = Tables<"accounts">;
@@ -100,8 +101,9 @@ export async function updateTransaction(id: string, t: NewTransaction): Promise<
   must(await createClient().from("transactions").update(patch).eq("id", id).select("id").single());
 }
 
-/** 하드 삭제. 호출 전에 확인 모달을 거칠 것. */
+/** 하드 삭제(영수증 파일 포함). 호출 전에 확인 모달을 거칠 것. */
 export async function deleteTransaction(id: string): Promise<void> {
+  await removeReceiptFilesOfTransaction(id); // DB 행은 cascade 로 지워지지만 Storage 파일은 직접 지워야 한다
   must(await createClient().from("transactions").delete().eq("id", id).select("id"));
 }
 
