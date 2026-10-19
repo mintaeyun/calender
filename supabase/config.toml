@@ -427,3 +427,8 @@ skip_nonce_check = true
 # JWT 검증이 켜져 있으면 모든 호출이 401 이므로 끈다. (클라우드 배포: `supabase functions deploy mcp` 가 이 설정을 따른다)
 [functions.mcp]
 verify_jwt = false
+
+# gcal-sync: OAuth 콜백(구글이 브라우저를 리다이렉트)에는 Supabase JWT 가 없으므로 게이트웨이의 JWT 검증을 끄고,
+# 각 경로에서 직접 인증한다(start/sync/disconnect/calendars = 사용자 JWT, sync-all = service role, callback = 서명된 state).
+[functions.gcal-sync]
+verify_jwt = false
