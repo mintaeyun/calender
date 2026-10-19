@@ -45,7 +45,7 @@ export function TodoDetail({ id, onDeleted }: { id: string; onDeleted: () => voi
         <span>상세</span>
         <span className="flex items-center gap-3">
           {t.event_id ? (
-            <Link href="/calendar" className="text-lime">일정 보기 ↗</Link>
+            <Link href="/calendar" className="text-lime-ink">일정 보기 ↗</Link>
           ) : (
             <button
               disabled={!t.due_date || convert.isPending}
@@ -56,11 +56,11 @@ export function TodoDetail({ id, onDeleted }: { id: string; onDeleted: () => voi
           )}
           <button
             onClick={() => { if (confirm("이 할일을 삭제할까요?")) del.mutate(t.id, { onSuccess: onDeleted }); }}
-            className="hover:text-danger"
+            className="hover:text-danger-ink"
           >삭제</button>
         </span>
       </div>
-      {convMsg && <span className="text-xs text-lime" role="status">{convMsg}</span>}
+      {convMsg && <span className="text-xs text-lime-ink" role="status">{convMsg}</span>}
       <input
         value={title}
         onChange={(e) => setTitle(e.target.value)}
@@ -89,7 +89,7 @@ export function TodoDetail({ id, onDeleted }: { id: string; onDeleted: () => voi
             const on = tagIds.includes(g.id);
             return (
               <button key={g.id} onClick={() => setTags.mutate({ todoId: t.id, tagIds: on ? tagIds.filter((x) => x !== g.id) : [...tagIds, g.id] })}
-                className={`rounded-full px-2.5 py-1 text-xs ${on ? "bg-[var(--surface-5,#3a3a40)] text-fg" : "bg-surface-2 text-fg-subtle"}`}>{g.name}</button>
+                className={`rounded-full px-2.5 py-1 text-xs ${on ? "bg-surface-5 text-fg" : "bg-surface-2 text-fg-subtle"}`}>{g.name}</button>
             );
           })}
           {tags.length === 0 && <span className="text-xs text-fg-subtle">태그 없음</span>}
@@ -104,7 +104,7 @@ export function TodoDetail({ id, onDeleted }: { id: string; onDeleted: () => voi
             <div className="flex gap-1">
               {DAY_OPTIONS.map(([code, label]) => (
                 <button key={code} onClick={() => saveRec({ ...rec, byday: rec.byday.includes(code) ? rec.byday.filter((c) => c !== code) : [...rec.byday, code] })}
-                  className={`h-7 w-7 rounded-full text-xs ${rec.byday.includes(code) ? "bg-lime text-[color:var(--on-accent,#0b0b0c)]" : "bg-surface-2 text-fg-subtle"}`}>{label}</button>
+                  className={`h-7 w-7 rounded-full text-xs ${rec.byday.includes(code) ? "bg-lime text-on-accent" : "bg-surface-2 text-fg-subtle"}`}>{label}</button>
               ))}
             </div>
           )}
@@ -122,21 +122,21 @@ export function TodoDetail({ id, onDeleted }: { id: string; onDeleted: () => voi
         {items.map((i) => (
           <div key={i.id} className="group flex items-center gap-2.5 text-sm">
             <button aria-label="체크" onClick={() => updItem.mutate({ id: i.id, patch: { done: !i.done } })}
-              className="flex h-4 w-4 items-center justify-center rounded border-[1.5px] border-[color:var(--fg-faint,#55555c)] text-[10px]">{i.done ? "✓" : ""}</button>
-            <span className={`flex-1 ${i.done ? "text-[color:var(--fg-dim,#6c6c73)] line-through" : ""}`}>{i.text}</span>
+              className="flex h-4 w-4 items-center justify-center rounded border-[1.5px] border-fg-faint text-[10px]">{i.done ? "✓" : ""}</button>
+            <span className={`flex-1 ${i.done ? "text-fg-dim line-through" : ""}`}>{i.text}</span>
             <button aria-label="항목 삭제" onClick={() => delItem.mutate(i.id)} className="p-1.5 text-fg-subtle opacity-100 focus:opacity-100 sm:opacity-0 sm:group-hover:opacity-100">✕</button>
           </div>
         ))}
-        {items.length === 0 && <span className="text-sm text-[color:var(--fg-dim,#6c6c73)]">체크리스트 없음</span>}
+        {items.length === 0 && <span className="text-sm text-fg-dim">체크리스트 없음</span>}
         <form onSubmit={(e) => { e.preventDefault(); const v = newItem.trim(); if (!v) return; addItem.mutate({ todoId: t.id, text: v, positions: items.map((i) => i.position) }); setNewItem(""); }}>
-          <input aria-label="체크리스트 항목 추가" value={newItem} onChange={(e) => setNewItem(e.target.value)} placeholder="+ 항목 추가" className="w-full bg-transparent text-[13px] text-fg outline-none placeholder:text-[color:var(--fg-dim,#6c6c73)]" />
+          <input aria-label="체크리스트 항목 추가" value={newItem} onChange={(e) => setNewItem(e.target.value)} placeholder="+ 항목 추가" className="w-full bg-transparent text-[13px] text-fg outline-none placeholder:text-fg-dim" />
         </form>
       </div>
 
       <div className="flex flex-col gap-2 border-t border-border pt-3.5">
         <span className="text-[13px] text-fg-subtle">메모</span>
         <textarea aria-label="메모" value={notes} onChange={(e) => setNotes(e.target.value)} onBlur={() => { if (notes !== (t.notes ?? "")) patch({ notes: notes || null }); }}
-          rows={4} placeholder="메모 없음" className="resize-y bg-transparent text-sm leading-relaxed text-fg-muted outline-none placeholder:text-[color:var(--fg-dim,#6c6c73)]" />
+          rows={4} placeholder="메모 없음" className="resize-y bg-transparent text-sm leading-relaxed text-fg-muted outline-none placeholder:text-fg-dim" />
       </div>
     </div>
   );

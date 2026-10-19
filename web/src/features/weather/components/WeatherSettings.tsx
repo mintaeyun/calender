@@ -50,13 +50,13 @@ export function WeatherSettings() {
       <div className="flex gap-2">
         <input value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => e.key === "Enter" && search()} placeholder="도시 검색 (예: 서울, 부산)" className="min-w-0 flex-1 rounded-xl bg-surface-3 px-3 py-2 text-sm outline-none" />
         <button onClick={search} disabled={busy} className="rounded-xl bg-fg px-4 text-sm font-semibold text-bg disabled:opacity-60">검색</button>
-        <button onClick={here} disabled={busy} className="rounded-xl border border-[color:var(--border-strong,#3a3a40)] px-3 text-sm">현재 위치</button>
+        <button onClick={here} disabled={busy} className="rounded-xl border border-border-strong px-3 text-sm">현재 위치</button>
       </div>
       {results && (
         <ul className="flex flex-col rounded-2xl bg-surface-3">
           {results.map((r) => (
             <li key={`${r.lat},${r.lon}`}>
-              <button onClick={() => choose(r)} className="flex w-full justify-between gap-2 px-4 py-3 text-left text-sm hover:bg-[var(--surface-4,#2a2a2e)]">
+              <button onClick={() => choose(r)} className="flex w-full justify-between gap-2 px-4 py-3 text-left text-sm hover:bg-surface-4">
                 <span>{r.name}</span><span className="text-fg-subtle">{[r.admin, r.country].filter(Boolean).join(" · ")}</span>
               </button>
             </li>
@@ -69,8 +69,8 @@ export function WeatherSettings() {
           <option value="C">℃</option><option value="F">℉</option>
         </select>
       </label>
-      {msg && <span className="text-sm text-lime" role="status">{msg}</span>}
-      <span className="text-xs text-[color:var(--fg-dim,#6c6c73)]">날씨는 서버에서 가져와 30분간 캐시해요. 비 예보 알림은 일정의 장소가 아니라 이 기본 지역의 예보를 기준으로 해요.</span>
+      {msg && <span className="text-sm text-lime-ink" role="status">{msg}</span>}
+      <span className="text-xs text-fg-dim">날씨는 서버에서 가져와 30분간 캐시해요. 비 예보 알림은 일정의 장소가 아니라 이 기본 지역의 예보를 기준으로 해요.</span>
     </div>
   );
 }

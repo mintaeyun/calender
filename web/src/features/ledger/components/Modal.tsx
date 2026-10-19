@@ -40,7 +40,7 @@ export function Modal({ title, onClose, children, width = 540 }: { title?: strin
       <div
         ref={ref} role="dialog" aria-modal="true" aria-label={title} tabIndex={-1}
         onClick={(e) => e.stopPropagation()} style={{ width }}
-        className="flex max-h-[92vh] max-w-full flex-col gap-[18px] overflow-y-auto rounded-[28px] border border-border bg-[var(--surface-modal,#161619)] p-5 outline-none sm:p-[26px]"
+        className="flex max-h-[92vh] max-w-full flex-col gap-[18px] overflow-y-auto rounded-[28px] border border-border bg-surface-modal p-5 outline-none sm:p-[26px]"
       >
         <div className="flex items-center justify-between">
           <span className="text-lg font-semibold">{title}</span>

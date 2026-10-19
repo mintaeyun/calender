@@ -57,11 +57,11 @@ export function SearchPage() {
 
   return (
     <div className="mx-auto flex w-full max-w-[860px] flex-col gap-[18px]">
-      <form role="search" onSubmit={(e) => e.preventDefault()} className="flex items-center gap-3.5 rounded-full border border-[color:var(--border-strong,#3a3a40)] bg-surface px-6 py-4 text-lg">
+      <form role="search" onSubmit={(e) => e.preventDefault()} className="flex items-center gap-3.5 rounded-full border border-border-strong bg-surface px-6 py-4 text-lg">
         <span aria-hidden className="h-4 w-4 shrink-0 rounded-full border-2 border-fg-muted" />
         <input
           autoFocus value={input} onChange={(e) => setInput(e.target.value)} aria-label="검색어" placeholder="일정, 할일, 거래를 검색하세요"
-          className="min-w-0 flex-1 bg-transparent text-lg outline-none placeholder:text-[color:var(--fg-faint,#55555c)]"
+          className="min-w-0 flex-1 bg-transparent text-lg outline-none placeholder:text-fg-faint"
         />
         {search.isSuccess && <span className="whitespace-nowrap text-[13px] text-fg-subtle">{totalCount(counts)}개 결과</span>}
       </form>
@@ -69,7 +69,7 @@ export function SearchPage() {
       {!isSearchable(q) && (
         <div className="flex flex-col gap-2">
           <span className="text-[13px] text-fg-subtle">최근 검색</span>
-          {recent.length === 0 && <span className="text-sm text-[color:var(--fg-dim,#6c6c73)]">최근 검색어가 없어요</span>}
+          {recent.length === 0 && <span className="text-sm text-fg-dim">최근 검색어가 없어요</span>}
           <div className="flex flex-wrap gap-2">
             {recent.map((r) => (
               <span key={r} className="flex items-center rounded-full bg-surface-2 text-sm">
@@ -88,10 +88,10 @@ export function SearchPage() {
               <button key={k} role="tab" aria-selected={tab === k} onClick={() => setTab(k)} className={`rounded-full px-4 py-2 text-sm ${tab === k ? "bg-fg font-semibold text-bg" : "bg-surface-2 text-fg-muted"}`}>{label}</button>
             ))}
           </div>
-          {search.isLoading && <div className="p-10 text-center text-[color:var(--fg-dim,#6c6c73)]">검색 중…</div>}
-          {search.isError && <div className="text-sm text-danger" role="alert">검색하지 못했어요. {(search.error as Error).message}</div>}
+          {search.isLoading && <div className="p-10 text-center text-fg-dim">검색 중…</div>}
+          {search.isError && <div className="text-sm text-danger-ink" role="alert">검색하지 못했어요. {(search.error as Error).message}</div>}
           {search.isSuccess && totalCount(counts) === 0 && Object.keys(errors).length === 0 && (
-            <div className="p-10 text-center text-[15px] text-[color:var(--fg-dim,#6c6c73)]">&lsquo;{q}&rsquo;에 대한 결과가 없어요</div>
+            <div className="p-10 text-center text-[15px] text-fg-dim">&lsquo;{q}&rsquo;에 대한 결과가 없어요</div>
           )}
 
           <div className="flex flex-col gap-2.5">
@@ -101,14 +101,14 @@ export function SearchPage() {
               return (
                 <section key={g} className="flex flex-col gap-2.5" aria-label={GROUP_LABEL[g]}>
                   <h2 className="mt-2 text-[13px] font-normal text-fg-subtle">{GROUP_LABEL[g]}</h2>
-                  {errors[g] && <span className="text-sm text-danger">{GROUP_LABEL[g]} 검색에 실패했어요</span>}
+                  {errors[g] && <span className="text-sm text-danger-ink">{GROUP_LABEL[g]} 검색에 실패했어요</span>}
                   {g === "events" && res?.events.map((e) => {
                     const day = dateKey(e.start_at, tz);
                     return (
                       <Link key={e.id} href={`/calendar?view=day&date=${day}`} className={`${card} no-underline hover:no-underline`}>
                         <span className="flex items-center justify-between gap-2">
                           <span className="text-[15px] font-semibold text-fg">{e.title}</span>
-                          {day === today && <span className="rounded-full bg-lime px-2.5 py-[3px] text-xs font-bold text-[color:var(--on-accent,#0b0b0c)]">오늘</span>}
+                          {day === today && <span className="rounded-full bg-lime px-2.5 py-[3px] text-xs font-bold text-on-accent">오늘</span>}
                         </span>
                         <span className="text-[13px] text-fg-subtle">{e.all_day ? `${day} 종일` : formatDateTimeKo(e.start_at, tz)}{e.location ? ` · ${e.location}` : ""}{e.rrule ? " · 반복" : ""}</span>
                       </Link>
@@ -124,7 +124,7 @@ export function SearchPage() {
                     <Link key={t.id} href={`/ledger?from=${t.date}&to=${t.date}`} className={`${card} no-underline hover:no-underline`}>
                       <span className="flex items-center justify-between gap-3">
                         <span className="min-w-0 truncate text-[15px] font-semibold text-fg">{t.memo || (t.type === "transfer" ? "이체" : "메모 없음")}</span>
-                        <span className={`whitespace-nowrap font-semibold ${t.type === "income" ? "text-lime" : "text-fg"}`}>{formatSigned(t.amount, t.type)}</span>
+                        <span className={`whitespace-nowrap font-semibold ${t.type === "income" ? "text-lime-ink" : "text-fg"}`}>{formatSigned(t.amount, t.type)}</span>
                       </span>
                       <span className="text-[13px] text-fg-subtle">{t.date}{t.type === "transfer" ? "" : catName(t.category_id) ? ` · ${catName(t.category_id)}` : ""}</span>
                     </Link>
