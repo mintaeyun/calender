@@ -11,7 +11,7 @@ export function Seg<T extends string>({ value, onChange, items, label }: { value
           role="radio"
           aria-checked={k === value}
           onClick={() => onChange(k)}
-          className={`rounded-full px-4 py-[7px] text-sm ${k === value ? "bg-[#3a3a40] font-semibold text-white" : "text-fg-subtle"}`}
+          className={`rounded-full px-4 py-[7px] text-sm ${k === value ? "bg-surface-5 font-semibold text-fg" : "text-fg-subtle"}`}
         >
           {text}
         </button>
