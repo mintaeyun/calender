@@ -76,3 +76,16 @@ export const useDeleteProject = () => useTodoMutation((id: string) => api.delete
 export const useCreateTag = () => useTodoMutation(({ name, color }: { name: string; color?: string }) => api.createTag(name, color));
 export const useUpdateTag = () => useTodoMutation(({ id, patch }: { id: string; patch: Parameters<typeof api.updateTag>[1] }) => api.updateTag(id, patch));
 export const useDeleteTag = () => useTodoMutation((id: string) => api.deleteTag(id));
+
+/** 일정으로 전환(TODO-8). 성공하면 할일과 캘린더(['events']) 캐시를 모두 새로 불러온다. */
+export function useConvertTodoToEvent() {
+  const qc = useQueryClient();
+  const tz = useTimezone();
+  return useMutation({
+    mutationFn: (todo: Pick<Todo, "id" | "due_date">) => api.convertTodoToEvent(todo, tz),
+    onSettled: () => {
+      qc.invalidateQueries({ queryKey: todoKeys.all });
+      qc.invalidateQueries({ queryKey: ["events"] });
+    },
+  });
+}

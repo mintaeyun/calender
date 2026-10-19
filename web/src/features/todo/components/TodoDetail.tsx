@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useAddItem, useDeleteItem, useDeleteTodo, useProjects, useSetTodoTags, useTags, useTodo, useUpdateItem, useUpdateTodo } from "../hooks";
+import Link from "next/link";
+import { useAddItem, useConvertTodoToEvent, useDeleteItem, useDeleteTodo, useProjects, useSetTodoTags, useTags, useTodo, useUpdateItem, useUpdateTodo } from "../hooks";
 import { PRIORITIES, PRI_LABEL, DAY_OPTIONS, buildRule, dueFull, parseRule, recurrenceLabel, type RecurrenceDraft } from "../lib/display";
 import type { Priority } from "../lib/due";
 
@@ -18,6 +19,8 @@ export function TodoDetail({ id, onDeleted }: { id: string; onDeleted: () => voi
   const updItem = useUpdateItem();
   const delItem = useDeleteItem();
   const del = useDeleteTodo();
+  const convert = useConvertTodoToEvent();
+  const [convMsg, setConvMsg] = useState("");
   const [title, setTitle] = useState("");
   const [notes, setNotes] = useState("");
   const [newItem, setNewItem] = useState("");
@@ -40,11 +43,24 @@ export function TodoDetail({ id, onDeleted }: { id: string; onDeleted: () => voi
     <div className="flex flex-col gap-4 rounded-[22px] bg-surface p-[22px]">
       <div className="flex items-center justify-between text-[13px] text-fg-subtle">
         <span>상세</span>
-        <button
-          onClick={() => { if (confirm("이 할일을 삭제할까요?")) del.mutate(t.id, { onSuccess: onDeleted }); }}
-          className="hover:text-danger"
-        >삭제</button>
+        <span className="flex items-center gap-3">
+          {t.event_id ? (
+            <Link href="/calendar" className="text-lime">일정 보기 ↗</Link>
+          ) : (
+            <button
+              disabled={!t.due_date || convert.isPending}
+              title={t.due_date ? "마감일 기준 종일 일정으로 만들어요" : "마감일이 있어야 전환할 수 있어요"}
+              onClick={() => { setConvMsg(""); convert.mutate(t, { onSuccess: (r) => setConvMsg(r.created ? "캘린더에 종일 일정을 만들었어요" : "이미 전환된 할일이에요"), onError: (e) => setConvMsg((e as Error).message) }); }}
+              className="hover:text-fg disabled:opacity-40"
+            >일정으로 전환 ↗</button>
+          )}
+          <button
+            onClick={() => { if (confirm("이 할일을 삭제할까요?")) del.mutate(t.id, { onSuccess: onDeleted }); }}
+            className="hover:text-danger"
+          >삭제</button>
+        </span>
       </div>
+      {convMsg && <span className="text-xs text-lime" role="status">{convMsg}</span>}
       <input
         value={title}
         onChange={(e) => setTitle(e.target.value)}
