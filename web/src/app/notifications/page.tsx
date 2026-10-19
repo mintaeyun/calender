@@ -1,5 +1,5 @@
-import { PagePlaceholder } from "@/components/layout/PagePlaceholder";
+import { NotificationInbox } from "@/features/notifications/components/NotificationInbox";
 
 export default function Page() {
-  return <PagePlaceholder title="알림" />;
+  return <NotificationInbox />;
 }
