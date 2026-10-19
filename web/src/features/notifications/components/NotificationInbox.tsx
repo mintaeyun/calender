@@ -24,11 +24,11 @@ export function NotificationInbox() {
     <div className="mx-auto flex w-full max-w-[860px] flex-col gap-[18px]">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-display text-[30px]">알림 <span className="text-fg-subtle">{unread ? `읽지 않음 ${unread}` : "모두 읽음"}</span></h1>
-        <button onClick={() => markAll.mutate(undefined)} disabled={unread === 0} className="rounded-full border border-[color:var(--border-strong,#3a3a40)] px-[18px] py-2.5 text-sm disabled:opacity-40">모두 읽음</button>
+        <button onClick={() => markAll.mutate(undefined)} disabled={unread === 0} className="rounded-full border border-border-strong px-[18px] py-2.5 text-sm disabled:opacity-40">모두 읽음</button>
       </div>
-      {isError && <div className="text-sm text-danger">{(error as Error).message}</div>}
+      {isError && <div className="text-sm text-danger-ink">{(error as Error).message}</div>}
       <ul className="flex flex-col rounded-[22px] bg-surface px-[22px] py-2">
-        {isLoading && <li className="p-10 text-center text-[color:var(--fg-dim,#6c6c73)]">불러오는 중…</li>}
+        {isLoading && <li className="p-10 text-center text-fg-dim">불러오는 중…</li>}
         {data.map((n) => {
           const m = typeMeta(n.type);
           return (
@@ -45,13 +45,13 @@ export function NotificationInbox() {
                 <span>{relativeTime(n.scheduled_at, new Date(), tz)}</span>
                 <span className="flex gap-1">
                   {!n.read_at && <button onClick={() => markRead.mutate(n.id)} className="px-2 py-1.5">읽음 처리</button>}
-                  <button onClick={() => del.mutate(n.id)} aria-label={`${n.title} 알림 삭제`} className="px-2 py-1.5 hover:text-danger">삭제</button>
+                  <button onClick={() => del.mutate(n.id)} aria-label={`${n.title} 알림 삭제`} className="px-2 py-1.5 hover:text-danger-ink">삭제</button>
                 </span>
               </div>
             </li>
           );
         })}
-        {!isLoading && data.length === 0 && <li className="p-10 text-center text-[15px] text-[color:var(--fg-dim,#6c6c73)]">새 알림이 없어요</li>}
+        {!isLoading && data.length === 0 && <li className="p-10 text-center text-[15px] text-fg-dim">새 알림이 없어요</li>}
       </ul>
     </div>
   );

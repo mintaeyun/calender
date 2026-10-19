@@ -49,7 +49,7 @@ export function ProjectTagPanel() {
               const msg = r.k === "project" ? `'${r.name}' 프로젝트를 삭제할까요? 소속 할일은 프로젝트 없음으로 이동해요.` : `'${r.name}' 태그를 삭제할까요?`;
               if (confirm(msg)) (r.k === "project" ? deleteProject : deleteTag).mutate(r.id);
             }}
-            className="text-xs text-fg-subtle hover:text-danger"
+            className="text-xs text-fg-subtle hover:text-danger-ink"
           >삭제</button>
         </div>
       ))}
@@ -61,7 +61,7 @@ export function ProjectTagPanel() {
       <div className="flex gap-1.5">
         {COLORS.map((c) => <button key={c} aria-label="색 선택" onClick={() => setColor(c)} className={`h-5 w-5 rounded-full ${color === c ? "ring-2 ring-fg" : ""}`} style={{ background: c }} />)}
       </div>
-      {err && <span className="text-xs text-danger">{err}</span>}
+      {err && <span className="text-xs text-danger-ink">{err}</span>}
     </div>
   );
 }

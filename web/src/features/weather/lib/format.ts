@@ -53,4 +53,4 @@ export const ICON_EMOJI: Record<string, string> = { clear: "☀️", partly: "�
 
 export const AIR_LABEL: Record<string, string> = { good: "좋음", normal: "보통", bad: "나쁨", very_bad: "매우나쁨" };
 /** 등급 색: 좋음=라임, 보통=회색, 나쁨/매우나쁨=경고색 (색 외에 등급 텍스트를 항상 병기) */
-export const AIR_COLOR: Record<string, string> = { good: "var(--lime)", normal: "var(--fg-muted)", bad: "var(--danger)", very_bad: "var(--danger)" };
+export const AIR_COLOR: Record<string, string> = { good: "var(--lime-ink)", normal: "var(--fg-muted)", bad: "var(--danger-ink)", very_bad: "var(--danger-ink)" };

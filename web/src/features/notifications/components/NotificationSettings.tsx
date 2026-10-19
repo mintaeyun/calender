@@ -10,7 +10,7 @@ const REMINDER_OPTIONS: [number, string][] = [[0, "정시"], [10, "10분 전"], 
 function Switch({ on, onClick, label, disabled }: { on: boolean; onClick?: () => void; label: string; disabled?: boolean }) {
   return (
     <button role="switch" aria-checked={on} aria-label={label} disabled={disabled} onClick={onClick}
-      className={`relative h-6 w-11 shrink-0 rounded-full ${disabled ? "opacity-50" : ""}`} style={{ background: on ? "var(--lime)" : "#3a3a40" }}>
+      className={`relative h-6 w-11 shrink-0 rounded-full ${disabled ? "opacity-50" : ""}`} style={{ background: on ? "var(--lime)" : "var(--surface-5)" }}>
       <span className="absolute top-[3px] h-[18px] w-[18px] rounded-full bg-fg" style={{ left: on ? 23 : 3 }} />
     </button>
   );
@@ -23,7 +23,7 @@ export function NotificationSettings() {
   const [msg, setMsg] = useState("");
 
   if (isLoading) return <div className="text-sm text-fg-subtle">불러오는 중…</div>;
-  if (isError || !s) return <div className="text-sm text-danger">{(error as Error | null)?.message ?? "설정을 불러오지 못했어요"}</div>;
+  if (isError || !s) return <div className="text-sm text-danger-ink">{(error as Error | null)?.message ?? "설정을 불러오지 못했어요"}</div>;
 
   const enabled = (s.enabled_types ?? {}) as Partial<Record<NotificationType, boolean>>;
   const channels = (s.channels ?? {}) as { in_app?: boolean; push?: boolean; email?: boolean };
@@ -89,12 +89,12 @@ export function NotificationSettings() {
         <span className="text-sm font-semibold">새 일정의 기본 알림</span>
         <div className="flex flex-wrap gap-2">
           {REMINDER_OPTIONS.map(([m, l]) => (
-            <button key={m} onClick={() => toggleReminder(m)} className={`rounded-full px-3.5 py-1.5 text-sm ${reminders.includes(m) ? "bg-[var(--surface-5,#3a3a40)] font-semibold text-fg" : "bg-surface-3 text-fg-subtle"}`}>{l}</button>
+            <button key={m} onClick={() => toggleReminder(m)} className={`rounded-full px-3.5 py-1.5 text-sm ${reminders.includes(m) ? "bg-surface-5 font-semibold text-fg" : "bg-surface-3 text-fg-subtle"}`}>{l}</button>
           ))}
         </div>
       </div>
 
-      {msg && <span className="text-sm text-danger" role="alert">{msg}</span>}
+      {msg && <span className="text-sm text-danger-ink" role="alert">{msg}</span>}
     </div>
   );
 }
