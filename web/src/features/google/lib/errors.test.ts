@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { classifyGoogleError, lastSyncedLabel, oauthReturnMessage, shouldAutoSync } from "./errors";
+import { classifyGoogleError, isTargetCalendar, lastSyncedLabel, oauthReturnMessage, shouldAutoSync } from "./errors";
 
 describe("classifyGoogleError", () => {
   it("오류 없음", () => {
@@ -28,6 +28,7 @@ describe("표시 유틸", () => {
   it("OAuth 복귀 메시지", () => {
     expect(oauthReturnMessage("connected")?.ok).toBe(true);
     expect(oauthReturnMessage("denied")?.ok).toBe(false);
+    expect(oauthReturnMessage("no_target")?.text).toContain("mycal");
     expect(oauthReturnMessage(null)).toBeNull();
   });
   it("자동 동기화 조건", () => {
@@ -35,5 +36,12 @@ describe("표시 유틸", () => {
     expect(shouldAutoSync({ last_synced_at: "2026-10-14T04:58:00Z", last_error: null }, now)).toBe(false);
     expect(shouldAutoSync({ last_synced_at: "2026-10-14T04:00:00Z", last_error: null }, now)).toBe(true);
     expect(shouldAutoSync({ last_synced_at: "2026-10-14T04:00:00Z", last_error: "invalid_grant: x" }, now)).toBe(false);
+  });
+});
+
+describe("isTargetCalendar", () => {
+  it("mycal 만 대상", () => {
+    expect(isTargetCalendar(" MyCal ")).toBe(true);
+    expect(isTargetCalendar("개인")).toBe(false);
   });
 });

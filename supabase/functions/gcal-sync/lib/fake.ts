@@ -12,7 +12,7 @@ export class FakeStore implements EventStore, ConnStore, ConnAdmin {
   private seq = 0;
   conn: Connection | null = { refresh_token_enc: "enc", sync_direction: "import_only", sync_token_by_calendar: {} };
   lockUntil: Date | null = null;
-  calendars: { id: string; google_calendar_id: string; name: string }[] = [{ id: "cal-1", google_calendar_id: "primary@x.com", name: "개인" }];
+  calendars: { id: string; google_calendar_id: string; name: string }[] = [{ id: "cal-1", google_calendar_id: "primary@x.com", name: "mycal" }];
   tz = "Asia/Seoul";
   result: { last_synced_at?: string; last_error: string | null } | null = null;
   logs: { kind: string; detail: Record<string, unknown> }[] = [];

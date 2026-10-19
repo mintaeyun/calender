@@ -6,7 +6,7 @@ import {
   disconnectGoogle, getConnection, listGoogleCalendars, refreshCalendarList, setCalendarEnabled, setSyncDirection, startConnect, syncNow,
   type GoogleConnection,
 } from "./api";
-import { shouldAutoSync } from "./lib/errors";
+import { isTargetCalendar, shouldAutoSync } from "./lib/errors";
 
 export const connectionKey = ["google", "connection"] as const;
 export const calendarsKey = ["google", "calendars"] as const;
@@ -17,7 +17,13 @@ export function useGoogleConnection() {
 }
 
 export function useGoogleCalendars(enabled = true) {
-  return useQuery({ queryKey: calendarsKey, queryFn: listGoogleCalendars, enabled, staleTime: 30_000 });
+  return useQuery({
+    queryKey: calendarsKey,
+    // mycal 외의 캘린더(이전에 저장된 것 포함)는 화면에서 숨긴다
+    queryFn: async () => (await listGoogleCalendars()).filter((c) => isTargetCalendar(c.name)),
+    enabled,
+    staleTime: 30_000,
+  });
 }
 
 export function useGoogleActions() {

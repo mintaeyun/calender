@@ -110,13 +110,17 @@ function Panel() {
 
       <div className="flex flex-col gap-1.5 border-t border-border pt-4">
         <div className="mb-1 flex items-center justify-between">
-          <span className="text-sm font-semibold">동기화할 캘린더</span>
+          <span className="text-sm font-semibold">동기화할 캘린더 (mycal)</span>
           <button className="text-[13px] text-fg-subtle hover:text-fg" disabled={act.refreshList.isPending} onClick={() => act.refreshList.mutate()}>
             {act.refreshList.isPending ? "불러오는 중…" : "목록 새로고침"}
           </button>
         </div>
         {act.refreshList.isError && <p role="alert" className="text-sm text-danger-ink">{(act.refreshList.error as Error).message}</p>}
-        {calendars.data?.length === 0 && <span className="text-sm text-fg-subtle">캘린더가 없어요. 목록을 새로고침해 보세요.</span>}
+        {calendars.data?.length === 0 && (
+          <p role="status" className="rounded-xl bg-surface-3 px-3.5 py-3 text-[13px] leading-relaxed text-fg-muted">
+            Google 캘린더에서 이름이 <b>mycal</b> 인 캘린더를 찾지 못했어요. Google 캘린더에서 mycal 캘린더를 만들거나 이름을 확인한 뒤 '목록 새로고침'을 눌러 주세요. 이 앱은 mycal 캘린더 하나만 연동합니다.
+          </p>
+        )}
         {calendars.data?.map((c) => (
           <label key={c.id} className="flex cursor-pointer items-center gap-3 py-1.5 text-sm" style={{ color: c.sync_enabled ? undefined : "var(--fg-subtle)" }}>
             <input

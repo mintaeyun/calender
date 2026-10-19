@@ -38,6 +38,7 @@ export function classifyGoogleError(lastError: string | null | undefined): Googl
 export function oauthReturnMessage(status: string | null): { ok: boolean; text: string } | null {
   switch (status) {
     case "connected": return { ok: true, text: "Google 계정을 연결했어요. 일정을 가져오는 중입니다." };
+    case "no_target": return { ok: false, text: "Google 계정은 연결했지만 'mycal' 캘린더를 찾지 못했어요. Google 캘린더에서 이름이 mycal 인 캘린더를 만들거나 이름을 확인한 뒤 '목록 새로고침'을 눌러 주세요." };
     case "denied": return { ok: false, text: "Google 연결을 취소했어요." };
     case "no_refresh": return { ok: false, text: "Google에서 장기 연결 권한을 받지 못했어요. Google 계정의 앱 접근 권한에서 이 앱을 제거한 뒤 다시 연결해 주세요." };
     case "error": return { ok: false, text: "Google 연결 중 오류가 발생했어요. 다시 시도해 주세요." };
@@ -62,3 +63,8 @@ export function shouldAutoSync(c: { last_synced_at: string | null; last_error: s
   if (!c.last_synced_at) return true;
   return now.getTime() - new Date(c.last_synced_at).getTime() > intervalMs;
 }
+
+/** 동기화 대상 캘린더 이름 (gcal-sync 함수의 target.ts 와 같은 규칙) */
+export const TARGET_CALENDAR_NAME = "mycal";
+export const isTargetCalendar = (name: string | null | undefined) =>
+  (name ?? "").replace(/s+/g, "").toLowerCase() === TARGET_CALENDAR_NAME;

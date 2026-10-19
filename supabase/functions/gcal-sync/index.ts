@@ -24,7 +24,8 @@ function makeDeps(userId: string | null): { deps: HandlerDeps; store: DbStore } 
   const api = createGoogleApi({ clientId: env("GOOGLE_CLIENT_ID"), clientSecret: env("GOOGLE_CLIENT_SECRET") });
   const ring = keyRingFromEnv((n) => Deno.env.get(n));
   const now = () => new Date();
-  const base = { api, events: store, conn: store, ring, now, budgetMs: 90_000 };
+  const targetName = Deno.env.get("GOOGLE_TARGET_CALENDAR") ?? undefined;
+  const base = { api, events: store, conn: store, ring, now, budgetMs: 90_000, targetName };
   const deps: HandlerDeps = {
     api, ring, now,
     redirectUri: `${env("SUPABASE_URL")}/functions/v1/gcal-sync/oauth/callback`,
@@ -37,6 +38,7 @@ function makeDeps(userId: string | null): { deps: HandlerDeps; store: DbStore } 
     },
     syncBudgetMs: 90_000,
     syncAllBudgetMs: 100_000,
+    targetName: Deno.env.get("GOOGLE_TARGET_CALENDAR") ?? undefined,
   };
   return { deps, store };
 }

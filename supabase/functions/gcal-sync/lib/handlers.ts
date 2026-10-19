@@ -3,6 +3,7 @@ import { badRequest, HttpError } from "../../_shared/errors.ts";
 import { decryptToken, encryptToken, signState, verifyState, type KeyRing } from "./crypto.ts";
 import { GoogleApiError, type GoogleApi, type GoogleCalendarEntry } from "./google.ts";
 import { syncAll, syncUser, type RunDeps } from "./run.ts";
+import { isTargetCalendar, TARGET_CALENDAR_NAME } from "./target.ts";
 
 export type CalendarOut = {
   id: string;
@@ -40,6 +41,8 @@ export type HandlerDeps = {
   runDeps: (userId: string) => RunDeps;
   syncBudgetMs: number;
   syncAllBudgetMs: number;
+  /** 동기화할 구글 캘린더 이름 (기본 "mycal") */
+  targetName?: string;
 };
 
 const STATE_TTL_SEC = 600;
@@ -82,13 +85,14 @@ export async function oauthCallback(params: URLSearchParams, d: HandlerDeps): Pr
   try {
     const { refreshToken, accessToken } = await d.api.exchangeCode(code, d.redirectUri);
     if (!refreshToken) return back("no_refresh"); // prompt=consent 인데도 없으면 앱 권한을 지우고 다시 연결해야 한다
-    const calendars = await d.api.listCalendars(accessToken);
-    const primary = calendars.find((c) => c.primary) ?? calendars[0];
+    const all = await d.api.listCalendars(accessToken);
+    const primary = all.find((c) => c.primary) ?? all[0]; // 계정 이메일은 기본 캘린더 id
+    const targets = all.filter((c) => isTargetCalendar(c.summary, d.targetName));
     const enc = await encryptToken(refreshToken, d.ring);
-    const { created } = await d.admin.upsertConnection(payload.u, { google_email: primary?.id ?? "", refresh_token_enc: enc });
-    // 처음 연결할 때는 기본 캘린더만 켠다. 나머지는 설정에서 고른다(GCAL-2).
-    await d.admin.upsertCalendars(payload.u, calendars, created && primary ? [primary.id] : []);
-    return back("connected");
+    await d.admin.upsertConnection(payload.u, { google_email: primary?.id ?? "", refresh_token_enc: enc });
+    // 대상 캘린더(mycal)만 저장하고 처음 연결할 때 자동으로 켠다. 다른 캘린더는 앱에 가져오지 않는다.
+    await d.admin.upsertCalendars(payload.u, targets, targets.map((c) => c.id));
+    return back(targets.length ? "connected" : "no_target");
   } catch (e) {
     console.error("oauth callback failed", e instanceof GoogleApiError ? `${e.code}` : (e as Error).name);
     return back("error");
@@ -100,8 +104,13 @@ export async function refreshCalendars(userId: string, d: HandlerDeps) {
   const enc = await d.admin.getRefreshToken(userId);
   if (!enc) throw new HttpError(404, "not_connected", "Google 계정이 연결되어 있지 않습니다.");
   const access = await d.api.refreshAccessToken(await decryptToken(enc, d.ring));
-  await d.admin.upsertCalendars(userId, await d.api.listCalendars(access), []);
-  return { calendars: await d.admin.listGoogleCalendars(userId) };
+  const targets = (await d.api.listCalendars(access)).filter((c) => isTargetCalendar(c.summary, d.targetName));
+  await d.admin.upsertCalendars(userId, targets, targets.map((c) => c.id));
+  return {
+    calendars: (await d.admin.listGoogleCalendars(userId)).filter((c) => isTargetCalendar(c.name, d.targetName)),
+    target_found: targets.length > 0,
+    target_name: d.targetName ?? TARGET_CALENDAR_NAME,
+  };
 }
 
 export async function runSync(userId: string, d: HandlerDeps) {

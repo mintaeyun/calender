@@ -247,12 +247,19 @@ describe("syncUser", () => {
   });
 
   it("캘린더가 구글에서 사라졌으면(404) 그 캘린더만 건너뜀", async () => {
-    store.calendars.push({ id: "cal-2", google_calendar_id: "other@x.com", name: "가족" });
+    store.calendars.push({ id: "cal-2", google_calendar_id: "other@x.com", name: " My Cal " });
     api.pages.push(new GoogleApiError(404, "not_found", "x", false), { items: [timed("z", "Z")], nextSyncToken: "t" });
     const r = await syncUser(deps(), "u1");
     expect(r.status).toBe("ok");
-    expect(store.logs[0].detail).toMatchObject({ calendar: "개인" });
+    expect(store.logs[0].detail).toMatchObject({ calendar: "mycal" });
     expect(store.byGoogle("z")).toBeDefined();
+  });
+
+  it("mycal 이 아닌 캘린더는 선택돼 있어도 동기화하지 않는다", async () => {
+    store.calendars.push({ id: "cal-x", google_calendar_id: "family@x.com", name: "가족" });
+    api.pages.push({ items: [timed("a", "A")], nextSyncToken: "t" });
+    await syncUser(deps(), "u1");
+    expect(api.calls.map((c) => c.calendarId)).toEqual(["primary@x.com"]);
   });
 
   it("연결 없음 / 선택된 캘린더 없음", async () => {
