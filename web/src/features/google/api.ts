@@ -64,8 +64,8 @@ export async function listGoogleCalendars(): Promise<GoogleCalendar[]> {
     .order("name");
   if (error) throw error;
   const out: GoogleCalendar[] = [];
-  // read_only 컬럼은 07 마이그레이션 적용 후 생성 타입에 들어온다(그 전에는 unknown 경유).
-  for (const c of (data ?? []) as unknown as Omit<GoogleCalendar, "event_count">[]) {
+
+  for (const c of (data ?? []) as Omit<GoogleCalendar, "event_count">[]) {
     const { count } = await db.from("events").select("id", { count: "exact", head: true }).eq("calendar_id", c.id).is("deleted_at", null);
     out.push({ ...c, event_count: count ?? 0 });
   }
