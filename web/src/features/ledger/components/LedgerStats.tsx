@@ -56,12 +56,12 @@ export function LedgerStats() {
   const total = monthOverMonth(curSameCats.reduce((s, c) => s + c.amount, 0), previous.reduce((s, c) => s + c.amount, 0));
 
   const pctText = (pct: number | null, diff: number) => (pct === null ? (diff === 0 ? "0%" : "신규") : `${pct > 0 ? "+" : pct < 0 ? "−" : ""}${Math.abs(pct).toFixed(1)}%`);
-  const pctColor = (diff: number) => (diff > 0 ? "text-danger" : diff < 0 ? "text-lime" : "");
+  const pctColor = (diff: number) => (diff > 0 ? "text-danger-ink" : diff < 0 ? "text-lime-ink" : "");
 
   return (
     <div className="flex flex-col gap-3.5">
       <MonthNav month={month} onChange={setMonth} />
-      {q.isError && <span className="text-sm text-danger">{(q.error as Error).message}</span>}
+      {q.isError && <span className="text-sm text-danger-ink">{(q.error as Error).message}</span>}
       <div className="grid grid-cols-1 gap-3.5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)]">
         <div className="flex flex-col gap-5 rounded-[22px] bg-surface p-6">
           <span className="text-[17px] font-semibold">카테고리별 지출</span>
@@ -87,7 +87,7 @@ export function LedgerStats() {
                   <span className="font-semibold">{formatWon(s.amount)}</span><span className="text-right text-[13px] text-fg-subtle">{(s.ratio * 100).toFixed(1)}%</span>
                 </div>
               ))}
-              {shares.length === 0 && !q.isLoading && <span className="text-sm text-[color:var(--fg-dim,#6c6c73)]">{monthLabel(month)} 지출이 없어요</span>}
+              {shares.length === 0 && !q.isLoading && <span className="text-sm text-fg-dim">{monthLabel(month)} 지출이 없어요</span>}
             </div>
           </div>
         </div>

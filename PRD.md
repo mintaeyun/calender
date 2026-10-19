@@ -225,7 +225,7 @@
 |---|---|---|
 | `profiles` | `display_name`, `timezone`, `theme`, `week_start`, `weather_location`(name, lat, lon), `temp_unit` | auth.users 1:1 |
 | `calendars` | `name`, `color`, `source`(local/google), `google_calendar_id?`, `sync_enabled` | 일정 분류 |
-| `events` | `calendar_id`, `title`, `start_at`, `end_at`, `all_day`, `location`, `notes`, `color`, `rrule?`, `google_event_id?`, `google_etag?`, `deleted_at?` | 소프트 삭제(동기화용) |
+| `events` | `calendar_id`, `title`, `start_at`, `end_at`, `all_day`, `location`, `notes`, `color`, `rrule?`, `recurring_event_id?`, `original_start_at?`, `exdates`, `google_event_id?`, `google_etag?`, `deleted_at?` | 소프트 삭제(동기화용) |
 | `event_reminders` | `event_id`, `minutes_before` | |
 | `google_connections` | `google_email`, `refresh_token_enc`, `sync_direction`, `sync_token_by_calendar`(jsonb), `last_synced_at`, `last_error` | 토큰 암호화 저장 |
 | `todo_projects` | `name`, `color`, `archived` | |
@@ -399,14 +399,14 @@ pg_cron(매일) → `next_run_date <= today`인 활성 항목 → `transactions`
 
 | # | 질문 | 권고 |
 |---|---|---|
-| 1 | 날씨 제공처: Open-Meteo vs 기상청 | Open-Meteo로 시작, 추상화로 교체 대비 |
+| 1 | 날씨 제공처: Open-Meteo vs 기상청 | Open-Meteo로 시작, 추상화로 교체 대비 — **확정 (2026-10-14)** |
 | 2 | 구글 동기화 방향 기본값 | 가져오기만으로 시작 후 안정화되면 양방향 |
 | 3 | 프론트엔드 프레임워크: Next.js vs Vite | Next.js (Vercel 배포 편의) — **확정 (2026-10-14)** |
 | 4 | 구글 OAuth 앱 게시 상태 | 개인용 프로덕션(미검증) 전환 |
 | 5 | 구글 일정을 앱에서 삭제 시 구글에서도 삭제할지 | 양방향 모드에서만 삭제, 확인 모달 표시 |
-| 6 | 알림 채널 | 앱 내 + 웹 푸시, 이메일은 후순위 |
+| 6 | 알림 채널 | 앱 내 + 웹 푸시, 이메일은 후순위 — **확정 (2026-10-14)**, 이메일은 "준비 중" |
 | 7 | 가계부 이체·카드 결제일 정산 처리 범위 | v1은 단순 이체만, 카드 정산은 제외 |
-| 8 | MCP 인증 방식: 개인 토큰 vs OAuth | 토큰 방식으로 시작 (커넥터 호환 확인 필요) |
+| 8 | MCP 인증 방식: 개인 토큰 vs OAuth | 토큰 방식으로 시작 (커넥터 호환 확인 필요) — **확정 (2026-10-14)**: 개인 토큰을 커넥터 Request headers(`Authorization: Bearer`)로 전달 |
 
 ---
 

@@ -52,10 +52,10 @@ export function LedgerBudget() {
         <MonthNav month={month} onChange={setMonth} />
         <button
           onClick={() => copy.mutate({ from: addMonths(month, -1), to: month }, { onSuccess: (n) => setMsg(n ? `지난달 예산 ${n}건을 불러왔어요` : "불러올 예산이 없어요"), onError: (e) => setErr((e as Error).message) })}
-          className="rounded-full border border-[color:var(--border-strong,#3a3a40)] px-4 py-2 text-sm"
+          className="rounded-full border border-border-strong px-4 py-2 text-sm"
         >지난달 예산 불러오기</button>
       </div>
-      {(err || msg) && <span className={`text-sm ${err ? "text-danger" : "text-lime"}`} role="status">{err || msg}</span>}
+      {(err || msg) && <span className={`text-sm ${err ? "text-danger-ink" : "text-lime-ink"}`} role="status">{err || msg}</span>}
 
       <div className="flex flex-col gap-3.5 rounded-[22px] bg-surface p-6">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
@@ -66,17 +66,17 @@ export function LedgerBudget() {
           <>
             <div className="flex flex-wrap items-baseline gap-2.5">
               <span className="text-[40px] font-bold tracking-tight">{formatWon(tu.spent)}</span>
-              <span className="text-xl text-[color:var(--fg-dim,#6c6c73)]">/ {formatWon(total.amount)}원</span>
-              <span className="ml-2 text-[15px] font-semibold" style={{ color: tState === "over" ? "var(--danger)" : "var(--lime)" }}>{(tu.ratio * 100).toFixed(1)}%</span>
+              <span className="text-xl text-fg-dim">/ {formatWon(total.amount)}원</span>
+              <span className="ml-2 text-[15px] font-semibold" style={{ color: tState === "over" ? "var(--danger-ink)" : "var(--lime-ink)" }}>{(tu.ratio * 100).toFixed(1)}%</span>
             </div>
-            <div className="relative h-3.5 overflow-hidden rounded-[7px] bg-[var(--surface-4,#2a2a2e)]">
+            <div className="relative h-3.5 overflow-hidden rounded-[7px] bg-surface-4">
               <div className="h-full" style={{ width: `${Math.min(100, tu.ratio * 100)}%`, background: BAR[tState] }} />
               <div className="absolute inset-y-0 left-[80%] w-0.5 bg-fg" />
             </div>
             <div className="flex justify-between text-xs text-fg-subtle"><span>0</span><span>80% 도달 시 알림 · 100% 초과 시 알림</span><span>{formatWon(total.amount)}</span></div>
             <div className="flex gap-3 text-sm text-fg-subtle">
               <button onClick={() => editAmount(null, total.amount)}>금액 수정</button>
-              <button onClick={() => { if (confirm("총예산을 삭제할까요?")) delBudget.mutate(total.id); }} className="hover:text-danger">삭제</button>
+              <button onClick={() => { if (confirm("총예산을 삭제할까요?")) delBudget.mutate(total.id); }} className="hover:text-danger-ink">삭제</button>
             </div>
           </>
         ) : (
@@ -95,16 +95,16 @@ export function LedgerBudget() {
             <div key={b.id} className="flex flex-col gap-2.5 rounded-[20px] bg-surface p-5">
               <div className="flex items-center justify-between">
                 <span className="flex items-center gap-2 text-base font-semibold"><span className="h-[9px] w-[9px] rounded-sm" style={{ background: cat?.color ?? "var(--fg-faint, #55555c)" }} />{cat?.name ?? "보관된 카테고리"}</span>
-                <span className="rounded-full px-2.5 py-[3px] text-xs font-bold" style={{ background: st === "over" ? "var(--danger)" : st === "warn" ? "var(--lime)" : "#2a2a2e", color: st === "ok" ? "#d6d6da" : "#0b0b0c" }}>{Math.round(p)}%</span>
+                <span className="rounded-full px-2.5 py-[3px] text-xs font-bold" style={{ background: st === "over" ? "var(--danger)" : st === "warn" ? "var(--lime)" : "var(--surface-4)", color: st === "ok" ? "var(--fg-muted)" : "var(--on-accent)" }}>{Math.round(p)}%</span>
               </div>
-              <div className="h-2 overflow-hidden rounded bg-[var(--surface-4,#2a2a2e)]"><div className="h-full" style={{ width: `${Math.min(100, p)}%`, background: BAR[st] }} /></div>
+              <div className="h-2 overflow-hidden rounded bg-surface-4"><div className="h-full" style={{ width: `${Math.min(100, p)}%`, background: BAR[st] }} /></div>
               <div className="flex justify-between text-[13px] text-fg-subtle"><span>{formatWon(spent)} 사용</span><span>예산 {formatWon(b.amount)}</span></div>
-              <span className="text-xs" style={{ color: st === "over" ? "var(--danger)" : st === "warn" ? "var(--lime)" : "#8d8d94" }}>
+              <span className="text-xs" style={{ color: st === "over" ? "var(--danger-ink)" : st === "warn" ? "var(--lime-ink)" : "var(--fg-subtle)" }}>
                 {st === "over" ? `${formatWon(spent - b.amount)}원 초과` : st === "warn" ? "80% 도달" : `${formatWon(b.amount - spent)}원 남음`}
               </span>
               <div className="flex gap-3 text-xs text-fg-subtle">
                 <button onClick={() => editAmount(b.category_id, b.amount)}>수정</button>
-                <button onClick={() => { if (confirm("이 카테고리 예산을 삭제할까요?")) delBudget.mutate(b.id); }} className="hover:text-danger">삭제</button>
+                <button onClick={() => { if (confirm("이 카테고리 예산을 삭제할까요?")) delBudget.mutate(b.id); }} className="hover:text-danger-ink">삭제</button>
               </div>
             </div>
           );
@@ -118,7 +118,7 @@ export function LedgerBudget() {
             <input value={newAmt} inputMode="numeric" onChange={(e) => setNewAmt(e.target.value)} placeholder="예산 금액(원)" className="rounded-xl bg-surface-3 px-3 py-2 outline-none" />
             <div className="flex gap-2">
               <button onClick={() => { if (!newCat) { setErr("카테고리를 선택하세요"); return; } save(newCat, newAmt, () => { setAdding(false); setNewCat(""); setNewAmt(""); }); }} className="flex-1 rounded-xl bg-fg py-2 font-semibold text-bg">저장</button>
-              <button onClick={() => setAdding(false)} className="flex-1 rounded-xl border border-[color:var(--border-strong,#3a3a40)] py-2">취소</button>
+              <button onClick={() => setAdding(false)} className="flex-1 rounded-xl border border-border-strong py-2">취소</button>
             </div>
           </div>
         ) : (

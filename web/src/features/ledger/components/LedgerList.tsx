@@ -50,7 +50,7 @@ export function LedgerList() {
         {TYPE_TABS.map(([k, label]) => (
           <button key={k} aria-pressed={filter.type === k} onClick={() => setFilter({ type: k })} className={`rounded-full px-4 py-[9px] text-sm ${filter.type === k ? "bg-fg font-semibold text-bg" : "bg-surface-2 text-fg-muted"}`}>{label}</button>
         ))}
-        <span className="mx-1 h-6 w-px bg-[var(--surface-4,#2a2a2e)]" />
+        <span className="mx-1 h-6 w-px bg-surface-4" />
         <input type="date" aria-label="시작일" value={filter.from} onChange={(e) => setFilter({ from: e.target.value })} className={chipBase} />
         <span className="text-fg-subtle">–</span>
         <input type="date" aria-label="종료일" value={filter.to} onChange={(e) => setFilter({ to: e.target.value })} className={chipBase} />
@@ -72,15 +72,15 @@ export function LedgerList() {
         {([["수입", `${formatWon(sum.income)}원`], ["지출", `${formatWon(sum.expense)}원`], [`필터 결과 · ${sum.count}건`, `${sum.net >= 0 ? "+" : "−"}${formatWon(Math.abs(sum.net))}원`]] as const).map(([label, v], i) => (
           <div key={label} className="flex flex-col gap-1 rounded-[18px] bg-surface px-5 py-4">
             <span className="text-[13px] text-fg-subtle">{label}</span>
-            <span className={`text-[26px] font-bold ${i === 2 ? "text-lime" : ""}`}>{v}</span>
+            <span className={`text-[26px] font-bold ${i === 2 ? "text-lime-ink" : ""}`}>{v}</span>
           </div>
         ))}
       </div>
 
-      {q.isError && <div className="rounded-2xl bg-surface p-4 text-sm text-danger">거래를 불러오지 못했어요. {(q.error as Error).message}</div>}
+      {q.isError && <div className="rounded-2xl bg-surface p-4 text-sm text-danger-ink">거래를 불러오지 못했어요. {(q.error as Error).message}</div>}
 
       <div className="flex flex-col rounded-[22px] bg-surface px-[22px] pb-3.5 pt-2">
-        {q.isLoading && <div className="p-10 text-center text-[color:var(--fg-dim,#6c6c73)]">불러오는 중…</div>}
+        {q.isLoading && <div className="p-10 text-center text-fg-dim">불러오는 중…</div>}
         {groups.map((g) => (
           <div key={g.date} className="flex flex-col">
             <div className="flex justify-between border-b border-border pb-2 pt-4 text-[13px] text-fg-subtle">
@@ -91,7 +91,7 @@ export function LedgerList() {
               const c = cat(t.category_id);
               return (
                 <button key={t.id} onClick={() => setEditing(t)} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1.5 border-b border-surface-3 py-3 text-left text-sm sm:grid-cols-[140px_minmax(0,1fr)_160px_120px] sm:gap-y-0">
-                  <span className="order-3 flex w-fit items-center gap-1.5 rounded-full bg-[var(--surface-4,#2a2a2e)] px-2.5 py-1 text-xs sm:order-none">
+                  <span className="order-3 flex w-fit items-center gap-1.5 rounded-full bg-surface-4 px-2.5 py-1 text-xs sm:order-none">
                     <span className="h-[7px] w-[7px] rounded-full" style={{ background: t.type === "transfer" ? "var(--fg-subtle)" : c?.color ?? "var(--fg-faint, #55555c)" }} />
                     {t.type === "transfer" ? "이체" : c?.name ?? "미분류"}
                   </span>
@@ -103,29 +103,29 @@ export function LedgerList() {
                     {receiptCount?.get(t.id) ? <span className="text-[11px] text-fg-subtle" aria-label="영수증 있음">📎{receiptCount.get(t.id)}</span> : null}
                   </span>
                   <span className="order-4 truncate text-right text-[13px] text-fg-subtle sm:order-none sm:text-left">{t.type === "transfer" ? "" : acct(t.account_id)}</span>
-                  <span className={`order-2 text-right font-semibold sm:order-none ${t.type === "income" ? "text-lime" : t.type === "transfer" ? "text-fg-subtle" : ""}`}>{formatSigned(t.amount, t.type)}</span>
+                  <span className={`order-2 text-right font-semibold sm:order-none ${t.type === "income" ? "text-lime-ink" : t.type === "transfer" ? "text-fg-subtle" : ""}`}>{formatSigned(t.amount, t.type)}</span>
                 </button>
               );
             })}
           </div>
         ))}
-        {!q.isLoading && groups.length === 0 && <div className="p-10 text-center text-[15px] text-[color:var(--fg-dim,#6c6c73)]">조건에 맞는 거래가 없어요</div>}
+        {!q.isLoading && groups.length === 0 && <div className="p-10 text-center text-[15px] text-fg-dim">조건에 맞는 거래가 없어요</div>}
       </div>
 
       {editing && (
         <Modal title="거래 수정" onClose={() => setEditing(null)}>
           <TxForm tx={editing} onDone={() => setEditing(null)} />
-          <button onClick={() => { setDeleting(editing); setEditing(null); }} className="rounded-full border border-[color:var(--border-strong,#3a3a40)] py-2.5 text-sm text-danger">삭제</button>
+          <button onClick={() => { setDeleting(editing); setEditing(null); }} className="rounded-full border border-border-strong py-2.5 text-sm text-danger-ink">삭제</button>
         </Modal>
       )}
       {deleting && (
         <Modal title="거래를 삭제할까요?" onClose={() => setDeleting(null)} width={420}>
           <p className="text-sm text-fg-muted">{deleting.memo || "메모 없음"} · {formatSigned(deleting.amount, deleting.type)}원<br />삭제하면 되돌릴 수 없어요.</p>
           <div className="flex gap-2">
-            <button onClick={() => setDeleting(null)} className="flex-1 rounded-full border border-[color:var(--border-strong,#3a3a40)] py-3 text-sm">취소</button>
-            <button disabled={del.isPending} onClick={() => del.mutate(deleting.id, { onSuccess: () => setDeleting(null) })} className="flex-1 rounded-full bg-danger py-3 text-sm font-bold text-[color:var(--on-accent,#0b0b0c)] disabled:opacity-60">삭제</button>
+            <button onClick={() => setDeleting(null)} className="flex-1 rounded-full border border-border-strong py-3 text-sm">취소</button>
+            <button disabled={del.isPending} onClick={() => del.mutate(deleting.id, { onSuccess: () => setDeleting(null) })} className="flex-1 rounded-full bg-danger py-3 text-sm font-bold text-on-accent disabled:opacity-60">삭제</button>
           </div>
-          {del.isError && <span className="text-sm text-danger">{(del.error as Error).message}</span>}
+          {del.isError && <span className="text-sm text-danger-ink">{(del.error as Error).message}</span>}
         </Modal>
       )}
       {managing && <Modal title="카테고리 관리" onClose={() => setManaging(false)}><CategoryManager /></Modal>}

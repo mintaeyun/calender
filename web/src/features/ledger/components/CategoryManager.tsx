@@ -41,7 +41,7 @@ export function CategoryManager() {
                 if (!confirm(`'${c.name}' 카테고리를 삭제할까요? 거래가 있으면 삭제 대신 보관돼요.`)) return;
                 del.mutate(c.id, { onSuccess: (r) => setMsg(r === "archived" ? `'${c.name}'에 거래가 있어 삭제하지 않고 보관했어요` : `'${c.name}'을(를) 삭제했어요`), onError: onErr });
               }}
-              className="text-xs text-fg-subtle hover:text-danger"
+              className="text-xs text-fg-subtle hover:text-danger-ink"
             >삭제</button>
           </li>
         ))}
@@ -53,7 +53,7 @@ export function CategoryManager() {
       <div className="flex gap-1.5">
         {COLORS.map((c) => <button key={c} aria-label="색 선택" onClick={() => setColor(c)} className={`h-6 w-6 rounded-full ${color === c ? "ring-2 ring-fg" : ""}`} style={{ background: c }} />)}
       </div>
-      {msg && <span className="text-xs text-lime" role="status">{msg}</span>}
+      {msg && <span className="text-xs text-lime-ink" role="status">{msg}</span>}
     </div>
   );
 }

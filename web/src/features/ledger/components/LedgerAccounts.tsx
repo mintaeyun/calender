@@ -55,11 +55,11 @@ export function LedgerAccounts() {
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div className="flex flex-col gap-1">
           <span className="text-sm text-fg-subtle">순자산</span>
-          <span className="text-[44px] font-bold tracking-tight">{net < 0 ? "−" : ""}{formatWon(Math.abs(net))}<span className="text-2xl text-[color:var(--fg-dim,#6c6c73)]">원</span></span>
+          <span className="text-[44px] font-bold tracking-tight">{net < 0 ? "−" : ""}{formatWon(Math.abs(net))}<span className="text-2xl text-fg-dim">원</span></span>
         </div>
         <div className="flex gap-2">
-          <button onClick={() => { setErr(""); setAdding(true); }} className="rounded-full border border-[color:var(--border-strong,#3a3a40)] px-[18px] py-2.5 text-sm">계좌 추가 +</button>
-          <button onClick={() => { setErr(""); setMoving(true); }} disabled={active.length < 2} className="rounded-full border border-[color:var(--border-strong,#3a3a40)] px-[18px] py-2.5 text-sm disabled:opacity-40">계좌 간 이체 ⇄</button>
+          <button onClick={() => { setErr(""); setAdding(true); }} className="rounded-full border border-border-strong px-[18px] py-2.5 text-sm">계좌 추가 +</button>
+          <button onClick={() => { setErr(""); setMoving(true); }} disabled={active.length < 2} className="rounded-full border border-border-strong px-[18px] py-2.5 text-sm disabled:opacity-40">계좌 간 이체 ⇄</button>
         </div>
       </div>
 
@@ -88,8 +88,8 @@ export function LedgerAccounts() {
             <span>{name(r.account_id)} → {name(r.to_account_id)}</span><span className="text-fg-subtle">{r.date.slice(5).replace("-", "/")} · {formatWon(r.amount)}</span>
           </div>
         ))}
-        {recent.length === 0 && <span className="text-sm text-[color:var(--fg-dim,#6c6c73)]">이체 내역이 없어요</span>}
-        <span className="text-xs text-[color:var(--fg-dim,#6c6c73)]">카드 결제일 정산은 지원하지 않아요. 카드값 납부는 은행 → 카드 이체로 기록하세요.</span>
+        {recent.length === 0 && <span className="text-sm text-fg-dim">이체 내역이 없어요</span>}
+        <span className="text-xs text-fg-dim">카드 결제일 정산은 지원하지 않아요. 카드값 납부는 은행 → 카드 이체로 기록하세요.</span>
       </div>
 
       {adding && (
@@ -98,7 +98,7 @@ export function LedgerAccounts() {
             <input value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} placeholder="계좌 이름" className={inp} />
             <select value={f.type} onChange={(e) => setF({ ...f, type: e.target.value as keyof typeof TYPE_LABEL })} className={inp}>{Object.entries(TYPE_LABEL).map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select>
             <input value={f.initial} inputMode="numeric" onChange={(e) => setF({ ...f, initial: e.target.value })} placeholder="초기 잔액(원, 카드 부채는 음수)" className={inp} />
-            {err && <span className="text-sm text-danger">{err}</span>}
+            {err && <span className="text-sm text-danger-ink">{err}</span>}
             <button onClick={addAccount} disabled={create.isPending} className="rounded-xl bg-fg py-2.5 font-semibold text-bg disabled:opacity-60">추가</button>
           </div>
         </Modal>
@@ -110,7 +110,7 @@ export function LedgerAccounts() {
             <select value={t.to} onChange={(e) => setT({ ...t, to: e.target.value })} className={inp}><option value="">받는 계좌</option>{active.filter((a) => a.account_id !== (t.from || active[0]?.account_id)).map((a) => <option key={a.account_id} value={a.account_id}>{a.name}</option>)}</select>
             <input value={t.amount} inputMode="numeric" onChange={(e) => setT({ ...t, amount: e.target.value })} placeholder="금액(원)" className={inp} />
             <input value={t.memo} onChange={(e) => setT({ ...t, memo: e.target.value })} placeholder="메모 (선택)" className={inp} />
-            {err && <span className="text-sm text-danger">{err}</span>}
+            {err && <span className="text-sm text-danger-ink">{err}</span>}
             <button onClick={doTransfer} disabled={transfer.isPending} className="rounded-xl bg-fg py-2.5 font-semibold text-bg disabled:opacity-60">이체</button>
           </div>
         </Modal>

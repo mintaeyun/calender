@@ -71,7 +71,7 @@ export function ImportTransactions() {
       <span className="text-base font-semibold">거래 가져오기 (CSV)</span>
       <span className="text-xs text-fg-subtle">첫 줄은 열 이름이어야 해요. 금액은 양의 정수, 지출/수입은 &lsquo;구분&rsquo; 열로 표시해요. 파일은 이 브라우저에서만 읽고 서버에 저장하지 않아요. 내보낸 거래 파일을 그대로 다시 가져올 수 있어요. (한 번에 최대 {MAX_IMPORT_ROWS}건)</span>
       <div className="flex items-center gap-3">
-        <button onClick={() => input.current?.click()} className="rounded-full border border-[color:var(--border-strong,#3a3a40)] px-4 py-2 text-sm">CSV 파일 선택</button>
+        <button onClick={() => input.current?.click()} className="rounded-full border border-border-strong px-4 py-2 text-sm">CSV 파일 선택</button>
         <span className="truncate text-sm text-fg-subtle">{fileName}</span>
         <input ref={input} type="file" accept=".csv,text/csv" className="hidden" aria-label="CSV 파일" onChange={(e) => void onFile(e.target.files?.[0])} />
       </div>
@@ -81,7 +81,7 @@ export function ImportTransactions() {
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             {FIELDS.map((f: Field) => (
               <label key={f} className="flex items-center justify-between gap-2 text-sm">
-                <span>{FIELD_LABEL[f]}{REQUIRED.includes(f) && <span className="text-danger"> *</span>}</span>
+                <span>{FIELD_LABEL[f]}{REQUIRED.includes(f) && <span className="text-danger-ink"> *</span>}</span>
                 <select value={map[f] ?? ""} onChange={(e) => setMap({ ...map, [f]: e.target.value === "" ? undefined : Number(e.target.value) })} className={sel}>
                   <option value="">(사용 안 함)</option>
                   {header.map((h, i) => <option key={i} value={i}>{h || `열 ${i + 1}`}</option>)}
@@ -97,13 +97,13 @@ export function ImportTransactions() {
           </label>
 
           {missingRequired(map).length > 0 ? (
-            <span className="text-sm text-danger" role="alert">필수 열을 지정해 주세요: {missingRequired(map).map((f) => FIELD_LABEL[f]).join(", ")}</span>
+            <span className="text-sm text-danger-ink" role="alert">필수 열을 지정해 주세요: {missingRequired(map).map((f) => FIELD_LABEL[f]).join(", ")}</span>
           ) : (
             <div className="flex flex-col gap-2 rounded-2xl bg-surface-3 p-4 text-sm" aria-live="polite">
-              <span>전체 {records.length}행 · 정상 <b className="text-lime">{checked.length}</b> · 오류 <b className={errors.length ? "text-danger" : ""}>{errors.length}</b> · 중복 의심 <b>{dups.length}</b></span>
-              {tooMany && <span className="text-danger">{MAX_IMPORT_ROWS}행을 넘어요. 파일을 나눠서 가져와 주세요.</span>}
+              <span>전체 {records.length}행 · 정상 <b className="text-lime-ink">{checked.length}</b> · 오류 <b className={errors.length ? "text-danger-ink" : ""}>{errors.length}</b> · 중복 의심 <b>{dups.length}</b></span>
+              {tooMany && <span className="text-danger-ink">{MAX_IMPORT_ROWS}행을 넘어요. 파일을 나눠서 가져와 주세요.</span>}
               {errors.length > 0 && (
-                <ul className="max-h-40 overflow-y-auto text-xs text-danger">
+                <ul className="max-h-40 overflow-y-auto text-xs text-danger-ink">
                   {errors.slice(0, 50).map((r) => !r.ok && <li key={r.line}>{r.line}번째 줄: {r.errors.join(" / ")}</li>)}
                   {errors.length > 50 && <li>… 외 {errors.length - 50}건</li>}
                 </ul>
@@ -129,12 +129,12 @@ export function ImportTransactions() {
             </div>
           )}
 
-          <button onClick={() => void run()} disabled={!canImport} className="w-fit rounded-full bg-lime px-5 py-2.5 text-sm font-bold text-[color:var(--on-accent,#0b0b0c)] disabled:opacity-40">
+          <button onClick={() => void run()} disabled={!canImport} className="w-fit rounded-full bg-lime px-5 py-2.5 text-sm font-bold text-on-accent disabled:opacity-40">
             {busy ? "가져오는 중…" : `${toImport.length}건 가져오기`}
           </button>
         </>
       )}
-      {msg && <span className={`text-sm ${msg.ok ? "text-lime" : "text-danger"}`} role={msg.ok ? "status" : "alert"}>{msg.text}</span>}
+      {msg && <span className={`text-sm ${msg.ok ? "text-lime-ink" : "text-danger-ink"}`} role={msg.ok ? "status" : "alert"}>{msg.text}</span>}
     </div>
   );
 }

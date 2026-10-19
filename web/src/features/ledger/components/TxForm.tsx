@@ -68,7 +68,7 @@ export function TxForm({ tx, onDone }: { tx?: Transaction; onDone: () => void })
     else create.mutate(body, opts);
   };
   const pending = create.isPending || update.isPending;
-  const chip = (on: boolean) => `rounded-full px-3.5 py-1.5 text-sm ${on ? "bg-[var(--surface-5,#3a3a40)] font-semibold text-fg" : "bg-surface-3 text-fg-subtle"}`;
+  const chip = (on: boolean) => `rounded-full px-3.5 py-1.5 text-sm ${on ? "bg-surface-5 font-semibold text-fg" : "bg-surface-3 text-fg-subtle"}`;
 
   return (
     <form onSubmit={(e) => { e.preventDefault(); submit(); }} className="flex flex-col gap-4">
@@ -81,7 +81,7 @@ export function TxForm({ tx, onDone }: { tx?: Transaction; onDone: () => void })
         <input
           ref={amountRef} inputMode="numeric" value={amountText} aria-label="금액" placeholder="0"
           onChange={(e) => { setErr(""); const d = e.target.value.replace(/[^\d]/g, ""); setAmountText(d ? formatWon(Number(d)) : ""); }}
-          className="min-w-0 flex-1 bg-transparent text-[44px] font-bold tracking-tight outline-none placeholder:text-[color:var(--fg-faint,#55555c)]"
+          className="min-w-0 flex-1 bg-transparent text-[44px] font-bold tracking-tight outline-none placeholder:text-fg-faint"
         />
         <span className="text-2xl text-fg-subtle">원</span>
       </div>
@@ -124,7 +124,7 @@ export function TxForm({ tx, onDone }: { tx?: Transaction; onDone: () => void })
           </label>
         )}
         <label className="col-span-2 flex flex-col gap-1 rounded-[14px] bg-surface-3 px-3.5 py-3"><span className="text-xs text-fg-subtle">메모</span>
-          <input value={memo} onChange={(e) => setMemo(e.target.value)} placeholder="메모 (선택)" className="bg-transparent outline-none placeholder:text-[color:var(--fg-faint,#55555c)]" />
+          <input value={memo} onChange={(e) => setMemo(e.target.value)} placeholder="메모 (선택)" className="bg-transparent outline-none placeholder:text-fg-faint" />
           {memoHints.length > 0 && (
             <span className="flex flex-wrap gap-1.5 pt-1">
               {memoHints.map((h) => <button type="button" key={h} onClick={() => { setMemo(h); setMemoHints([]); }} className="rounded-full bg-surface-2 px-2.5 py-0.5 text-xs text-fg-muted">{h}</button>)}
@@ -135,8 +135,8 @@ export function TxForm({ tx, onDone }: { tx?: Transaction; onDone: () => void })
 
       {tx && type !== "transfer" && <ReceiptSection transactionId={tx.id} />}
 
-      {err && <span className="text-sm text-danger" role="alert">{err}</span>}
-      <button type="submit" disabled={pending} className="rounded-full bg-lime py-3.5 text-base font-bold text-[color:var(--on-accent,#0b0b0c)] disabled:opacity-60">{pending ? "저장 중…" : tx ? "수정 저장" : "저장"}</button>
+      {err && <span className="text-sm text-danger-ink" role="alert">{err}</span>}
+      <button type="submit" disabled={pending} className="rounded-full bg-lime py-3.5 text-base font-bold text-on-accent disabled:opacity-60">{pending ? "저장 중…" : tx ? "수정 저장" : "저장"}</button>
     </form>
   );
 }

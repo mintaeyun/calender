@@ -31,7 +31,7 @@ export function SettingsShell({ tab }: { tab: SettingsTab }) {
         <div className="flex gap-0.5 overflow-x-auto md:flex-col">
           {SETTINGS_TABS.map(([k, name]) => (
             <Link key={k} href={`/settings/${k}`} aria-current={k === tab ? "page" : undefined}
-              className={`whitespace-nowrap rounded-xl px-3.5 py-[11px] text-[15px] ${k === tab ? "bg-surface-2 text-white" : "text-fg-muted hover:bg-surface-2/60"}`}>
+              className={`whitespace-nowrap rounded-xl px-3.5 py-[11px] text-[15px] ${k === tab ? "bg-surface-2 text-fg" : "text-fg-muted hover:bg-surface-2/60"}`}>
               {name}
             </Link>
           ))}
