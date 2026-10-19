@@ -1,7 +1,7 @@
 // 영수증 Storage 호출(LED-9). 버킷 `receipts`는 비공개이며 서명 URL로만 보여준다.
 // 업로드 전에 캔버스로 긴 변 1600px JPEG(품질 0.8)로 압축한다. 파일 삭제는 DB 행 삭제로는 지워지지 않으므로 항상 함께 처리한다.
 import { createClient } from "@/lib/supabase/client";
-import { fitWithin, isOwnPath, receiptPath, validateReceipt } from "./lib/receipts";
+import { fitWithin, receiptPath, validateReceipt } from "./lib/receipts";
 
 const BUCKET = "receipts";
 const SIGNED_URL_SECONDS = 3600;
@@ -85,32 +85,4 @@ export async function removeReceiptFilesOfTransaction(transactionId: string): Pr
   if (!data.length) return;
   const rm = await supabase.storage.from(BUCKET).remove(data.map((r) => r.storage_path));
   if (rm.error) throw new Error("영수증 파일을 삭제하지 못했어요");
-}
-
-/**
- * 계정 삭제 전에 호출(01 `lib/auth.ts deleteAccount`): 내 `receipts/<user_id>/` 아래 모든 파일을 지운다.
- * DB 행은 계정 삭제 cascade 로 사라지지만 Storage 파일은 남기 때문에 먼저 처리해야 한다.
- * 폴더 구조: <user_id>/<transaction_id>/<파일>
- */
-export async function removeAllMyReceiptFiles(): Promise<number> {
-  const supabase = createClient();
-  const userId = await uid();
-  const files: string[] = [];
-  const { data: folders, error } = await supabase.storage.from(BUCKET).list(userId, { limit: 1000 });
-  if (error) throw new Error(error.message);
-  for (const f of folders ?? []) {
-    // 폴더는 id 가 null 인 항목
-    if (f.id === null) {
-      const { data: inner } = await supabase.storage.from(BUCKET).list(`${userId}/${f.name}`, { limit: 1000 });
-      for (const o of inner ?? []) if (o.id !== null) files.push(`${userId}/${f.name}/${o.name}`);
-    } else {
-      files.push(`${userId}/${f.name}`);
-    }
-  }
-  const own = files.filter((p) => isOwnPath(p, userId));
-  for (let i = 0; i < own.length; i += 100) {
-    const rm = await supabase.storage.from(BUCKET).remove(own.slice(i, i + 100));
-    if (rm.error) throw new Error("영수증 파일을 삭제하지 못했어요");
-  }
-  return own.length;
 }
