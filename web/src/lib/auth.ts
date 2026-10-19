@@ -8,13 +8,25 @@ export async function signOut() {
   window.location.assign("/login");
 }
 
+/** 영수증 파일(Storage receipts/<user_id>/<transaction_id>/…)을 모두 지운다. DB 삭제(cascade)로는 파일이 지워지지 않는다. */
+async function removeReceiptFiles(userId: string) {
+  const bucket = createClient().storage.from("receipts");
+  const { data: folders } = await bucket.list(userId, { limit: 1000 });
+  for (const folder of folders ?? []) {
+    const { data: files } = await bucket.list(`${userId}/${folder.name}`, { limit: 1000 });
+    const paths = (files ?? []).map((f) => `${userId}/${folder.name}/${f.name}`);
+    if (paths.length) await bucket.remove(paths);
+  }
+}
+
 /**
- * 계정 삭제(AUTH-3): 모든 데이터는 on delete cascade 로 삭제된다.
+ * 계정 삭제(AUTH-3): 영수증 파일을 먼저 지우고, DB 데이터는 on delete cascade 로 함께 삭제된다.
  * TODO(07): 호출 전에 구글 토큰 revoke(gcal-sync 함수)를 먼저 호출한다. REQUESTS.md 참고.
- * TODO(04): 영수증 파일(Storage `receipts/<user_id>/`)은 DB 삭제로 지워지지 않으므로 먼저 삭제해야 한다.
  */
 export async function deleteAccount() {
   const supabase = createClient();
+  const { data: sess } = await supabase.auth.getSession();
+  if (sess.session) await removeReceiptFiles(sess.session.user.id);
   const { error } = await supabase.rpc("delete_my_account");
   if (error) throw error;
   await supabase.auth.signOut();
