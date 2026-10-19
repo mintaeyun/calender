@@ -79,7 +79,7 @@ export async function startConnect(): Promise<string> {
 }
 
 export const syncNow = () => callFn<SyncResult>("sync");
-export const refreshCalendarList = () => callFn<{ calendars: GoogleCalendar[] }>("calendars");
+export const refreshCalendarList = () => callFn<{ calendars: GoogleCalendar[]; target_found: boolean; target_name: string }>("calendars");
 export const disconnectGoogle = (deleteEvents = false) => callFn<{ ok: true; had_connection: boolean }>("disconnect", { delete_events: deleteEvents });
 
 export async function setCalendarEnabled(calendarId: string, enabled: boolean) {

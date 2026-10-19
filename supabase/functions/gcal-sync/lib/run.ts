@@ -1,6 +1,7 @@
 // 사용자 단위 동기화 실행: 락 → 토큰 갱신 → 선택된 캘린더 순회 → 결과 기록.
 import { decryptToken, type KeyRing } from "./crypto.ts";
 import { GoogleApiError, type GoogleApi } from "./google.ts";
+import { isTargetCalendar } from "./target.ts";
 import { normalizeState, syncCalendar, type CalendarState, type EventStore, type Stats } from "./sync.ts";
 
 export type Connection = {
@@ -32,6 +33,8 @@ export type RunDeps = {
   now: () => Date;
   /** 사용자 한 명에게 쓸 최대 시간(ms) */
   budgetMs: number;
+  /** 동기화할 구글 캘린더 이름 (기본 "mycal"). 이 이름이 아닌 캘린더는 선택돼 있어도 건너뛴다. */
+  targetName?: string;
 };
 
 export type UserResult =
@@ -51,7 +54,7 @@ export async function syncUser(deps: RunDeps, userId: string): Promise<UserResul
   if (!(await conn.tryLock(userId, new Date(now.getTime() + LOCK_MS), now))) return { status: "locked" };
 
   try {
-    const calendars = await conn.listSyncCalendars(userId);
+    const calendars = (await conn.listSyncCalendars(userId)).filter((c) => isTargetCalendar(c.name, deps.targetName));
     if (!calendars.length) return { status: "no_calendars" };
 
     const tz = await conn.getTimezone(userId);
