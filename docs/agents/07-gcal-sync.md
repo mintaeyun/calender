@@ -124,17 +124,18 @@ Google OAuth로 계정을 연결하고, 선택한 캘린더의 일정을 앱으�
 
 ## 실연동 점검 절차 (배포 후)
 
-사전: 마이그레이션 2개 적용됨, Edge secrets(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, TOKEN_ENC_KEY) 등록, `npx supabase functions deploy gcal-sync`, 구글 콘솔 리디렉션 URI 등록 + 동의 화면 "프로덕션(미검증)". 로컬 웹은 `npm run dev`(http://localhost:3000, ALLOWED_RETURN_ORIGINS 기본값과 일치).
-1. `GET <SUPABASE_URL>/functions/v1/gcal-sync/health` → `{"ok":true}` (배포·라우팅 확인).
-2. 설정 > Google 캘린더 → "Google 계정 연결" → 구글 동의(캘린더 권한 모두 허용) → 설정 화면으로 복귀하며 "연결했어요" 안내와 자동 첫 동기화. 기본 캘린더(primary)만 체크돼 있어야 한다.
-3. 캘린더 목록에서 가져올 캘린더 체크(체크하면 즉시 동기화). 공휴일 같은 읽기 전용 캘린더는 "읽기 전용" 표시.
-4. "지금 동기화" → 마지막 동기화 시각 갱신. /calendar 에서 구글 일정이 G 배지로 보이고(수정·드래그 불가), 종일·여러 날 일정이 구글과 같은 날짜인지, 반복 일정(예외·삭제된 회차 포함)이 구글과 같은지 대조.
+사전: 마이그레이션 3개(gcal_sync, gcal_stale_fn, gcal_two_way) 적용됨, Edge secrets(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, TOKEN_ENC_KEY) 등록, `npx supabase functions deploy gcal-sync`, 구글 콘솔 리디렉션 URI 등록 + 동의 화면 "프로덕션(미검증)". 로컬 웹은 `npm run dev`(http://localhost:3000, ALLOWED_RETURN_ORIGINS 기본값과 일치).
+0. 구글 캘린더에 이름이 정확히 **mycal** 인 캘린더가 있어야 한다(없으면 먼저 만든다). 이 캘린더만 연동한다.
+1. `GET <SUPABASE_URL>/functions/v1/gcal-sync/health` → `{"ok":true}`, `GET …/gcal-sync/diag` → sign_verify·url_roundtrip 이 "ok", expiry_detected true (배포·키 설정 확인, 비밀값은 나오지 않음).
+2. 설정 > Google 캘린더 → "Google 계정 연결" → 구글 동의(캘린더 권한 모두 허용) → 설정 화면으로 복귀하며 "연결했어요" 안내와 자동 첫 동기화. 목록에 **mycal 하나만** 보이고 체크돼 있어야 한다. 처음 연결의 기본 방향은 "양방향". (mycal 이 없으면 "찾지 못했어요" 안내가 뜬다 → 만든 뒤 "목록 새로고침")
+3. mycal 체크를 껐다 켜 보기(켜면 즉시 동기화). 다른 캘린더는 목록에 나타나지 않는다.
+4. "지금 동기화" → 마지막 동기화 시각 갱신. /calendar 에서 구글 일정이 G 배지로 보이고(양방향이면 수정·드래그 가능, 가져오기만이면 불가), 종일·여러 날 일정이 구글과 같은 날짜인지, 반복 일정(예외·삭제된 회차 포함)이 구글과 같은지 대조.
 5. 구글 앱에서 일정 하나를 수정·삭제·추가 → 앱에서 "지금 동기화"(또는 15분 대기) → 반영, 중복 없음.
 6. (양방향) 설정에서 "양방향" 확인 → 앱 /calendar 에서 새 일정(예: 업무 캘린더)을 만들고 1~2초 뒤 구글 mycal 에 같은 일정이 생기는지 확인 → 앱에서 제목·시간 수정 → 구글에 반영 → 구글 앱에서 같은 일정 수정 후 앱 "지금 동기화" → 앱에 반영(중복 없음) → 앱에서 삭제(확인 문구 "Google 캘린더(mycal)에서도 삭제됩니다") → 구글에서도 삭제. 반복 일정: 앱에서 매주 월·수 반복 생성 → 구글에서 같은 요일 반복, 앱에서 "이번만" 수정/삭제 → 구글에 해당 회차만 반영. 충돌 확인: 양쪽에서 같은 일정을 고친 뒤 동기화 → 나중에 고친 쪽 채택, `select kind, detail from sync_logs where kind = 'conflict' order by created_at desc limit 5;` 에 덮어쓴 값 기록.
 7. 연결 해제 → google_connections 행 삭제, https://myaccount.google.com/permissions 에서 앱 권한 사라짐 확인. 다시 연결해도 일정이 중복되지 않아야 한다(google_event_id 로 갱신).
 실패 시 확인할 곳:
 - 화면의 오류 배너(last_error): invalid_grant = 토큰 만료/철회(동의 화면 "테스트" 상태면 7일), forbidden = 권한 거부, invalid_client = client id/secret 불일치.
-- Edge Function 로그: Supabase Dashboard > Edge Functions > gcal-sync > Logs (오류 코드만 기록, 토큰·code 는 로그에 남기지 않는다). 콜백이 "state 가 올바르지 않거나 만료" 텍스트를 보이면 연결을 처음부터 다시(10분 제한).
+- Edge Function 로그: Supabase Dashboard > Edge Functions > gcal-sync > Logs (오류 코드만 기록, 토큰·code 는 로그에 남기지 않는다). 콜백이 "state 가 올바르지 않거나 만료" 텍스트를 보이면 연결을 처음부터 다시(30분 제한). 화면 문구 끝의 [state_signature|expired|missing|format] 코드와 Edge 로그의 "state rejected reason=" 으로 원인을 구분한다.
 - DB: `select kind, detail, created_at from sync_logs order by created_at desc limit 20;` (일시 오류·캘린더 404 기록), `select last_synced_at, last_error, sync_lock_until, sync_token_by_calendar from google_connections;` (락이 3분 넘게 남아 있으면 이전 실행이 비정상 종료한 것 — 자동 해제됨). 전체 재동기화를 강제하려면 해당 캘린더의 sync_token_by_calendar 키를 지우고 동기화.
 - cron: `select * from cron.job_run_details where jobid = (select jobid from cron.job where jobname = 'gcal-sync-all') order by start_time desc limit 5;` 와 Vault 비밀값(project_url, service_role_key) 존재 여부.
 - 리디렉션 URI 불일치(redirect_uri_mismatch)는 구글 콘솔의 URI 와 위 콜백 URL 을 글자 단위로 비교.
