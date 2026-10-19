@@ -6,6 +6,8 @@ export type GoogleConnection = {
   id: string;
   google_email: string;
   sync_direction: "import_only" | "two_way";
+  /** 로컬 일정을 구글(mycal)에도 만들지 (양방향일 때) */
+  push_local: boolean;
   last_synced_at: string | null;
   last_error: string | null;
 };
@@ -47,12 +49,17 @@ async function callFn<T>(path: string, body?: unknown): Promise<T> {
 }
 
 export async function getConnection(): Promise<GoogleConnection | null> {
-  const { data, error } = await createClient()
-    .from("google_connections")
-    .select("id, google_email, sync_direction, last_synced_at, last_error")
-    .maybeSingle();
-  if (error) throw error;
-  return data as GoogleConnection | null;
+  const db = createClient();
+  const cols = "id, google_email, sync_direction, last_synced_at, last_error";
+  const { data, error } = await db.from("google_connections").select(`${cols}, push_local`).maybeSingle();
+  if (!error) return data as unknown as GoogleConnection | null;
+  // push_local 컬럼(양방향 마이그레이션)이 아직 없는 DB: 컬럼 없이 다시 읽고 기본값을 채운다.
+  if (error.code === "42703") {
+    const r = await db.from("google_connections").select(cols).maybeSingle();
+    if (r.error) throw r.error;
+    return r.data ? ({ ...(r.data as object), push_local: true } as GoogleConnection) : null;
+  }
+  throw error;
 }
 
 export async function listGoogleCalendars(): Promise<GoogleCalendar[]> {
@@ -79,6 +86,8 @@ export async function startConnect(): Promise<string> {
 }
 
 export const syncNow = () => callFn<SyncResult>("sync");
+/** 로컬 변경만 구글로 보낸다(일정 저장 직후). 양방향이 아니면 skipped. */
+export const pushNow = () => callFn<{ status: string }>("push");
 export const refreshCalendarList = () => callFn<{ calendars: GoogleCalendar[]; target_found: boolean; target_name: string }>("calendars");
 export const disconnectGoogle = (deleteEvents = false) => callFn<{ ok: true; had_connection: boolean }>("disconnect", { delete_events: deleteEvents });
 
@@ -89,5 +98,10 @@ export async function setCalendarEnabled(calendarId: string, enabled: boolean) {
 
 export async function setSyncDirection(direction: GoogleConnection["sync_direction"]) {
   const { error } = await createClient().from("google_connections").update({ sync_direction: direction }).not("id", "is", null);
+  if (error) throw error;
+}
+
+export async function setPushLocal(enabled: boolean) {
+  const { error } = await createClient().from("google_connections").update({ push_local: enabled } as never) /* 마이그레이션 적용 후 타입 재생성하면 캐스트 제거 */.not("id", "is", null);
   if (error) throw error;
 }

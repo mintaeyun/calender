@@ -23,6 +23,8 @@ export type GoogleEvent = {
   recurringEventId?: string;
   originalStartTime?: GoogleDateTime;
   updated?: string;
+  /** 앱이 push 할 때 넣는 보조 매칭 키(extendedProperties.private.appEventId) */
+  extendedProperties?: { private?: Record<string, string> };
 };
 
 /** events 테이블에 쓸 값(로컬 id·user_id·calendar_id·recurring_event_id 는 호출 측이 채운다) */
@@ -41,6 +43,8 @@ export type ConvertedEvent = {
   /** 예외 인스턴스일 때 마스터의 구글 id 와 원래 발생 시각 */
   master_google_id: string | null;
   original_start_at: string | null;
+  /** 이 이벤트를 앱이 만들어 push 했다면 그 로컬 일정 id */
+  app_event_id: string | null;
 };
 
 export type ConvertResult =
@@ -145,6 +149,7 @@ export function convertGoogleEvent(g: GoogleEvent, userTz: string): ConvertResul
       exdates: isException ? [] : extractExdates(g.recurrence, userTz, eventTz),
       master_google_id: isException && orig ? g.recurringEventId! : null,
       original_start_at: isException && orig ? orig.at.toISOString() : null,
+      app_event_id: g.extendedProperties?.private?.appEventId ?? null,
     },
   };
 }

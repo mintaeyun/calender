@@ -3,12 +3,13 @@
 import { useEffect, useRef } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  disconnectGoogle, getConnection, listGoogleCalendars, refreshCalendarList, setCalendarEnabled, setSyncDirection, startConnect, syncNow,
+  disconnectGoogle, getConnection, listGoogleCalendars, refreshCalendarList, setCalendarEnabled, setPushLocal, setSyncDirection, startConnect, syncNow,
   type GoogleConnection,
 } from "./api";
 import { isTargetCalendar, shouldAutoSync } from "./lib/errors";
 
-export const connectionKey = ["google", "connection"] as const;
+import { connectionKey } from "./push";
+export { connectionKey };
 export const calendarsKey = ["google", "calendars"] as const;
 
 /** 연결 상태(이메일·마지막 동기화·오류). 연결이 없으면 data 가 null. */
@@ -47,6 +48,10 @@ export function useGoogleActions() {
       mutationFn: (v: { id: string; enabled: boolean }) => setCalendarEnabled(v.id, v.enabled),
       onSuccess: () => qc.invalidateQueries({ queryKey: calendarsKey }),
     }),
+    setPushLocal: useMutation({
+      mutationFn: (enabled: boolean) => setPushLocal(enabled),
+      onSuccess: () => qc.invalidateQueries({ queryKey: connectionKey }),
+    }),
     setDirection: useMutation({
       mutationFn: (d: GoogleConnection["sync_direction"]) => setSyncDirection(d),
       onSuccess: () => qc.invalidateQueries({ queryKey: connectionKey }),
@@ -69,4 +74,9 @@ export function useGoogleAutoSync() {
       sync.mutate();
     }
   }, [conn, sync]);
+}
+
+/** 양방향 동기화 중인가 (구글 일정 수정·삭제 가능 여부 판단에 쓴다) */
+export function useGoogleTwoWay(): boolean {
+  return useGoogleConnection().data?.sync_direction === "two_way";
 }

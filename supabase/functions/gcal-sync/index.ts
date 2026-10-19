@@ -1,5 +1,5 @@
 // Edge Function `gcal-sync`: 구글 캘린더 가져오기 동기화.
-// 경로(함수 이름 뒤): POST oauth/start · GET oauth/callback · GET|POST calendars · POST sync · POST sync-all · POST disconnect · GET health
+// 경로(함수 이름 뒤): POST push(로컬 변경만 구글로) · POST oauth/start · GET oauth/callback · GET|POST calendars · POST sync · POST sync-all · POST disconnect · GET health
 // verify_jwt = false (config.toml): 콜백에는 Supabase JWT 가 없다. 경로별로 직접 인증한다.
 //   start/calendars/sync/disconnect = 사용자 JWT, sync-all = service role 키, callback = 서명된 state.
 // 필요한 secrets: GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, TOKEN_ENC_KEY(base64 32바이트), 선택: ALLOWED_RETURN_ORIGINS(쉼표 구분, 기본 http://localhost:3000)
@@ -10,7 +10,7 @@ import { adminClient } from "../_shared/supabase.ts";
 import { keyRingFromEnv } from "./lib/crypto.ts";
 import { DbStore } from "./lib/db.ts";
 import { createGoogleApi } from "./lib/google.ts";
-import { diag, disconnect, oauthCallback, oauthStart, refreshCalendars, runSync, runSyncAll, type HandlerDeps } from "./lib/handlers.ts";
+import { diag, disconnect, oauthCallback, oauthStart, refreshCalendars, runPush, runSync, runSyncAll, type HandlerDeps } from "./lib/handlers.ts";
 
 function env(name: string): string {
   const v = Deno.env.get(name);
@@ -25,7 +25,7 @@ function makeDeps(userId: string | null): { deps: HandlerDeps; store: DbStore } 
   const ring = keyRingFromEnv((n) => Deno.env.get(n));
   const now = () => new Date();
   const targetName = Deno.env.get("GOOGLE_TARGET_CALENDAR") ?? undefined;
-  const base = { api, events: store, conn: store, ring, now, budgetMs: 90_000, targetName };
+  const base = { api, events: store, conn: store, pushStore: store, ring, now, budgetMs: 90_000, targetName };
   const deps: HandlerDeps = {
     api, ring, now,
     redirectUri: `${env("SUPABASE_URL")}/functions/v1/gcal-sync/oauth/callback`,
@@ -34,7 +34,7 @@ function makeDeps(userId: string | null): { deps: HandlerDeps; store: DbStore } 
     // sync-all 은 사용자마다 userId 가 다르므로 사용자별 DbStore 를 만든다.
     runDeps: (uid) => {
       const s = new DbStore(db, uid);
-      return { ...base, events: s, conn: s };
+      return { ...base, events: s, conn: s, pushStore: s };
     },
     syncBudgetMs: 90_000,
     syncAllBudgetMs: 100_000,
@@ -87,6 +87,12 @@ Deno.serve(async (req) => {
         const { userId } = await requireUser(req);
         const { deps } = makeDeps(userId);
         return json(await runSync(userId, deps));
+      }
+
+      case "push": {
+        const { userId } = await requireUser(req);
+        const { deps } = makeDeps(userId);
+        return json(await runPush(userId, deps));
       }
 
       case "sync-all": {

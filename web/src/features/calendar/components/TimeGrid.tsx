@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { formatTime, WEEKDAYS_KO, weekdayOf, zonedParts } from "@/lib/time";
 import type { CalendarRow } from "../api";
+import { useGoogleTwoWay } from "@/features/google/hooks";
 import { eventColor, isGoogleEvent, isReadOnlyEvent, LIME, PURPLE, readableOn } from "../lib/colors";
 import { daysSpanned } from "../lib/days";
 import { layoutColumns } from "../lib/layout";
@@ -49,6 +50,7 @@ const minToY = (min: number) => ((Math.min(Math.max(min, START_HOUR * 60), END_H
 export function TimeGrid({
   days, today, tz, instances, calendars, markers, nextKey, now, onCreateAt, onOpen, onChangeRange, renderWeather,
 }: Props) {
+  const twoWay = useGoogleTwoWay();
   const colsRef = useRef<HTMLDivElement>(null);
   const [drag, setDrag] = useState<Drag | null>(null);
   const dragRef = useRef<Drag | null>(null);
@@ -61,7 +63,7 @@ export function TimeGrid({
   const colWidth = () => (colsRef.current ? colsRef.current.getBoundingClientRect().width / days.length : 1);
 
   function begin(e: React.PointerEvent, inst: EventInstance, mode: "move" | "resize") {
-    if (isReadOnlyEvent(inst.event, calendars)) return;
+    if (isReadOnlyEvent(inst.event, calendars, twoWay)) return;
     e.stopPropagation();
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
     setDrag({ inst, mode, startX: e.clientX, startY: e.clientY, dx: 0, dy: 0, active: false });
@@ -210,7 +212,7 @@ export function TimeGrid({
                     const bg = eventColor(inst.event, calendars);
                     const fg = readableOn(bg);
                     const isDragging = drag?.inst.key === inst.key && drag.active;
-                    const ro = isReadOnlyEvent(inst.event, calendars);
+                    const ro = isReadOnlyEvent(inst.event, calendars, twoWay);
                     const dy = isDragging ? snap((drag!.dy / HOUR_PX) * 60) * (HOUR_PX / 60) : 0;
                     const dx = isDragging && drag!.mode === "move" && days.length > 1 ? Math.round(drag!.dx / colWidth()) * colWidth() : 0;
                     const short = height < 44;

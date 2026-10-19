@@ -3,6 +3,7 @@
 import { useState, type ReactNode } from "react";
 import { formatTime, WEEKDAYS_KO, weekdayOf } from "@/lib/time";
 import type { CalendarRow } from "../api";
+import { useGoogleTwoWay } from "@/features/google/hooks";
 import { eventColor, isGoogleEvent, isReadOnlyEvent, LIME, readableOn } from "../lib/colors";
 import { instancesByDay } from "../lib/days";
 import type { EventInstance } from "../lib/recurrence";
@@ -36,6 +37,7 @@ export function MonthView({
   days, month, today, tz, weekStart, instances, calendars, markers, nextKey,
   onCreate, onOpen, onShowDay, onDropOn, renderWeather,
 }: Props) {
+  const twoWay = useGoogleTwoWay();
   const byDay = instancesByDay(instances, tz);
   const [dragging, setDragging] = useState<EventInstance | null>(null);
   const [over, setOver] = useState<string | null>(null);
@@ -90,7 +92,7 @@ export function MonthView({
               {shown.map((i) => {
                 const bg = eventColor(i.event, calendars);
                 const fg = readableOn(bg);
-                const readOnly = isReadOnlyEvent(i.event, calendars);
+                const readOnly = isReadOnlyEvent(i.event, calendars, twoWay);
                 const next = i.key === nextKey;
                 return (
                   <div

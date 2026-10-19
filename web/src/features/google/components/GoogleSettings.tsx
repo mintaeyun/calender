@@ -20,6 +20,7 @@ function Panel() {
   const act = useGoogleActions();
   const [confirmDisconnect, setConfirmDisconnect] = useState(false);
   const [deleteEvents, setDeleteEvents] = useState(false);
+  const [confirmTwoWay, setConfirmTwoWay] = useState(false);
   const [notice, setNotice] = useState<{ ok: boolean; text: string } | null>(null);
   const handled = useRef(false);
 
@@ -102,10 +103,44 @@ function Panel() {
       <div className="flex flex-col gap-2.5 border-t border-border pt-4">
         <span className="text-sm font-semibold">동기화 방향</span>
         <div role="radiogroup" aria-label="동기화 방향" className="flex w-fit rounded-full bg-surface-3 p-1">
-          <button role="radio" aria-checked={true} className="rounded-full bg-surface-5 px-4 py-[7px] text-sm font-semibold text-fg">가져오기만</button>
-          <button role="radio" aria-checked={false} disabled title="준비 중" className="rounded-full px-4 py-[7px] text-sm text-fg-subtle opacity-60">양방향 (준비 중)</button>
+          {([["import_only", "가져오기만"], ["two_way", "양방향"]] as const).map(([k, label]) => (
+            <button
+              key={k}
+              role="radio"
+              aria-checked={connection.sync_direction === k}
+              disabled={act.setDirection.isPending}
+              onClick={() => {
+                if (connection.sync_direction === k) return;
+                if (k === "two_way") setConfirmTwoWay(true);
+                else act.setDirection.mutate("import_only");
+              }}
+              className={`rounded-full px-4 py-[7px] text-sm ${connection.sync_direction === k ? "bg-surface-5 font-semibold text-fg" : "text-fg-subtle"}`}
+            >
+              {label}
+            </button>
+          ))}
         </div>
-        <span className="text-[13px] text-fg-subtle">Google 일정을 앱으로 가져오기만 합니다. 앱에서 만든 일정은 Google에 반영되지 않아요.</span>
+        {act.setDirection.isError && <p role="alert" className="text-sm text-danger-ink">{(act.setDirection.error as Error).message}</p>}
+        {connection.sync_direction === "two_way" ? (
+          <>
+            <span className="text-[13px] text-fg-subtle">
+              앱에서 만들고 수정·삭제한 일정이 Google의 mycal 캘린더에 반영되고, Google에서 바뀐 일정도 앱으로 가져옵니다. 같은 일정을 양쪽에서 고치면 나중에 수정한 쪽을 채택하고, 덮어쓴 내용은 기록에 남겨요.
+            </span>
+            <label className="mt-1 flex cursor-pointer items-center gap-2.5 text-sm">
+              <input
+                type="checkbox"
+                checked={connection.push_local}
+                disabled={act.setPushLocal.isPending}
+                onChange={(e) => act.setPushLocal.mutate(e.target.checked)}
+                className="h-[18px] w-[18px] accent-[var(--lime)]"
+              />
+              앱의 모든 일정(업무·개인·운동 등)을 Google mycal 에도 만들기
+            </label>
+            <span className="text-xs text-fg-dim">끄면 앱에서 새로 만든 일정은 Google에 보내지 않고, 이미 Google과 연결된 일정의 변경만 반영해요.</span>
+          </>
+        ) : (
+          <span className="text-[13px] text-fg-subtle">Google 일정을 앱으로 가져오기만 합니다. 앱에서 만든 일정은 Google에 반영되지 않아요.</span>
+        )}
       </div>
 
       <div className="flex flex-col gap-1.5 border-t border-border pt-4">
@@ -140,6 +175,29 @@ function Panel() {
       <p className="rounded-[14px] bg-surface-3 px-4 py-3.5 text-[13px] leading-relaxed text-fg-muted">
         주기 동기화 15분 · 앱 진입 시 자동. 할일·가계부는 동기화하지 않습니다. 캘린더를 끄면 이후 변경은 반영되지 않고, 이미 가져온 일정은 그대로 남아요.
       </p>
+
+      {confirmTwoWay && (
+        <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/70 p-5" role="dialog" aria-modal="true" aria-label="양방향 동기화 확인" onClick={() => setConfirmTwoWay(false)}>
+          <div className="flex w-[440px] max-w-full flex-col gap-4 rounded-[28px] border border-surface-4 bg-surface-modal p-6" onClick={(e) => e.stopPropagation()}>
+            <h2 className="font-display text-[22px]">양방향 동기화를 켤까요?</h2>
+            <ul className="flex list-disc flex-col gap-1.5 pl-5 text-sm text-fg-muted">
+              <li>앱에서 만든 일정이 <b className="text-fg">Google의 mycal 캘린더에 생성</b>됩니다.</li>
+              <li>앱에서 수정한 내용이 Google에 반영되고, <b className="text-fg">앱에서 삭제한 일정은 Google에서도 삭제</b>됩니다.</li>
+              <li>같은 일정을 양쪽에서 고치면 나중에 수정한 쪽을 채택합니다.</li>
+            </ul>
+            <div className="flex justify-end gap-2">
+              <button className={ghostBtn} onClick={() => setConfirmTwoWay(false)}>취소</button>
+              <button
+                className={primaryBtn}
+                disabled={act.setDirection.isPending}
+                onClick={() => act.setDirection.mutate("two_way", { onSuccess: () => { setConfirmTwoWay(false); act.sync.mutate(); } })}
+              >
+                양방향으로 전환
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {confirmDisconnect && (
         <div className="fixed inset-0 z-30 flex items-center justify-center bg-black/70 p-5" role="dialog" aria-modal="true" onClick={() => setConfirmDisconnect(false)}>
