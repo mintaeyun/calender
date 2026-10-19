@@ -135,9 +135,11 @@ export type Database = {
         Row: {
           color: string
           created_at: string
+          google_access_role: string | null
           google_calendar_id: string | null
           id: string
           name: string
+          read_only: boolean
           source: string
           sync_enabled: boolean
           updated_at: string
@@ -146,9 +148,11 @@ export type Database = {
         Insert: {
           color?: string
           created_at?: string
+          google_access_role?: string | null
           google_calendar_id?: string | null
           id?: string
           name: string
+          read_only?: boolean
           source?: string
           sync_enabled?: boolean
           updated_at?: string
@@ -157,9 +161,11 @@ export type Database = {
         Update: {
           color?: string
           created_at?: string
+          google_access_role?: string | null
           google_calendar_id?: string | null
           id?: string
           name?: string
+          read_only?: boolean
           source?: string
           sync_enabled?: boolean
           updated_at?: string
@@ -249,6 +255,7 @@ export type Database = {
           exdates: string[]
           google_etag: string | null
           google_event_id: string | null
+          google_synced_at: string | null
           google_updated_at: string | null
           id: string
           location: string | null
@@ -271,6 +278,7 @@ export type Database = {
           exdates?: string[]
           google_etag?: string | null
           google_event_id?: string | null
+          google_synced_at?: string | null
           google_updated_at?: string | null
           id?: string
           location?: string | null
@@ -293,6 +301,7 @@ export type Database = {
           exdates?: string[]
           google_etag?: string | null
           google_event_id?: string | null
+          google_synced_at?: string | null
           google_updated_at?: string | null
           id?: string
           location?: string | null
@@ -331,6 +340,7 @@ export type Database = {
           last_synced_at: string | null
           refresh_token_enc: string
           sync_direction: string
+          sync_lock_until: string | null
           sync_token_by_calendar: Json
           updated_at: string
           user_id: string
@@ -343,6 +353,7 @@ export type Database = {
           last_synced_at?: string | null
           refresh_token_enc: string
           sync_direction?: string
+          sync_lock_until?: string | null
           sync_token_by_calendar?: Json
           updated_at?: string
           user_id: string
@@ -355,6 +366,7 @@ export type Database = {
           last_synced_at?: string | null
           refresh_token_enc?: string
           sync_direction?: string
+          sync_lock_until?: string | null
           sync_token_by_calendar?: Json
           updated_at?: string
           user_id?: string
@@ -1088,6 +1100,17 @@ export type Database = {
         }[]
       }
       delete_my_account: { Args: never; Returns: undefined }
+      gcal_soft_delete_stale: {
+        Args: {
+          p_before: string
+          p_calendar: string
+          p_max: string
+          p_min: string
+          p_user: string
+        }
+        Returns: number
+      }
+      invoke_gcal_sync: { Args: never; Returns: undefined }
       invoke_notify: { Args: never; Returns: undefined }
       next_pay_date: {
         Args: {
