@@ -9,7 +9,7 @@ const master: EventRow = {
   start_at: "2026-10-12T00:30:00Z", end_at: "2026-10-12T01:00:00Z", all_day: false,
   location: null, notes: null, color: null, rrule: "FREQ=WEEKLY;BYDAY=MO,WE;COUNT=10",
   recurring_event_id: null, original_start_at: null, exdates: [],
-  google_event_id: null, google_etag: null, google_updated_at: null, google_synced_at: null, deleted_at: null, created_at: "", updated_at: "",
+  google_event_id: null, google_etag: null, google_updated_at: null, google_synced_at: null, google_seen_run: null, deleted_at: null, created_at: "", updated_at: "",
 };
 const fieldsOf = (r: EventRow, o: Partial<EventFields> = {}): EventFields => ({
   title: r.title, start_at: r.start_at, end_at: r.end_at, all_day: r.all_day, location: r.location,
