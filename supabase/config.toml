@@ -422,3 +422,8 @@ enabled = false
 client_id = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID)"
 secret = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET)"
 skip_nonce_check = true
+
+# MCP 서버는 Supabase JWT 가 아니라 자체 개인 토큰(lm_…, mcp_tokens 해시)으로 인증한다.
+# JWT 검증이 켜져 있으면 모든 호출이 401 이므로 끈다. (클라우드 배포: `supabase functions deploy mcp` 가 이 설정을 따른다)
+[functions.mcp]
+verify_jwt = false
