@@ -41,7 +41,7 @@ export function ProfileSettings() {
   };
 
   if (profile.isLoading) return <div className={card}>불러오는 중…</div>;
-  if (profile.isError || !profile.data) return <div className={`${card} text-danger`}>프로필을 불러오지 못했어요. 새로고침해 주세요.</div>;
+  if (profile.isError || !profile.data) return <div className={`${card} text-danger-ink`}>프로필을 불러오지 못했어요. 새로고침해 주세요.</div>;
   const p = profile.data;
   const provider = user.data?.app_metadata?.provider === "google" ? "Google 로그인" : "이메일 로그인";
 
@@ -82,7 +82,7 @@ export function ProfileSettings() {
             {SCREENS.map(([k, l]) => <option key={k} value={k}>{l}</option>)}
           </select>
         </div>
-        <div role="status" className={`min-h-4 text-xs ${msg?.ok ? "text-fg-subtle" : "text-danger"}`}>{msg?.text}</div>
+        <div role="status" className={`min-h-4 text-xs ${msg?.ok ? "text-fg-subtle" : "text-danger-ink"}`}>{msg?.text}</div>
       </div>
       <AccountCard />
     </>

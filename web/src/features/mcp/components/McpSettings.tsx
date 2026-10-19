@@ -13,7 +13,7 @@ import {
 
 const card = "flex flex-col gap-4 rounded-[22px] bg-surface p-6";
 const btn = "rounded-full bg-surface-3 px-4 py-2 text-sm";
-const primary = "rounded-full bg-white px-[18px] py-2.5 text-sm font-semibold text-black disabled:opacity-40";
+const primary = "rounded-full bg-fg px-[18px] py-2.5 text-sm font-semibold text-bg disabled:opacity-40";
 
 /** 클립보드 복사 (실패하면 사용자가 직접 복사하도록 안내) */
 function CopyButton({ value, label = "복사" }: { value: string; label?: string }) {
@@ -69,7 +69,7 @@ export function McpSettings() {
           <button className={primary} onClick={() => setCreating(true)}>새 토큰 발급</button>
         </div>
         {tokens.isLoading && <p className="text-sm text-fg-subtle">불러오는 중…</p>}
-        {tokens.isError && <p role="alert" className="text-sm text-danger">{(tokens.error as Error).message}</p>}
+        {tokens.isError && <p role="alert" className="text-sm text-danger-ink">{(tokens.error as Error).message}</p>}
         {tokens.data?.length === 0 && <p className="text-sm text-fg-subtle">발급한 토큰이 없어요</p>}
         <ul className="flex flex-col divide-y divide-border">
           {tokens.data?.map((t) => (
@@ -80,12 +80,12 @@ export function McpSettings() {
               </div>
               <div className="flex flex-wrap gap-1.5 text-xs">
                 {SERVICES.map(([k, name]) => (
-                  <span key={k} className={`rounded-full bg-surface-3 px-2.5 py-1 ${t.scopes[k] === "write" ? "text-lime" : t.scopes[k] === "read" ? "text-fg-muted" : "text-fg-subtle opacity-60"}`}>
+                  <span key={k} className={`rounded-full bg-surface-3 px-2.5 py-1 ${t.scopes[k] === "write" ? "text-lime-ink" : t.scopes[k] === "read" ? "text-fg-muted" : "text-fg-subtle opacity-60"}`}>
                     {name} {levelLabel(t.scopes[k])}
                   </span>
                 ))}
               </div>
-              <button className="rounded-full px-3 py-1.5 text-danger" onClick={() => setRevoking(t)}>폐기</button>
+              <button className="rounded-full px-3 py-1.5 text-danger-ink" onClick={() => setRevoking(t)}>폐기</button>
             </li>
           ))}
         </ul>
@@ -94,7 +94,7 @@ export function McpSettings() {
 
       <section className={card} aria-labelledby="mcp-logs">
         <h2 id="mcp-logs" className="text-base font-semibold">최근 호출</h2>
-        {logs.isError && <p role="alert" className="text-sm text-danger">호출 이력을 불러오지 못했어요.</p>}
+        {logs.isError && <p role="alert" className="text-sm text-danger-ink">호출 이력을 불러오지 못했어요.</p>}
         {logs.data?.length === 0 && <p className="text-sm text-fg-subtle">아직 호출 기록이 없어요</p>}
         <ul className="flex flex-col">
           {logs.data?.map((l) => {
@@ -104,7 +104,7 @@ export function McpSettings() {
                 <span className="text-fg-subtle max-md:hidden">{formatDateTimeKo(l.called_at, tz)}</span>
                 <code className="truncate">{l.tool}</code>
                 <span className="truncate text-fg-muted max-md:hidden" title={l.error ?? l.input_summary ?? ""}>{l.error ?? l.input_summary}</span>
-                <span className={st.tone === "ok" ? "text-lime" : "text-danger"}>{st.label}</span>
+                <span className={st.tone === "ok" ? "text-lime-ink" : "text-danger-ink"}>{st.label}</span>
               </li>
             );
           })}
@@ -115,10 +115,10 @@ export function McpSettings() {
       {revoking && (
         <Modal title="토큰 폐기" onClose={() => setRevoking(null)}>
           <p className="text-sm"><b>{revoking.name}</b> 토큰을 폐기할까요? 이 토큰을 쓰는 Claude 연결은 즉시 끊기고 되돌릴 수 없어요.</p>
-          {revoke.isError && <p role="alert" className="text-sm text-danger">{(revoke.error as Error).message}</p>}
+          {revoke.isError && <p role="alert" className="text-sm text-danger-ink">{(revoke.error as Error).message}</p>}
           <div className="flex justify-end gap-2">
             <button className={btn} onClick={() => setRevoking(null)}>취소</button>
-            <button className="rounded-full bg-danger px-4 py-2 text-sm font-semibold text-black" disabled={revoke.isPending}
+            <button className="rounded-full bg-danger px-4 py-2 text-sm font-semibold text-on-accent" disabled={revoke.isPending}
               onClick={() => revoke.mutate(revoking.id, { onSuccess: () => setRevoking(null) })}>폐기</button>
           </div>
         </Modal>
@@ -150,7 +150,7 @@ function CreateTokenModal({ onClose }: { onClose: () => void }) {
   if (issued) {
     return (
       <Modal title="토큰이 발급되었어요" onClose={onClose}>
-        <p className="text-sm text-danger">지금 복사해 두세요. 이 창을 닫으면 토큰을 다시 볼 수 없어요.</p>
+        <p className="text-sm text-danger-ink">지금 복사해 두세요. 이 창을 닫으면 토큰을 다시 볼 수 없어요.</p>
         <div className="flex flex-wrap items-center gap-2">
           <code className="min-w-0 flex-1 break-all rounded-xl bg-surface-3 px-3.5 py-3 text-xs" data-testid="issued-token">{issued}</code>
           <CopyButton value={issued} />
@@ -176,9 +176,9 @@ function CreateTokenModal({ onClose }: { onClose: () => void }) {
             <Seg label={`${label} 권한`} value={scopes[k]} items={LEVELS} onChange={(v: Level) => setScopes({ ...scopes, [k]: v })} />
           </div>
         ))}
-        {!hasAnyAccess(scopes) && <span className="text-xs text-danger">하나 이상의 서비스에 권한을 주세요</span>}
+        {!hasAnyAccess(scopes) && <span className="text-xs text-danger-ink">하나 이상의 서비스에 권한을 주세요</span>}
       </div>
-      {create.isError && <p role="alert" className="text-sm text-danger">{(create.error as Error).message}</p>}
+      {create.isError && <p role="alert" className="text-sm text-danger-ink">{(create.error as Error).message}</p>}
       <div className="flex justify-end gap-2">
         <button className={btn} onClick={onClose}>취소</button>
         <button className={primary} disabled={!valid || create.isPending}
