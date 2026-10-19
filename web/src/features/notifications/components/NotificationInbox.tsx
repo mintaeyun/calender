@@ -22,7 +22,7 @@ export function NotificationInbox() {
 
   return (
     <div className="mx-auto flex w-full max-w-[860px] flex-col gap-[18px]">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-display text-[30px]">알림 <span className="text-fg-subtle">{unread ? `읽지 않음 ${unread}` : "모두 읽음"}</span></h1>
         <button onClick={() => markAll.mutate(undefined)} disabled={unread === 0} className="rounded-full border border-[#3a3a40] px-[18px] py-2.5 text-sm disabled:opacity-40">모두 읽음</button>
       </div>
@@ -32,18 +32,22 @@ export function NotificationInbox() {
         {data.map((n) => {
           const m = typeMeta(n.type);
           return (
-            <li key={n.id} className={`flex items-start gap-4 border-b border-border py-4 last:border-0 ${n.read_at ? "opacity-60" : ""}`}>
-              <span className="whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-bold" style={{ background: m.bg, color: m.fg }}>{m.label}</span>
-              <button onClick={() => open(n)} className="flex min-w-0 flex-1 flex-col gap-0.5 text-left">
-                <span className="text-[15px] font-semibold">{n.title}</span>
-                {n.body && <span className="text-[13px] text-fg-subtle">{n.body}</span>}
-              </button>
-              <span className="whitespace-nowrap text-xs text-fg-subtle">{relativeTime(n.scheduled_at, new Date(), tz)}</span>
-              <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${n.read_at ? "bg-transparent" : "bg-lime"}`} aria-label={n.read_at ? "읽음" : "읽지 않음"} />
-              <span className="flex gap-2 text-xs text-fg-subtle">
-                {!n.read_at && <button onClick={() => markRead.mutate(n.id)}>읽음</button>}
-                <button onClick={() => del.mutate(n.id)} aria-label="알림 삭제" className="hover:text-danger">삭제</button>
-              </span>
+            <li key={n.id} className={`flex flex-col gap-2 border-b border-border py-4 last:border-0 ${n.read_at ? "opacity-60" : ""}`}>
+              <div className="flex items-start gap-3">
+                <span className="whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-bold" style={{ background: m.bg, color: m.fg }}>{m.label}</span>
+                <button onClick={() => open(n)} className="flex min-w-0 flex-1 flex-col gap-0.5 text-left">
+                  <span className="break-words text-[15px] font-semibold">{n.title}</span>
+                  {n.body && <span className="break-words text-[13px] text-fg-subtle">{n.body}</span>}
+                </button>
+                <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${n.read_at ? "bg-transparent" : "bg-lime"}`} role="img" aria-label={n.read_at ? "읽음" : "읽지 않음"} />
+              </div>
+              <div className="flex items-center justify-between gap-3 text-xs text-fg-subtle">
+                <span>{relativeTime(n.scheduled_at, new Date(), tz)}</span>
+                <span className="flex gap-1">
+                  {!n.read_at && <button onClick={() => markRead.mutate(n.id)} className="px-2 py-1.5">읽음 처리</button>}
+                  <button onClick={() => del.mutate(n.id)} aria-label={`${n.title} 알림 삭제`} className="px-2 py-1.5 hover:text-danger">삭제</button>
+                </span>
+              </div>
             </li>
           );
         })}

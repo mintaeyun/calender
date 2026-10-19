@@ -48,3 +48,10 @@ export function validateTransfer(from: string | null, to: string | null): string
   if (from === to) return "같은 계좌로는 이체할 수 없어요";
   return null;
 }
+
+/** 좁은 칸용 축약 표기: 12,000 → 1.2만, 350,000 → 35만, 5,500 → 5,500 */
+export function compactWon(n: number): string {
+  if (n < 10000) return formatWon(n);
+  const man = n / 10000;
+  return `${Number.isInteger(man) ? man : man.toFixed(1).replace(/.0$/, "")}만`;
+}

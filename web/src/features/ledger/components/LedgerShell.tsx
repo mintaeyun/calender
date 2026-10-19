@@ -16,7 +16,7 @@ export function LedgerShell({ children }: { children: ReactNode }) {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-[18px]">
           <h1 className="font-display text-[30px]">가계부</h1>
-          <nav className="flex overflow-x-auto rounded-full bg-surface-2 p-[5px] text-sm" aria-label="가계부 메뉴">
+          <nav className="flex max-w-full overflow-x-auto rounded-full bg-surface-2 p-[5px] text-sm" aria-label="가계부 메뉴">
             {TABS.map(([href, label]) => (
               <Link key={href} href={href} className={`whitespace-nowrap rounded-full px-4 py-2 no-underline hover:no-underline ${path === href ? "bg-[#3a3a40] font-semibold text-white" : "text-fg-subtle"}`}>{label}</Link>
             ))}

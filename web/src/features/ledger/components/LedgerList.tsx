@@ -48,7 +48,7 @@ export function LedgerList() {
     <div className="flex flex-col gap-3.5">
       <div className="flex flex-wrap items-center gap-2">
         {TYPE_TABS.map(([k, label]) => (
-          <button key={k} onClick={() => setFilter({ type: k })} className={`rounded-full px-4 py-[9px] text-sm ${filter.type === k ? "bg-white font-semibold text-black" : "bg-surface-2 text-fg-muted"}`}>{label}</button>
+          <button key={k} aria-pressed={filter.type === k} onClick={() => setFilter({ type: k })} className={`rounded-full px-4 py-[9px] text-sm ${filter.type === k ? "bg-white font-semibold text-black" : "bg-surface-2 text-fg-muted"}`}>{label}</button>
         ))}
         <span className="mx-1 h-6 w-px bg-[#2a2a2e]" />
         <input type="date" aria-label="시작일" value={filter.from} onChange={(e) => setFilter({ from: e.target.value })} className={chipBase} />
@@ -90,20 +90,20 @@ export function LedgerList() {
             {g.rows.map((t) => {
               const c = cat(t.category_id);
               return (
-                <button key={t.id} onClick={() => setEditing(t)} className="grid grid-cols-[110px_minmax(0,1fr)_100px_110px] items-center gap-3 border-b border-surface-3 py-3 text-left text-sm sm:grid-cols-[140px_minmax(0,1fr)_160px_120px]">
-                  <span className="flex w-fit items-center gap-1.5 rounded-full bg-[#2a2a2e] px-2.5 py-1 text-xs">
+                <button key={t.id} onClick={() => setEditing(t)} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1.5 border-b border-surface-3 py-3 text-left text-sm sm:grid-cols-[140px_minmax(0,1fr)_160px_120px] sm:gap-y-0">
+                  <span className="order-3 flex w-fit items-center gap-1.5 rounded-full bg-[#2a2a2e] px-2.5 py-1 text-xs sm:order-none">
                     <span className="h-[7px] w-[7px] rounded-full" style={{ background: t.type === "transfer" ? "#8d8d94" : c?.color ?? "#55555c" }} />
                     {t.type === "transfer" ? "이체" : c?.name ?? "미분류"}
                   </span>
-                  <span className="flex min-w-0 items-center gap-2 truncate">
+                  <span className="order-1 flex min-w-0 items-center gap-2 truncate sm:order-none">
                     {t.type === "transfer" ? `${acct(t.account_id)} → ${acct(t.to_account_id)}` : t.memo ?? ""}
                     {t.type === "transfer" && t.memo ? ` · ${t.memo}` : ""}
                     {t.source === "mcp" && <span className="text-[11px] text-fg-subtle">· Claude에서 기록</span>}
                     {t.recurring_id && <span className="text-[11px] text-fg-subtle">· 고정지출</span>}
                     {receiptCount?.get(t.id) ? <span className="text-[11px] text-fg-subtle" aria-label="영수증 있음">📎{receiptCount.get(t.id)}</span> : null}
                   </span>
-                  <span className="truncate text-[13px] text-fg-subtle">{t.type === "transfer" ? "" : acct(t.account_id)}</span>
-                  <span className={`text-right font-semibold ${t.type === "income" ? "text-lime" : t.type === "transfer" ? "text-fg-subtle" : ""}`}>{formatSigned(t.amount, t.type)}</span>
+                  <span className="order-4 truncate text-right text-[13px] text-fg-subtle sm:order-none sm:text-left">{t.type === "transfer" ? "" : acct(t.account_id)}</span>
+                  <span className={`order-2 text-right font-semibold sm:order-none ${t.type === "income" ? "text-lime" : t.type === "transfer" ? "text-fg-subtle" : ""}`}>{formatSigned(t.amount, t.type)}</span>
                 </button>
               );
             })}
