@@ -1,11 +1,13 @@
 // Edge Function `weather`: 외부 날씨 API는 서버(여기)에서만 호출한다.
 //   GET  ?lat=&lon=            → 정규화 예보(캐시 30분, 장애 시 stale 캐시)
 //   GET  ?action=geocode&q=    → 도시 검색 후보
+//   GET  ?action=air&lat=&lon= → 미세먼지(WX-6). AIRKOREA_API_KEY 가 없으면 { enabled: false }
 // 인증: 로그인 사용자 JWT 필수. 캐시 쓰기는 service role(weather_cache는 일반 사용자 쓰기 불가).
 // 제공처는 환경변수 WEATHER_PROVIDER(기본 open-meteo). 비밀값이 필요한 제공처로 바뀌면 Edge secrets에만 둔다.
 import { requireUser } from "../_shared/auth.ts";
 import { handleCors, json } from "../_shared/cors.ts";
 import { badRequest, errorResponse, HttpError } from "../_shared/errors.ts";
+import { createAirProvider } from "./air.ts";
 import { createProvider, dbCacheStore } from "./deps.ts";
 import { getForecast, WeatherUnavailable } from "./service.ts";
 
@@ -27,6 +29,19 @@ Deno.serve(async (req) => {
       const q = (url.searchParams.get("q") ?? "").trim();
       if (q.length < 1 || q.length > 50) throw badRequest("검색어는 1~50자여야 합니다.");
       return json({ results: await provider.geocode(q) });
+    }
+
+    if (url.searchParams.get("action") === "air") {
+      const air = createAirProvider(Deno.env.get("AIRKOREA_API_KEY"));
+      if (!air) return json({ enabled: false });
+      const alat = num(url.searchParams.get("lat"), -90, 90, "lat");
+      const alon = num(url.searchParams.get("lon"), -180, 180, "lon");
+      try {
+        return json({ enabled: true, ...(await air.getAir({ lat: alat, lon: alon })) });
+      } catch (e) {
+        console.error("air provider failed", e instanceof Error ? e.message : e);
+        throw new HttpError(503, "AIR_UNAVAILABLE", "미세먼지 정보를 가져올 수 없습니다.");
+      }
     }
 
     const lat = num(url.searchParams.get("lat"), -90, 90, "lat");

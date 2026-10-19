@@ -24,3 +24,9 @@ export type WeatherLocation = { name: string; lat: number; lon: number };
 
 /** 캘린더 날짜 셀용 요약 */
 export type DailyWeather = { icon: WeatherIcon; label: string; text: string };
+
+/** 미세먼지(WX-6). enabled:false 면 서버에 에어코리아 키가 없어 기능이 꺼진 상태다. */
+export type AirGrade = "good" | "normal" | "bad" | "very_bad";
+export type AirData =
+  | { enabled: false }
+  | { enabled: true; pm25: number | null; pm10: number | null; pm25Grade: AirGrade | null; pm10Grade: AirGrade | null; grade: AirGrade | null; station: string; measured_at: string };

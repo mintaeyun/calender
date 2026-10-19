@@ -50,3 +50,7 @@ export const STALE_NOTICE = "날씨 서버에 연결할 수 없어 마지막으�
 
 /** 날씨 아이콘 이모지(디자인에 아이콘 에셋이 없어 텍스트 아이콘 사용) */
 export const ICON_EMOJI: Record<string, string> = { clear: "☀️", partly: "🌤️", cloudy: "☁️", fog: "🌫️", drizzle: "🌦️", rain: "🌧️", snow: "❄️", thunder: "⛈️" };
+
+export const AIR_LABEL: Record<string, string> = { good: "좋음", normal: "보통", bad: "나쁨", very_bad: "매우나쁨" };
+/** 등급 색: 좋음=라임, 보통=회색, 나쁨/매우나쁨=경고색 (색 외에 등급 텍스트를 항상 병기) */
+export const AIR_COLOR: Record<string, string> = { good: "var(--lime)", normal: "#b4b4ba", bad: "var(--danger)", very_bad: "var(--danger)" };
