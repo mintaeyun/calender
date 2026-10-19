@@ -10,9 +10,11 @@
     "db:start": "supabase start --workdir ..",
     "db:reset": "supabase db reset --workdir ..",
     "db:types": "node scripts/db-types.mjs",
-    "db:test": "supabase db query --local --workdir .. -f ../supabase/tests/rls.sql",
+    "db:test": "supabase db query --local --workdir .. -f supabase/tests/rls.sql",
     "test": "vitest run",
-    "test:functions": "vitest run -c vitest.functions.config.ts"
+    "test:functions": "vitest run -c vitest.functions.config.ts",
+    "db:types:remote": "node scripts/db-types.mjs --linked",
+    "db:test:remote": "supabase db query --linked --workdir .. -f supabase/tests/rls.sql"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

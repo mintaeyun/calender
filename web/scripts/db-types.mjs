@@ -4,7 +4,9 @@ import { spawnSync } from "node:child_process";
 import { writeFileSync } from "node:fs";
 
 const target = new URL("../src/lib/supabase/database.types.ts", import.meta.url);
-const args = ["supabase", "gen", "types", "typescript", "--local", "--workdir", ".."];
+// 기본은 로컬(Docker). `--linked` 를 주면 supabase link 된 원격 프로젝트 기준으로 생성한다.
+const source = process.argv.includes("--linked") ? "--linked" : "--local";
+const args = ["supabase", "gen", "types", "typescript", source, "--workdir", ".."];
 const r = spawnSync("npx", args, { encoding: "utf8", shell: true });
 if (r.status !== 0 || !r.stdout.includes("export type Database")) {
   console.error(r.stderr || r.stdout || "supabase gen types 실패");
