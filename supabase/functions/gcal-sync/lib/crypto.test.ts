@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { decryptToken, encryptToken, keyRingFromEnv, signState, verifyState } from "./crypto.ts";
+import { decryptToken, encryptToken, keyRingFromEnv, signState, verifyState, verifyStateDetailed } from "./crypto.ts";
 
 const k = (n: number) => btoa(String.fromCharCode(...new Uint8Array(32).fill(n)));
 const ring = keyRingFromEnv((name) => ({ TOKEN_ENC_KEY: k(1) } as Record<string, string>)[name]);
@@ -48,5 +48,20 @@ describe("oauth state", () => {
     const other = keyRingFromEnv((n) => (n === "TOKEN_ENC_KEY" ? k(9) : undefined));
     expect(await verifyState(s, other, 1000)).toBeNull();
     expect(await verifyState(`${body}`, ring, 1000)).toBeNull();
+  });
+});
+
+describe("verifyStateDetailed: 실패 이유 구분", () => {
+  it("missing / format / signature / payload / expired", async () => {
+    const s = await signState({ u: "u", r: "http://localhost:3000/", e: 2000 }, ring);
+    expect(await verifyStateDetailed(null, ring, 1000)).toEqual({ ok: false, reason: "missing" });
+    expect(await verifyStateDetailed("abc", ring, 1000)).toMatchObject({ ok: false, reason: "format" });
+    expect(await verifyStateDetailed("a.b.c", ring, 1000)).toMatchObject({ ok: false, reason: "format" });
+    const [body] = s.split(".");
+    expect(await verifyStateDetailed(`${body}.AAAA`, ring, 1000)).toMatchObject({ ok: false, reason: "signature" });
+    expect(await verifyStateDetailed(s, ring, 3000)).toMatchObject({ ok: false, reason: "expired" });
+    expect(await verifyStateDetailed(s, ring, 1000)).toMatchObject({ ok: true });
+    const other = keyRingFromEnv((n) => (n === "TOKEN_ENC_KEY" ? k(9) : undefined));
+    expect(await verifyStateDetailed(s, other, 1000)).toMatchObject({ ok: false, reason: "signature" });
   });
 });
