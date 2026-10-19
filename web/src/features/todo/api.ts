@@ -4,6 +4,7 @@ import type { Tables, TablesInsert, TablesUpdate } from "@/lib/supabase/database
 import { todayIn, type Priority, type TodoStatus } from "./lib/due";
 import { nextOccurrence } from "./lib/nextOccurrence";
 import { positionBetween, positionForAppend } from "./lib/position";
+import { allDayToRange } from "@/features/calendar/lib/allday";
 
 export type Project = Tables<"todo_projects">;
 export type Tag = Tables<"tags">;
@@ -172,4 +173,17 @@ export async function setTodoTags(todoId: string, tagIds: string[]): Promise<voi
   const user_id = await uid();
   must(await supabase.from("todo_tags").delete().eq("todo_id", todoId).select("tag_id"));
   if (tagIds.length) must(await supabase.from("todo_tags").insert(tagIds.map((tag_id) => ({ user_id, todo_id: todoId, tag_id }))).select("tag_id"));
+}
+
+// ── 일정 전환 (TODO-8) ──────────────────────────────────
+
+/**
+ * 마감일 기준 종일 일정을 만들고 할일에 연결한다(02 종일 규칙: end_at = 마지막 날 다음 00:00).
+ * 이미 연결된 살아있는 일정이 있으면 새로 만들지 않고 그 id를 돌려준다(created=false) — DB 함수가 행을 잠가 중복을 막는다.
+ */
+export async function convertTodoToEvent(todo: Pick<Todo, "id" | "due_date">, tz: string): Promise<{ eventId: string; created: boolean }> {
+  if (!todo.due_date) throw new Error("마감일이 있는 할일만 일정으로 전환할 수 있어요");
+  const { start_at, end_at } = allDayToRange(todo.due_date, todo.due_date, tz);
+  const r = must(await createClient().rpc("convert_todo_to_event", { p_todo_id: todo.id, p_start_at: start_at, p_end_at: end_at }));
+  return { eventId: r[0].event_id, created: r[0].created };
 }

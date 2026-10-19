@@ -822,6 +822,7 @@ export type Database = {
           completed_at: string | null
           recurrence_rule: string | null
           recurrence_source_id: string | null
+          event_id: string | null
           position: number
           deleted_at: string | null
           created_at: string
@@ -839,6 +840,7 @@ export type Database = {
           completed_at?: string | null
           recurrence_rule?: string | null
           recurrence_source_id?: string | null
+          event_id?: string | null
           position?: number
           deleted_at?: string | null
           created_at?: string
@@ -856,6 +858,7 @@ export type Database = {
           completed_at?: string | null
           recurrence_rule?: string | null
           recurrence_source_id?: string | null
+          event_id?: string | null
           position?: number
           deleted_at?: string | null
           created_at?: string
@@ -991,6 +994,10 @@ export type Database = {
       }
     }
     Functions: {
+      convert_todo_to_event: {
+        Args: { p_todo_id: string; p_start_at: string; p_end_at: string; p_calendar_id?: string }
+        Returns: { event_id: string; created: boolean }[]
+      }
       budget_usage: {
         Args: { p_user?: string; p_month?: string }
         Returns: { category_id: string | null; budget: number; spent: number; ratio: number }[]
