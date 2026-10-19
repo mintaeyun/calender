@@ -6,6 +6,7 @@ import { todayKey } from "@/lib/time";
 import { suggestMemos, type NewTransaction, type Transaction } from "../api";
 import { useAccounts, useCategories, useCreateTransaction, useRecentCategories, useUpdateTransaction } from "../hooks";
 import { formatWon, parseAmount, type TxType } from "../lib/money";
+import { ReceiptSection } from "./ReceiptSection";
 
 const TYPES: [TxType, string][] = [["expense", "지출"], ["income", "수입"], ["transfer", "이체"]];
 const LAST_ACCOUNT_KEY = "ledger:lastAccount";
@@ -131,6 +132,8 @@ export function TxForm({ tx, onDone }: { tx?: Transaction; onDone: () => void })
           )}
         </label>
       </div>
+
+      {tx && type !== "transfer" && <ReceiptSection transactionId={tx.id} />}
 
       {err && <span className="text-sm text-danger" role="alert">{err}</span>}
       <button type="submit" disabled={pending} className="rounded-full bg-lime py-3.5 text-base font-bold text-black disabled:opacity-60">{pending ? "저장 중…" : tx ? "수정 저장" : "저장"}</button>

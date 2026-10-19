@@ -5,7 +5,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useTimezone } from "@/lib/profile";
 import { todayKey, WEEKDAYS_KO, weekdayOf } from "@/lib/time";
 import { summarize, type Transaction } from "../api";
-import { useAccounts, useCategories, useDeleteTransaction, useTransactions } from "../hooks";
+import { useAccounts, useCategories, useDeleteTransaction, useReceiptCounts, useTransactions } from "../hooks";
 import { fromParams, groupByDate, toApiFilter, toParams, type UiFilter } from "../lib/filters";
 import { formatSigned, formatWon } from "../lib/money";
 import { CategoryManager } from "./CategoryManager";
@@ -33,6 +33,7 @@ export function LedgerList() {
   const categories = useCategories(undefined, true).data ?? [];
   const accounts = useAccounts(true).data ?? [];
   const del = useDeleteTransaction();
+  const receiptCount = useReceiptCounts((q.data ?? []).filter((t) => t.type !== "transfer").map((t) => t.id)).data;
   const [editing, setEditing] = useState<Transaction | null>(null);
   const [deleting, setDeleting] = useState<Transaction | null>(null);
   const [managing, setManaging] = useState(false);
@@ -99,6 +100,7 @@ export function LedgerList() {
                     {t.type === "transfer" && t.memo ? ` · ${t.memo}` : ""}
                     {t.source === "mcp" && <span className="text-[11px] text-fg-subtle">· Claude에서 기록</span>}
                     {t.recurring_id && <span className="text-[11px] text-fg-subtle">· 고정지출</span>}
+                    {receiptCount?.get(t.id) ? <span className="text-[11px] text-fg-subtle" aria-label="영수증 있음">📎{receiptCount.get(t.id)}</span> : null}
                   </span>
                   <span className="truncate text-[13px] text-fg-subtle">{t.type === "transfer" ? "" : acct(t.account_id)}</span>
                   <span className={`text-right font-semibold ${t.type === "income" ? "text-lime" : t.type === "transfer" ? "text-fg-subtle" : ""}`}>{formatSigned(t.amount, t.type)}</span>

@@ -1,90 +1,125 @@
-// 이 파일은 마이그레이션에서 생성된다. 직접 수정하지 않는다. (npm run db:types)
-export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.18"
+  }
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          extensions?: Json
+          operationName?: string
+          query?: string
+          variables?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       accounts: {
         Row: {
-          id: string
-          user_id: string
-          name: string
-          type: string
-          initial_balance: number
           archived: boolean
           created_at: string
+          id: string
+          initial_balance: number
+          name: string
+          type: string
           updated_at: string
+          user_id: string
         }
         Insert: {
+          archived?: boolean
+          created_at?: string
           id?: string
-          user_id: string
+          initial_balance?: number
           name: string
           type?: string
-          initial_balance?: number
-          archived?: boolean
-          created_at?: string
           updated_at?: string
+          user_id: string
         }
         Update: {
-          id?: string
-          user_id?: string
-          name?: string
-          type?: string
-          initial_balance?: number
           archived?: boolean
           created_at?: string
+          id?: string
+          initial_balance?: number
+          name?: string
+          type?: string
           updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
       allowed_emails: {
         Row: {
-          email: string
           created_at: string
+          email: string
         }
         Insert: {
-          email: string
           created_at?: string
+          email: string
         }
         Update: {
-          email?: string
           created_at?: string
+          email?: string
         }
         Relationships: []
       }
       budgets: {
         Row: {
-          id: string
-          user_id: string
-          month: string
-          category_id: string | null
-          amount: number
-          alerted_80_at: string | null
           alerted_100_at: string | null
+          alerted_80_at: string | null
+          amount: number
+          category_id: string | null
           created_at: string
+          id: string
+          month: string
           updated_at: string
+          user_id: string
         }
         Insert: {
-          id?: string
-          user_id: string
-          month: string
-          category_id?: string | null
-          amount: number
-          alerted_80_at?: string | null
           alerted_100_at?: string | null
+          alerted_80_at?: string | null
+          amount: number
+          category_id?: string | null
           created_at?: string
+          id?: string
+          month: string
           updated_at?: string
+          user_id: string
         }
         Update: {
-          id?: string
-          user_id?: string
-          month?: string
-          category_id?: string | null
-          amount?: number
-          alerted_80_at?: string | null
           alerted_100_at?: string | null
+          alerted_80_at?: string | null
+          amount?: number
+          category_id?: string | null
           created_at?: string
+          id?: string
+          month?: string
           updated_at?: string
+          user_id?: string
         }
         Relationships: [
           {
@@ -98,100 +133,100 @@ export type Database = {
       }
       calendars: {
         Row: {
-          id: string
-          user_id: string
-          name: string
           color: string
-          source: string
-          google_calendar_id: string | null
-          sync_enabled: boolean
           created_at: string
+          google_calendar_id: string | null
+          id: string
+          name: string
+          source: string
+          sync_enabled: boolean
           updated_at: string
+          user_id: string
         }
         Insert: {
-          id?: string
-          user_id: string
-          name: string
           color?: string
-          source?: string
-          google_calendar_id?: string | null
-          sync_enabled?: boolean
           created_at?: string
+          google_calendar_id?: string | null
+          id?: string
+          name: string
+          source?: string
+          sync_enabled?: boolean
           updated_at?: string
+          user_id: string
         }
         Update: {
-          id?: string
-          user_id?: string
-          name?: string
           color?: string
-          source?: string
-          google_calendar_id?: string | null
-          sync_enabled?: boolean
           created_at?: string
+          google_calendar_id?: string | null
+          id?: string
+          name?: string
+          source?: string
+          sync_enabled?: boolean
           updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
       categories: {
         Row: {
-          id: string
-          user_id: string
-          name: string
-          kind: string
-          color: string
-          icon: string | null
           archived: boolean
+          color: string
           created_at: string
+          icon: string | null
+          id: string
+          kind: string
+          name: string
           updated_at: string
+          user_id: string
         }
         Insert: {
-          id?: string
-          user_id: string
-          name: string
-          kind: string
-          color?: string
-          icon?: string | null
           archived?: boolean
+          color?: string
           created_at?: string
+          icon?: string | null
+          id?: string
+          kind: string
+          name: string
           updated_at?: string
+          user_id: string
         }
         Update: {
-          id?: string
-          user_id?: string
-          name?: string
-          kind?: string
-          color?: string
-          icon?: string | null
           archived?: boolean
+          color?: string
           created_at?: string
+          icon?: string | null
+          id?: string
+          kind?: string
+          name?: string
           updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
       event_reminders: {
         Row: {
-          id: string
-          user_id: string
-          event_id: string
-          minutes_before: number
           created_at: string
+          event_id: string
+          id: string
+          minutes_before: number
           updated_at: string
+          user_id: string
         }
         Insert: {
-          id?: string
-          user_id: string
-          event_id: string
-          minutes_before: number
           created_at?: string
+          event_id: string
+          id?: string
+          minutes_before: number
           updated_at?: string
+          user_id: string
         }
         Update: {
-          id?: string
-          user_id?: string
-          event_id?: string
-          minutes_before?: number
           created_at?: string
+          event_id?: string
+          id?: string
+          minutes_before?: number
           updated_at?: string
+          user_id?: string
         }
         Relationships: [
           {
@@ -205,70 +240,70 @@ export type Database = {
       }
       events: {
         Row: {
-          id: string
-          user_id: string
-          calendar_id: string | null
-          title: string
-          start_at: string
-          end_at: string
           all_day: boolean
+          calendar_id: string | null
+          color: string | null
+          created_at: string
+          deleted_at: string | null
+          end_at: string
+          exdates: string[]
+          google_etag: string | null
+          google_event_id: string | null
+          google_updated_at: string | null
+          id: string
           location: string | null
           notes: string | null
-          color: string | null
-          rrule: string | null
-          recurring_event_id: string | null
           original_start_at: string | null
-          exdates: string[]
-          google_event_id: string | null
-          google_etag: string | null
-          google_updated_at: string | null
-          deleted_at: string | null
-          created_at: string
+          recurring_event_id: string | null
+          rrule: string | null
+          start_at: string
+          title: string
           updated_at: string
+          user_id: string
         }
         Insert: {
-          id?: string
-          user_id: string
-          calendar_id?: string | null
-          title: string
-          start_at: string
-          end_at: string
           all_day?: boolean
+          calendar_id?: string | null
+          color?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          end_at: string
+          exdates?: string[]
+          google_etag?: string | null
+          google_event_id?: string | null
+          google_updated_at?: string | null
+          id?: string
           location?: string | null
           notes?: string | null
-          color?: string | null
-          rrule?: string | null
-          recurring_event_id?: string | null
           original_start_at?: string | null
-          exdates?: string[]
-          google_event_id?: string | null
-          google_etag?: string | null
-          google_updated_at?: string | null
-          deleted_at?: string | null
-          created_at?: string
+          recurring_event_id?: string | null
+          rrule?: string | null
+          start_at: string
+          title: string
           updated_at?: string
+          user_id: string
         }
         Update: {
-          id?: string
-          user_id?: string
-          calendar_id?: string | null
-          title?: string
-          start_at?: string
-          end_at?: string
           all_day?: boolean
+          calendar_id?: string | null
+          color?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          end_at?: string
+          exdates?: string[]
+          google_etag?: string | null
+          google_event_id?: string | null
+          google_updated_at?: string | null
+          id?: string
           location?: string | null
           notes?: string | null
-          color?: string | null
-          rrule?: string | null
-          recurring_event_id?: string | null
           original_start_at?: string | null
-          exdates?: string[]
-          google_event_id?: string | null
-          google_etag?: string | null
-          google_updated_at?: string | null
-          deleted_at?: string | null
-          created_at?: string
+          recurring_event_id?: string | null
+          rrule?: string | null
+          start_at?: string
+          title?: string
           updated_at?: string
+          user_id?: string
         }
         Relationships: [
           {
@@ -289,82 +324,82 @@ export type Database = {
       }
       google_connections: {
         Row: {
-          id: string
-          user_id: string
+          created_at: string
           google_email: string
+          id: string
+          last_error: string | null
+          last_synced_at: string | null
           refresh_token_enc: string
           sync_direction: string
           sync_token_by_calendar: Json
-          last_synced_at: string | null
-          last_error: string | null
-          created_at: string
           updated_at: string
+          user_id: string
         }
         Insert: {
-          id?: string
-          user_id: string
+          created_at?: string
           google_email: string
+          id?: string
+          last_error?: string | null
+          last_synced_at?: string | null
           refresh_token_enc: string
           sync_direction?: string
           sync_token_by_calendar?: Json
-          last_synced_at?: string | null
-          last_error?: string | null
-          created_at?: string
           updated_at?: string
+          user_id: string
         }
         Update: {
-          id?: string
-          user_id?: string
+          created_at?: string
           google_email?: string
+          id?: string
+          last_error?: string | null
+          last_synced_at?: string | null
           refresh_token_enc?: string
           sync_direction?: string
           sync_token_by_calendar?: Json
-          last_synced_at?: string | null
-          last_error?: string | null
-          created_at?: string
           updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
       mcp_logs: {
         Row: {
-          id: string
-          user_id: string
-          token_id: string | null
-          tool: string
-          input_summary: string | null
-          status: string
-          error: string | null
-          duration_ms: number | null
           called_at: string
           created_at: string
+          duration_ms: number | null
+          error: string | null
+          id: string
+          input_summary: string | null
+          status: string
+          token_id: string | null
+          tool: string
           updated_at: string
+          user_id: string
         }
         Insert: {
+          called_at?: string
+          created_at?: string
+          duration_ms?: number | null
+          error?: string | null
           id?: string
-          user_id: string
-          token_id?: string | null
-          tool: string
           input_summary?: string | null
           status: string
-          error?: string | null
-          duration_ms?: number | null
-          called_at?: string
-          created_at?: string
+          token_id?: string | null
+          tool: string
           updated_at?: string
+          user_id: string
         }
         Update: {
-          id?: string
-          user_id?: string
-          token_id?: string | null
-          tool?: string
-          input_summary?: string | null
-          status?: string
-          error?: string | null
-          duration_ms?: number | null
           called_at?: string
           created_at?: string
+          duration_ms?: number | null
+          error?: string | null
+          id?: string
+          input_summary?: string | null
+          status?: string
+          token_id?: string | null
+          tool?: string
           updated_at?: string
+          user_id?: string
         }
         Relationships: [
           {
@@ -378,193 +413,193 @@ export type Database = {
       }
       mcp_tokens: {
         Row: {
+          created_at: string
           id: string
-          user_id: string
+          last_used_at: string | null
           name: string
+          revoked_at: string | null
+          scopes: Json
           token_hash: string
           token_prefix: string | null
-          scopes: Json
-          last_used_at: string | null
-          revoked_at: string | null
-          created_at: string
           updated_at: string
+          user_id: string
         }
         Insert: {
+          created_at?: string
           id?: string
-          user_id: string
+          last_used_at?: string | null
           name: string
+          revoked_at?: string | null
+          scopes?: Json
           token_hash: string
           token_prefix?: string | null
-          scopes?: Json
-          last_used_at?: string | null
-          revoked_at?: string | null
-          created_at?: string
           updated_at?: string
+          user_id: string
         }
         Update: {
+          created_at?: string
           id?: string
-          user_id?: string
+          last_used_at?: string | null
           name?: string
+          revoked_at?: string | null
+          scopes?: Json
           token_hash?: string
           token_prefix?: string | null
-          scopes?: Json
-          last_used_at?: string | null
-          revoked_at?: string | null
-          created_at?: string
           updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
       notification_settings: {
         Row: {
-          id: string
-          user_id: string
-          enabled_types: Json
           channels: Json
-          default_reminder_minutes: number[]
-          quiet_start: string | null
-          quiet_end: string | null
-          push_subscriptions: Json
           created_at: string
+          default_reminder_minutes: number[]
+          enabled_types: Json
+          id: string
+          push_subscriptions: Json
+          quiet_end: string | null
+          quiet_start: string | null
           updated_at: string
+          user_id: string
         }
         Insert: {
-          id?: string
-          user_id: string
-          enabled_types?: Json
           channels?: Json
-          default_reminder_minutes?: number[]
-          quiet_start?: string | null
-          quiet_end?: string | null
-          push_subscriptions?: Json
           created_at?: string
+          default_reminder_minutes?: number[]
+          enabled_types?: Json
+          id?: string
+          push_subscriptions?: Json
+          quiet_end?: string | null
+          quiet_start?: string | null
           updated_at?: string
+          user_id: string
         }
         Update: {
-          id?: string
-          user_id?: string
-          enabled_types?: Json
           channels?: Json
-          default_reminder_minutes?: number[]
-          quiet_start?: string | null
-          quiet_end?: string | null
-          push_subscriptions?: Json
           created_at?: string
+          default_reminder_minutes?: number[]
+          enabled_types?: Json
+          id?: string
+          push_subscriptions?: Json
+          quiet_end?: string | null
+          quiet_start?: string | null
           updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
       notifications: {
         Row: {
-          id: string
-          user_id: string
-          type: string
-          title: string
           body: string | null
-          link: string | null
+          created_at: string
           dedupe_key: string | null
+          delivered_at: string | null
+          id: string
+          link: string | null
           read_at: string | null
           scheduled_at: string
-          delivered_at: string | null
-          created_at: string
+          title: string
+          type: string
           updated_at: string
+          user_id: string
         }
         Insert: {
-          id?: string
-          user_id: string
-          type: string
-          title: string
           body?: string | null
-          link?: string | null
+          created_at?: string
           dedupe_key?: string | null
+          delivered_at?: string | null
+          id?: string
+          link?: string | null
           read_at?: string | null
           scheduled_at?: string
-          delivered_at?: string | null
-          created_at?: string
+          title: string
+          type: string
           updated_at?: string
+          user_id: string
         }
         Update: {
-          id?: string
-          user_id?: string
-          type?: string
-          title?: string
           body?: string | null
-          link?: string | null
+          created_at?: string
           dedupe_key?: string | null
+          delivered_at?: string | null
+          id?: string
+          link?: string | null
           read_at?: string | null
           scheduled_at?: string
-          delivered_at?: string | null
-          created_at?: string
+          title?: string
+          type?: string
           updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
       profiles: {
         Row: {
-          id: string
-          user_id: string
-          display_name: string | null
-          timezone: string
-          theme: string
-          week_start: string
-          start_screen: string
-          weather_location: Json | null
-          temp_unit: string
           created_at: string
+          display_name: string | null
+          id: string
+          start_screen: string
+          temp_unit: string
+          theme: string
+          timezone: string
           updated_at: string
+          user_id: string
+          weather_location: Json | null
+          week_start: string
         }
         Insert: {
-          id?: string
-          user_id: string
-          display_name?: string | null
-          timezone?: string
-          theme?: string
-          week_start?: string
-          start_screen?: string
-          weather_location?: Json | null
-          temp_unit?: string
           created_at?: string
+          display_name?: string | null
+          id?: string
+          start_screen?: string
+          temp_unit?: string
+          theme?: string
+          timezone?: string
           updated_at?: string
+          user_id: string
+          weather_location?: Json | null
+          week_start?: string
         }
         Update: {
-          id?: string
-          user_id?: string
-          display_name?: string | null
-          timezone?: string
-          theme?: string
-          week_start?: string
-          start_screen?: string
-          weather_location?: Json | null
-          temp_unit?: string
           created_at?: string
+          display_name?: string | null
+          id?: string
+          start_screen?: string
+          temp_unit?: string
+          theme?: string
+          timezone?: string
           updated_at?: string
+          user_id?: string
+          weather_location?: Json | null
+          week_start?: string
         }
         Relationships: []
       }
       receipts: {
         Row: {
-          id: string
-          user_id: string
-          transaction_id: string
-          storage_path: string
           created_at: string
+          id: string
+          storage_path: string
+          transaction_id: string
           updated_at: string
+          user_id: string
         }
         Insert: {
-          id?: string
-          user_id: string
-          transaction_id: string
-          storage_path: string
           created_at?: string
+          id?: string
+          storage_path: string
+          transaction_id: string
           updated_at?: string
+          user_id: string
         }
         Update: {
-          id?: string
-          user_id?: string
-          transaction_id?: string
-          storage_path?: string
           created_at?: string
+          id?: string
+          storage_path?: string
+          transaction_id?: string
           updated_at?: string
+          user_id?: string
         }
         Relationships: [
           {
@@ -578,54 +613,61 @@ export type Database = {
       }
       recurring_payments: {
         Row: {
-          id: string
-          user_id: string
-          name: string
+          account_id: string
+          active: boolean
           amount: number
+          category_id: string | null
+          created_at: string
           cycle: string
+          id: string
+          last_run_date: string | null
+          name: string
+          next_run_date: string
           pay_day: number
           pay_month: number | null
-          category_id: string | null
-          account_id: string
-          next_run_date: string
-          last_run_date: string | null
-          active: boolean
-          created_at: string
           updated_at: string
+          user_id: string
         }
         Insert: {
-          id?: string
-          user_id: string
-          name: string
+          account_id: string
+          active?: boolean
           amount: number
+          category_id?: string | null
+          created_at?: string
           cycle?: string
+          id?: string
+          last_run_date?: string | null
+          name: string
+          next_run_date: string
           pay_day: number
           pay_month?: number | null
-          category_id?: string | null
-          account_id: string
-          next_run_date: string
-          last_run_date?: string | null
-          active?: boolean
-          created_at?: string
           updated_at?: string
+          user_id: string
         }
         Update: {
-          id?: string
-          user_id?: string
-          name?: string
+          account_id?: string
+          active?: boolean
           amount?: number
+          category_id?: string | null
+          created_at?: string
           cycle?: string
+          id?: string
+          last_run_date?: string | null
+          name?: string
+          next_run_date?: string
           pay_day?: number
           pay_month?: number | null
-          category_id?: string | null
-          account_id?: string
-          next_run_date?: string
-          last_run_date?: string | null
-          active?: boolean
-          created_at?: string
           updated_at?: string
+          user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "recurring_payments_account_id_user_id_fkey"
+            columns: ["account_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "account_balances"
+            referencedColumns: ["account_id", "user_id"]
+          },
           {
             foreignKeyName: "recurring_payments_account_id_user_id_fkey"
             columns: ["account_id", "user_id"]
@@ -644,91 +686,91 @@ export type Database = {
       }
       sync_logs: {
         Row: {
-          id: string
-          user_id: string
-          event_id: string | null
-          kind: string
-          detail: Json
           created_at: string
+          detail: Json
+          event_id: string | null
+          id: string
+          kind: string
           updated_at: string
+          user_id: string
         }
         Insert: {
-          id?: string
-          user_id: string
-          event_id?: string | null
-          kind: string
-          detail?: Json
           created_at?: string
+          detail?: Json
+          event_id?: string | null
+          id?: string
+          kind: string
           updated_at?: string
+          user_id: string
         }
         Update: {
-          id?: string
-          user_id?: string
-          event_id?: string | null
-          kind?: string
-          detail?: Json
           created_at?: string
+          detail?: Json
+          event_id?: string | null
+          id?: string
+          kind?: string
           updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
       tags: {
         Row: {
-          id: string
-          user_id: string
-          name: string
           color: string
           created_at: string
+          id: string
+          name: string
           updated_at: string
+          user_id: string
         }
         Insert: {
-          id?: string
-          user_id: string
-          name: string
           color?: string
           created_at?: string
+          id?: string
+          name: string
           updated_at?: string
+          user_id: string
         }
         Update: {
-          id?: string
-          user_id?: string
-          name?: string
           color?: string
           created_at?: string
+          id?: string
+          name?: string
           updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
       todo_items: {
         Row: {
-          id: string
-          user_id: string
-          todo_id: string
-          text: string
-          done: boolean
-          position: number
           created_at: string
+          done: boolean
+          id: string
+          position: number
+          text: string
+          todo_id: string
           updated_at: string
+          user_id: string
         }
         Insert: {
-          id?: string
-          user_id: string
-          todo_id: string
-          text: string
-          done?: boolean
-          position?: number
           created_at?: string
+          done?: boolean
+          id?: string
+          position?: number
+          text: string
+          todo_id: string
           updated_at?: string
+          user_id: string
         }
         Update: {
-          id?: string
-          user_id?: string
-          todo_id?: string
-          text?: string
-          done?: boolean
-          position?: number
           created_at?: string
+          done?: boolean
+          id?: string
+          position?: number
+          text?: string
+          todo_id?: string
           updated_at?: string
+          user_id?: string
         }
         Relationships: [
           {
@@ -742,55 +784,55 @@ export type Database = {
       }
       todo_projects: {
         Row: {
-          id: string
-          user_id: string
-          name: string
-          color: string
           archived: boolean
+          color: string
           created_at: string
+          id: string
+          name: string
           updated_at: string
+          user_id: string
         }
         Insert: {
-          id?: string
-          user_id: string
-          name: string
-          color?: string
           archived?: boolean
+          color?: string
           created_at?: string
+          id?: string
+          name: string
           updated_at?: string
+          user_id: string
         }
         Update: {
-          id?: string
-          user_id?: string
-          name?: string
-          color?: string
           archived?: boolean
+          color?: string
           created_at?: string
+          id?: string
+          name?: string
           updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
       todo_tags: {
         Row: {
-          user_id: string
-          todo_id: string
-          tag_id: string
           created_at: string
+          tag_id: string
+          todo_id: string
           updated_at: string
+          user_id: string
         }
         Insert: {
-          user_id: string
-          todo_id: string
-          tag_id: string
           created_at?: string
+          tag_id: string
+          todo_id: string
           updated_at?: string
+          user_id: string
         }
         Update: {
-          user_id?: string
-          todo_id?: string
-          tag_id?: string
           created_at?: string
+          tag_id?: string
+          todo_id?: string
           updated_at?: string
+          user_id?: string
         }
         Relationships: [
           {
@@ -811,60 +853,67 @@ export type Database = {
       }
       todos: {
         Row: {
-          id: string
-          user_id: string
-          project_id: string | null
-          title: string
-          notes: string | null
-          due_date: string | null
-          priority: string
-          status: string
           completed_at: string | null
+          created_at: string
+          deleted_at: string | null
+          due_date: string | null
+          event_id: string | null
+          id: string
+          notes: string | null
+          position: number
+          priority: string
+          project_id: string | null
           recurrence_rule: string | null
           recurrence_source_id: string | null
-          event_id: string | null
-          position: number
-          deleted_at: string | null
-          created_at: string
+          status: string
+          title: string
           updated_at: string
+          user_id: string
         }
         Insert: {
-          id?: string
-          user_id: string
-          project_id?: string | null
-          title: string
-          notes?: string | null
-          due_date?: string | null
-          priority?: string
-          status?: string
           completed_at?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          due_date?: string | null
+          event_id?: string | null
+          id?: string
+          notes?: string | null
+          position?: number
+          priority?: string
+          project_id?: string | null
           recurrence_rule?: string | null
           recurrence_source_id?: string | null
-          event_id?: string | null
-          position?: number
-          deleted_at?: string | null
-          created_at?: string
+          status?: string
+          title: string
           updated_at?: string
+          user_id: string
         }
         Update: {
-          id?: string
-          user_id?: string
-          project_id?: string | null
-          title?: string
-          notes?: string | null
-          due_date?: string | null
-          priority?: string
-          status?: string
           completed_at?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          due_date?: string | null
+          event_id?: string | null
+          id?: string
+          notes?: string | null
+          position?: number
+          priority?: string
+          project_id?: string | null
           recurrence_rule?: string | null
           recurrence_source_id?: string | null
-          event_id?: string | null
-          position?: number
-          deleted_at?: string | null
-          created_at?: string
+          status?: string
+          title?: string
           updated_at?: string
+          user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "todos_event_fk"
+            columns: ["event_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id", "user_id"]
+          },
           {
             foreignKeyName: "todos_project_id_user_id_fkey"
             columns: ["project_id", "user_id"]
@@ -876,51 +925,58 @@ export type Database = {
       }
       transactions: {
         Row: {
-          id: string
-          user_id: string
-          date: string
-          amount: number
-          type: string
-          category_id: string | null
           account_id: string
-          to_account_id: string | null
+          amount: number
+          category_id: string | null
+          created_at: string
+          date: string
+          id: string
           memo: string | null
           recurring_id: string | null
           source: string
-          created_at: string
+          to_account_id: string | null
+          type: string
           updated_at: string
+          user_id: string
         }
         Insert: {
-          id?: string
-          user_id: string
-          date?: string
-          amount: number
-          type: string
-          category_id?: string | null
           account_id: string
-          to_account_id?: string | null
+          amount: number
+          category_id?: string | null
+          created_at?: string
+          date?: string
+          id?: string
           memo?: string | null
           recurring_id?: string | null
           source?: string
-          created_at?: string
+          to_account_id?: string | null
+          type: string
           updated_at?: string
+          user_id: string
         }
         Update: {
-          id?: string
-          user_id?: string
-          date?: string
-          amount?: number
-          type?: string
-          category_id?: string | null
           account_id?: string
-          to_account_id?: string | null
+          amount?: number
+          category_id?: string | null
+          created_at?: string
+          date?: string
+          id?: string
           memo?: string | null
           recurring_id?: string | null
           source?: string
-          created_at?: string
+          to_account_id?: string | null
+          type?: string
           updated_at?: string
+          user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "transactions_account_id_user_id_fkey"
+            columns: ["account_id", "user_id"]
+            isOneToOne: false
+            referencedRelation: "account_balances"
+            referencedColumns: ["account_id", "user_id"]
+          },
           {
             foreignKeyName: "transactions_account_id_user_id_fkey"
             columns: ["account_id", "user_id"]
@@ -946,6 +1002,13 @@ export type Database = {
             foreignKeyName: "transactions_to_account_id_user_id_fkey"
             columns: ["to_account_id", "user_id"]
             isOneToOne: false
+            referencedRelation: "account_balances"
+            referencedColumns: ["account_id", "user_id"]
+          },
+          {
+            foreignKeyName: "transactions_to_account_id_user_id_fkey"
+            columns: ["to_account_id", "user_id"]
+            isOneToOne: false
             referencedRelation: "accounts"
             referencedColumns: ["id", "user_id"]
           },
@@ -953,27 +1016,27 @@ export type Database = {
       }
       weather_cache: {
         Row: {
+          created_at: string
+          fetched_at: string
           id: string
           location_key: string
           payload: Json
-          fetched_at: string
-          created_at: string
           updated_at: string
         }
         Insert: {
+          created_at?: string
+          fetched_at?: string
           id?: string
           location_key: string
           payload: Json
-          fetched_at?: string
-          created_at?: string
           updated_at?: string
         }
         Update: {
+          created_at?: string
+          fetched_at?: string
           id?: string
           location_key?: string
           payload?: Json
-          fetched_at?: string
-          created_at?: string
           updated_at?: string
         }
         Relationships: []
@@ -983,41 +1046,64 @@ export type Database = {
       account_balances: {
         Row: {
           account_id: string | null
-          user_id: string | null
+          archived: boolean | null
+          balance: number | null
+          initial_balance: number | null
           name: string | null
           type: string | null
-          archived: boolean | null
-          initial_balance: number | null
-          balance: number | null
+          user_id: string | null
         }
         Relationships: []
       }
     }
     Functions: {
-      convert_todo_to_event: {
-        Args: { p_todo_id: string; p_start_at: string; p_end_at: string; p_calendar_id?: string }
-        Returns: { event_id: string; created: boolean }[]
-      }
       budget_usage: {
-        Args: { p_user?: string; p_month?: string }
-        Returns: { category_id: string | null; budget: number; spent: number; ratio: number }[]
-      }
-      run_recurring_payments: {
-        Args: { p_today?: string }
-        Returns: number
-      }
-      next_pay_date: {
-        Args: { p_cycle: string; p_pay_day: number; p_pay_month: number; p_after: string }
-        Returns: string
+        Args: { p_month?: string; p_user?: string }
+        Returns: {
+          budget: number
+          category_id: string
+          ratio: number
+          spent: number
+        }[]
       }
       complete_todo: {
-        Args: { p_id: string; p_next_due?: string; p_next_rule?: string; p_user?: string }
+        Args: {
+          p_id: string
+          p_next_due?: string
+          p_next_rule?: string
+          p_user?: string
+        }
         Returns: string
       }
-      delete_my_account: {
-        Args: never
-        Returns: undefined
+      convert_todo_to_event: {
+        Args: {
+          p_calendar_id?: string
+          p_end_at: string
+          p_start_at: string
+          p_todo_id: string
+        }
+        Returns: {
+          created: boolean
+          event_id: string
+        }[]
       }
+      delete_my_account: { Args: never; Returns: undefined }
+      invoke_notify: { Args: never; Returns: undefined }
+      next_pay_date: {
+        Args: {
+          p_after: string
+          p_cycle: string
+          p_pay_day: number
+          p_pay_month: number
+        }
+        Returns: string
+      }
+      pay_date_in: {
+        Args: { p_day: number; p_month: number; p_year: number }
+        Returns: string
+      }
+      purge_soft_deleted: { Args: never; Returns: undefined }
+      run_recurring_payments: { Args: { p_today?: string }; Returns: number }
     }
     Enums: {
       [_ in never]: never
@@ -1028,8 +1114,128 @@ export type Database = {
   }
 }
 
-type PublicSchema = Database["public"]
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
 
-export type Tables<T extends keyof PublicSchema["Tables"]> = PublicSchema["Tables"][T]["Row"]
-export type TablesInsert<T extends keyof PublicSchema["Tables"]> = PublicSchema["Tables"][T]["Insert"]
-export type TablesUpdate<T extends keyof PublicSchema["Tables"]> = PublicSchema["Tables"][T]["Update"]
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+
+export type Tables<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
+
+export type TablesInsert<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
+
+export type TablesUpdate<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
+
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never) = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never) = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
+
+export const Constants = {
+  graphql_public: {
+    Enums: {},
+  },
+  public: {
+    Enums: {},
+  },
+} as const
