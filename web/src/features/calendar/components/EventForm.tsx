@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { useTimezone } from "@/lib/profile";
 import { addDays, dateKey, formatDateKo, weekdayOf, WEEKDAYS_KO, zonedParts, zonedToUtc } from "@/lib/time";
 import type { EventWithReminders } from "../api";
+import { useGoogleTwoWay } from "@/features/google/hooks";
 import { useCalendars, useEventMutations } from "../hooks";
 import {
   allDayDates, allDayToRange, convertReminders, reminderOptions,
@@ -55,7 +56,10 @@ export function EventForm({ instance, master, defaultStart, onDone }: Props) {
   const { save, remove } = useEventMutations();
   const editing = Boolean(instance);
   const ev = instance?.event;
-  const readOnly = ev ? isReadOnlyEvent(ev, calendars) : false;
+  const twoWay = useGoogleTwoWay();
+  const readOnly = ev ? isReadOnlyEvent(ev, calendars, twoWay) : false;
+  // 양방향이고 이미 구글에 있는 일정이면 삭제가 구글에도 반영된다 — 확인 창에 명시
+  const googleDeleteNote = twoWay && Boolean(ev?.google_event_id) ? "Google 캘린더(mycal)에서도 삭제됩니다." : undefined;
   const seriesRule = master?.rrule ?? ev?.rrule ?? null;
   const parsedRule = useMemo(() => parseRRule(seriesRule, tz), [seriesRule, tz]);
 
@@ -361,12 +365,13 @@ export function EventForm({ instance, master, defaultStart, onDone }: Props) {
       {askScope && (
         <ScopeDialog
           kind={askScope.kind}
+          note={askScope.kind === "delete" ? googleDeleteNote : undefined}
           busy={busy}
           onCancel={() => setAskScope(null)}
           onPick={(s) => (askScope.kind === "save" ? doSave(s) : doDelete(s))}
         />
       )}
-      {confirmDelete && <ConfirmDelete title={ev?.title ?? ""} busy={busy} onCancel={() => setConfirmDelete(false)} onConfirm={() => doDelete()} />}
+      {confirmDelete && <ConfirmDelete title={ev?.title ?? ""} note={googleDeleteNote} busy={busy} onCancel={() => setConfirmDelete(false)} onConfirm={() => doDelete()} />}
     </div>
   );
 }

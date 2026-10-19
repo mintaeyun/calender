@@ -27,10 +27,11 @@ export function normalizeState(raw: unknown): CalendarState {
   return {};
 }
 
-export type UpsertRow = ConvertedEvent & { recurring_event_id: string | null; google_synced_at: string };
+/** seen_run: 이번 실행 id — 전체 가져오기 후 "이번에 확인되지 않은 일정" 을 가려내는 데 쓴다(시계 비교를 하지 않는다). */
+export type UpsertRow = ConvertedEvent & { recurring_event_id: string | null; seen_run: string };
 
 export interface EventStore {
-  /** 이 캘린더에서 google_event_id 로 로컬 일정을 찾는다(삭제된 행 포함). */
+  /** google_event_id 로 로컬 일정을 찾는다(삭제된 행 포함). 앱이 push 한 일정은 로컬 캘린더에 있으므로 캘린더와 무관하게 사용자 전체에서 찾는다. */
   findByGoogleIds(calendarId: string, googleIds: string[]): Promise<Map<string, { id: string; exdates: string[] }>>;
   /** insert/update. 기존 행은 exdates 를 합집합으로 병합한다. 반환: google id → 로컬 id */
   upsertEvents(calendarId: string, rows: UpsertRow[]): Promise<Map<string, string>>;
@@ -39,7 +40,7 @@ export interface EventStore {
   /** 마스터(구글 id)의 exdates 에 추가 */
   addExdates(calendarId: string, masterGoogleId: string, iso: string[]): Promise<void>;
   /** 전체 가져오기 후 확인되지 않은 구글 일정 소프트 삭제 */
-  softDeleteStale(calendarId: string, window: { min: string; max: string }, before: string): Promise<number>;
+  softDeleteStale(calendarId: string, window: { min: string; max: string }, runId: string): Promise<number>;
 }
 
 export type Stats = { pages: number; upserted: number; deleted: number; cancelledInstances: number; skipped: number; resynced: boolean };
@@ -107,8 +108,9 @@ export async function syncCalendar(deps: SyncDeps, ctx: CalendarCtx): Promise<{ 
     }
 
     stats.pages++;
-    const stamp = deps.now().toISOString();
-    await processItems(deps, ctx, page.items, stamp, stats);
+    // 전체 가져오기는 시작 시각을 실행 id 로 쓰고(여러 번 이어져도 같은 값), 증분은 매번 새 값을 쓴다.
+    const runId = state.mode === "full" && state.startedAt ? state.startedAt : deps.now().toISOString();
+    await processItems(deps, ctx, page.items, runId, stats);
 
     if (page.nextPageToken) {
       state = { ...state, pageToken: page.nextPageToken };
@@ -139,7 +141,7 @@ async function processItems(deps: SyncDeps, ctx: CalendarCtx, items: GoogleEvent
     else if (r.kind === "delete") deletes.push(r.google_event_id);
     else if (r.kind === "cancel_instance") cancels.push({ master: r.master_google_id, at: r.original_start_at, id: r.google_event_id });
     else if (r.event.master_google_id) exceptions.push(r.event);
-    else masters.push({ ...r.event, recurring_event_id: null, google_synced_at: stamp });
+    else masters.push({ ...r.event, recurring_event_id: null, seen_run: stamp });
   }
 
   const idByGoogle = new Map<string, string>();
@@ -157,7 +159,7 @@ async function processItems(deps: SyncDeps, ctx: CalendarCtx, items: GoogleEvent
       const g = await deps.api.getEvent(ctx.accessToken, ctx.googleCalendarId, mid);
       const r = g ? convertGoogleEvent(g, ctx.tz) : null;
       if (r?.kind === "upsert" && !r.event.master_google_id) {
-        const map = await deps.store.upsertEvents(ctx.calendarId, [{ ...r.event, recurring_event_id: null, google_synced_at: stamp }]);
+        const map = await deps.store.upsertEvents(ctx.calendarId, [{ ...r.event, recurring_event_id: null, seen_run: stamp }]);
         for (const [gid, id] of map) idByGoogle.set(gid, id);
         stats.upserted++;
       }
@@ -166,7 +168,7 @@ async function processItems(deps: SyncDeps, ctx: CalendarCtx, items: GoogleEvent
   const excRows: UpsertRow[] = exceptions.map((e) => {
     const parent = idByGoogle.get(e.master_google_id!) ?? null;
     // 마스터를 끝내 못 찾으면(삭제됨 등) 독립 일정으로 보존한다.
-    return parent ? { ...e, recurring_event_id: parent, google_synced_at: stamp } : { ...e, master_google_id: null, original_start_at: null, recurring_event_id: null, google_synced_at: stamp };
+    return parent ? { ...e, recurring_event_id: parent, seen_run: stamp } : { ...e, master_google_id: null, original_start_at: null, recurring_event_id: null, seen_run: stamp };
   });
   for (const part of chunks(excRows)) await deps.store.upsertEvents(ctx.calendarId, part);
   stats.upserted += excRows.length;

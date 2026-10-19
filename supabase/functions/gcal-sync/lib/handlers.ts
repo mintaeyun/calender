@@ -2,7 +2,7 @@
 import { badRequest, HttpError } from "../../_shared/errors.ts";
 import { decryptToken, encryptToken, signState, verifyStateDetailed, type KeyRing, type StateFailure } from "./crypto.ts";
 import { GoogleApiError, type GoogleApi, type GoogleCalendarEntry } from "./google.ts";
-import { syncAll, syncUser, type RunDeps } from "./run.ts";
+import { pushUser, syncAll, syncUser, type RunDeps } from "./run.ts";
 import { isTargetCalendar, TARGET_CALENDAR_NAME } from "./target.ts";
 
 export type CalendarOut = {
@@ -128,6 +128,11 @@ export async function refreshCalendars(userId: string, d: HandlerDeps) {
     target_found: targets.length > 0,
     target_name: d.targetName ?? TARGET_CALENDAR_NAME,
   };
+}
+
+/** 일정 저장 직후 호출: 로컬 변경만 구글(mycal)로 보낸다. 양방향이 아니면 skipped. */
+export async function runPush(userId: string, d: HandlerDeps) {
+  return await pushUser(d.runDeps(userId), userId);
 }
 
 export async function runSync(userId: string, d: HandlerDeps) {

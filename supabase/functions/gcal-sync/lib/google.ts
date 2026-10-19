@@ -47,6 +47,14 @@ export interface GoogleApi {
   listCalendars(accessToken: string): Promise<GoogleCalendarEntry[]>;
   listEvents(accessToken: string, calendarId: string, params: ListEventsParams): Promise<EventsPage>;
   getEvent(accessToken: string, calendarId: string, eventId: string): Promise<GoogleEvent | null>;
+  /** 새 이벤트 생성 (알림 메일 없음) */
+  insertEvent(accessToken: string, calendarId: string, body: Record<string, unknown>): Promise<GoogleEvent>;
+  /** 부분 수정. etag 를 주면 If-Match 로 낙관적 동시성 제어 — 다르면 GoogleApiError(code=precondition_failed) */
+  patchEvent(accessToken: string, calendarId: string, eventId: string, body: Record<string, unknown>, etag?: string | null): Promise<GoogleEvent>;
+  /** 삭제. 이미 없으면(404/410) 조용히 성공. etag 가 다르면 precondition_failed */
+  deleteEvent(accessToken: string, calendarId: string, eventId: string, etag?: string | null): Promise<void>;
+  /** extendedProperties.private.appEventId 로 이벤트를 찾는다(중복 생성 방지) */
+  findByAppEventId(accessToken: string, calendarId: string, appEventId: string): Promise<GoogleEvent | null>;
 }
 
 type Opts = {
@@ -105,6 +113,7 @@ export function createGoogleApi(o: Opts): GoogleApi {
       const limited = reason !== undefined && RETRYABLE_REASONS.has(reason);
       return new GoogleApiError(status, limited ? "rate_limited" : "forbidden", limited ? "Google 호출 한도를 초과했습니다." : "Google 캘린더 접근 권한이 없습니다.", !limited);
     }
+    if (status === 412) return new GoogleApiError(status, "precondition_failed", "Google 쪽에서 먼저 수정되었습니다.", false);
     if (status === 404) return new GoogleApiError(status, "not_found", "Google 캘린더 또는 일정을 찾을 수 없습니다.", false);
     if (status === 410) return new GoogleApiError(status, "gone", "동기화 토큰이 만료되었습니다.", false);
     if (status === 429) return new GoogleApiError(status, "rate_limited", "Google 호출 한도를 초과했습니다.", false);
@@ -186,6 +195,38 @@ export function createGoogleApi(o: Opts): GoogleApi {
         if (e instanceof GoogleApiError && (e.code === "not_found" || e.code === "gone")) return null;
         throw e;
       }
+    },
+
+    async insertEvent(accessToken, calendarId, body) {
+      const url = `${API}/calendars/${encodeURIComponent(calendarId)}/events?sendUpdates=none`;
+      const res = await request(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }, accessToken);
+      return await res.json() as GoogleEvent;
+    },
+
+    async patchEvent(accessToken, calendarId, eventId, body, etag) {
+      const url = `${API}/calendars/${encodeURIComponent(calendarId)}/events/${encodeURIComponent(eventId)}?sendUpdates=none`;
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (etag) headers["If-Match"] = etag;
+      const res = await request(url, { method: "PATCH", headers, body: JSON.stringify(body) }, accessToken);
+      return await res.json() as GoogleEvent;
+    },
+
+    async deleteEvent(accessToken, calendarId, eventId, etag) {
+      const url = `${API}/calendars/${encodeURIComponent(calendarId)}/events/${encodeURIComponent(eventId)}?sendUpdates=none`;
+      try {
+        await request(url, { method: "DELETE", headers: etag ? { "If-Match": etag } : {} }, accessToken);
+      } catch (e) {
+        if (e instanceof GoogleApiError && (e.code === "not_found" || e.code === "gone")) return; // 이미 삭제됨
+        throw e;
+      }
+    },
+
+    async findByAppEventId(accessToken, calendarId, appEventId) {
+      const url = new URL(`${API}/calendars/${encodeURIComponent(calendarId)}/events`);
+      url.searchParams.set("privateExtendedProperty", `appEventId=${appEventId}`);
+      url.searchParams.set("maxResults", "5");
+      const j = await (await request(url.toString(), { method: "GET" }, accessToken)).json() as { items?: GoogleEvent[] };
+      return j.items?.find((e) => e.status !== "cancelled") ?? null;
     },
   };
 }

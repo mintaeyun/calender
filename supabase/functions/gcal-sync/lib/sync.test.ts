@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { encryptToken, keyRingFromEnv } from "./crypto.ts";
 import type { GoogleEvent } from "./convert.ts";
-import { FakeGoogle, FakeStore, gone } from "./fake.ts";
+import { FakeGoogle, FakePushStore, FakeStore, gone } from "./fake.ts";
 import { GoogleApiError } from "./google.ts";
 import { syncUser } from "./run.ts";
 import { normalizeState, syncCalendar } from "./sync.ts";
@@ -260,6 +260,65 @@ describe("syncUser", () => {
     api.pages.push({ items: [timed("a", "A")], nextSyncToken: "t" });
     await syncUser(deps(), "u1");
     expect(api.calls.map((c) => c.calendarId)).toEqual(["primary@x.com"]);
+  });
+
+  describe("양방향", () => {
+    let push: FakePushStore;
+    beforeEach(() => {
+      push = new FakePushStore();
+      push.add({ id: "L1", title: "앱에서 만든 일정" });
+      store.conn!.sync_direction = "two_way";
+    });
+
+    it("가져오기 전에 로컬 변경을 구글로 push 한다", async () => {
+      const order: string[] = [];
+      const insert = api.insertEvent.bind(api);
+      api.insertEvent = async (...a) => { order.push("push"); return insert(...a); };
+      const list = api.listEvents.bind(api);
+      api.listEvents = async (...a) => { order.push("pull"); return list(...a); };
+      api.pages.push({ items: [], nextSyncToken: "t" });
+      const r = await syncUser({ ...deps(), pushStore: push }, "u1");
+      expect(r).toMatchObject({ status: "ok", push: { created: 1 } });
+      expect(order).toEqual(["push", "pull"]);
+      expect(push.get("L1").google_event_id).toBeTruthy();
+    });
+
+    it("가져오기만이면 push 하지 않는다", async () => {
+      store.conn!.sync_direction = "import_only";
+      api.pages.push({ items: [], nextSyncToken: "t" });
+      const r = await syncUser({ ...deps(), pushStore: push }, "u1");
+      expect(r).toMatchObject({ status: "ok" });
+      expect((r as { push?: unknown }).push).toBeUndefined();
+      expect(api.ops).toHaveLength(0);
+    });
+
+    it("push_local=false 면 신규 로컬 일정은 보내지 않는다", async () => {
+      store.conn!.push_local = false;
+      api.pages.push({ items: [], nextSyncToken: "t" });
+      const r = await syncUser({ ...deps(), pushStore: push }, "u1");
+      expect(r).toMatchObject({ push: { created: 0 } });
+    });
+
+    it("읽기 전용 캘린더(권한 reader)에는 push 하지 않는다", async () => {
+      store.calendars[0].read_only = true;
+      api.pages.push({ items: [], nextSyncToken: "t" });
+      await syncUser({ ...deps(), pushStore: push }, "u1");
+      expect(api.ops).toHaveLength(0);
+    });
+
+    it("push 한 일정이 가져오기에 다시 나타나도 중복 생성·캘린더 이동이 없다", async () => {
+      api.pages.push({ items: [], nextSyncToken: "t1" });
+      await syncUser({ ...deps(), pushStore: push }, "u1");
+      const gid = push.get("L1").google_event_id!;
+      // 같은 일정이 가져오기 응답에도 들어온다고 가정 — 로컬 캘린더에 있는 행을 그대로 갱신해야 한다
+      store.rows.push({ id: "ev-L1", calendar_id: "local-1", google_event_id: gid, title: "앱에서 만든 일정", deleted_at: null, exdates: [], seen_run: "old", recurring_event_id: null } as never);
+      api.pages.push({ items: [timed(gid, "앱에서 만든 일정 (구글에서 확인)")], nextSyncToken: "t2" });
+      await run({ syncToken: "t1", mode: "incremental" });
+      const rows = store.rows.filter((r) => r.google_event_id === gid);
+      expect(rows).toHaveLength(1);
+      expect(rows[0].calendar_id).toBe("local-1");
+      expect(rows[0].title).toBe("앱에서 만든 일정 (구글에서 확인)");
+    });
   });
 
   it("연결 없음 / 선택된 캘린더 없음", async () => {

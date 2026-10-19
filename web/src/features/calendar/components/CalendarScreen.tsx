@@ -10,6 +10,7 @@ import { formatDateKo, formatTime, todayKey, zonedToUtc } from "@/lib/time";
 import {
   eventsQueryOptions, useCalendars, useEventMutations, useEvents, useRecurringPayments, useTodoDeadlines,
 } from "../hooks";
+import { useGoogleTwoWay } from "@/features/google/hooks";
 import { isReadOnlyEvent, LIME, SKY } from "../lib/colors";
 import { diffDays, instancesByDay, nextUpcomingKey } from "../lib/days";
 import { moveRange } from "../lib/move";
@@ -70,6 +71,7 @@ export function CalendarScreen() {
   const { instances, rows, isLoading, error } = useEvents(range);
   const { data: calendars = [] } = useCalendars();
   const { move } = useEventMutations();
+  const twoWay = useGoogleTwoWay();
 
   // 이전/다음 구간 미리 불러오기 (월 전환 300ms 목표)
   useEffect(() => {
@@ -158,7 +160,7 @@ export function CalendarScreen() {
   }
 
   function requestMove(instance: EventInstance, range: { start_at: string; end_at: string }) {
-    if (isReadOnlyEvent(instance.event, calendars)) return;
+    if (isReadOnlyEvent(instance.event, calendars, twoWay)) return;
     if (instance.recurring) setPendingMove({ instance, range });
     else commitMove(instance, range);
   }

@@ -35,10 +35,17 @@ export function eventColor(ev: EventRow, calendars: CalendarRow[], masterColor?:
   return ev.color ?? masterColor ?? calendars.find((c) => c.id === ev.calendar_id)?.color ?? NEUTRAL;
 }
 
-/** 구글 캘린더 소속 일정은 앱에서 수정하지 않는다(가져오기 전용 기본값). 양방향 지원(07)이 생기면 이 함수만 바꾼다. */
-export function isReadOnlyEvent(ev: EventRow, calendars: CalendarRow[]): boolean {
-  if (ev.google_event_id) return true;
-  return calendars.find((c) => c.id === ev.calendar_id)?.source === "google";
+/**
+ * 앱에서 수정·삭제·드래그할 수 없는 일정인가.
+ *  - 구글에서 읽기 전용 권한인 캘린더(공휴일 등, calendars.read_only)는 항상 읽기 전용
+ *  - 구글 캘린더 소속 일정은 가져오기 전용일 때만 읽기 전용, 양방향(twoWay)이면 수정 가능(변경은 구글에 반영된다)
+ *  - 앱 캘린더의 일정은 구글에 push 된 것(google_event_id 있음)이어도 수정 가능
+ */
+export function isReadOnlyEvent(ev: EventRow, calendars: CalendarRow[], twoWay = false): boolean {
+  const cal = calendars.find((c) => c.id === ev.calendar_id);
+  if (cal?.read_only) return true;
+  if (cal?.source === "google") return !twoWay;
+  return false;
 }
 
 export function isGoogleEvent(ev: EventRow, calendars: CalendarRow[]): boolean {

@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTimezone } from "@/lib/profile";
+import { triggerPush } from "@/features/google/push";
 import {
   deleteEvent, listCalendars, listEvents, listRecurringPayments, listTodoDeadlines, saveEvent,
   type DeleteArgs, type EventWithReminders, type SaveArgs,
@@ -54,7 +55,11 @@ export function useRecurringPayments(enabled: boolean) {
 
 export function useEventMutations() {
   const qc = useQueryClient();
-  const invalidate = () => qc.invalidateQueries({ queryKey: ["events"] });
+  // 저장·삭제·이동 뒤에는 목록을 다시 불러오고, 구글과 양방향이면 변경을 구글(mycal)로 보낸다(실패해도 다음 동기화가 보낸다).
+  const invalidate = () => {
+    triggerPush(qc);
+    return qc.invalidateQueries({ queryKey: ["events"] });
+  };
 
   const save = useMutation({
     mutationFn: (args: Omit<SaveArgs, "tz"> & { tz: string }) => saveEvent(args),
