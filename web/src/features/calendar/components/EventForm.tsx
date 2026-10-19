@@ -25,7 +25,7 @@ type Props = {
   onDone: () => void;
 };
 
-const field = "flex flex-col gap-0.5 rounded-[14px] bg-[#202024] px-3.5 py-3";
+const field = "flex flex-col gap-0.5 rounded-[14px] bg-[var(--surface-3)] px-3.5 py-3";
 const hint = "text-xs text-fg-subtle";
 const inputCls = "bg-transparent text-[15px] text-fg outline-none [color-scheme:dark] disabled:opacity-60";
 const FREQS: [Freq | "none", string][] = [["none", "안 함"], ["daily", "매일"], ["weekly", "매주"], ["monthly", "매월"], ["yearly", "매년"]];
@@ -192,7 +192,7 @@ export function EventForm({ instance, master, defaultStart, onDone }: Props) {
         disabled={readOnly}
         placeholder="제목"
         aria-label="제목"
-        className="border-b border-[#2a2a2e] bg-transparent pb-3 text-2xl font-semibold text-fg outline-none placeholder:text-[#55555c]"
+        className="border-b border-surface-4 bg-transparent pb-3 text-2xl font-semibold text-fg outline-none placeholder:text-[var(--fg-faint)]"
       />
 
       <button
@@ -206,8 +206,8 @@ export function EventForm({ instance, master, defaultStart, onDone }: Props) {
           <span>종일</span>
           <span className={hint}>{allDay ? "시간 없이 날짜만 · 여러 날 가능" : "시간을 지정하는 일정"}</span>
         </span>
-        <span className="relative inline-block h-6 w-11 rounded-full" style={{ background: allDay ? LIME : "#3a3a40" }}>
-          <span className="absolute top-[3px] h-[18px] w-[18px] rounded-full bg-white" style={{ left: allDay ? 23 : 3 }} />
+        <span className="relative inline-block h-6 w-11 rounded-full" style={{ background: allDay ? LIME : "var(--surface-5)" }}>
+          <span className="absolute top-[3px] h-[18px] w-[18px] rounded-full bg-fg" style={{ left: allDay ? 23 : 3 }} />
         </span>
       </button>
 
@@ -245,7 +245,7 @@ export function EventForm({ instance, master, defaultStart, onDone }: Props) {
             const on = reminders.includes(o.minutes);
             return (
               <button key={o.minutes} type="button" disabled={readOnly} aria-pressed={on} onClick={() => toggleReminder(o.minutes)}
-                className="rounded-full px-3.5 py-[7px]" style={on ? { background: LIME, color: "#000", fontWeight: 600 } : { background: "#202024" }}>
+                className="rounded-full px-3.5 py-[7px]" style={on ? { background: LIME, color: "var(--bg)", fontWeight: 600 } : { background: "var(--surface-3)" }}>
                 {o.label}
               </button>
             );
@@ -253,10 +253,10 @@ export function EventForm({ instance, master, defaultStart, onDone }: Props) {
         </div>
       </div>
 
-      <div className="flex flex-col gap-2.5 rounded-2xl bg-[#1c1c20] p-3.5">
+      <div className="flex flex-col gap-2.5 rounded-2xl bg-[var(--surface-2)] p-3.5">
         <div className="flex items-center justify-between">
           <span className="text-[13px] text-fg-subtle">반복</span>
-          <span className="text-xs" style={{ color: LIME }}>{summary}</span>
+          <span className="text-xs" style={{ color: "var(--lime-ink)" }}>{summary}</span>
         </div>
         {unsupportedRule ? (
           <span className="text-xs text-fg-subtle">이 반복 규칙(Google 등)은 앱에서 편집할 수 없어 그대로 유지됩니다.</span>
@@ -266,7 +266,7 @@ export function EventForm({ instance, master, defaultStart, onDone }: Props) {
               {FREQS.map(([k, label]) => (
                 <button key={k} type="button" disabled={lockRepeat} onClick={() => setFreq(k)} aria-pressed={freq === k}
                   className="rounded-full px-3.5 py-[7px]"
-                  style={freq === k ? { background: "#fff", color: "#000", fontWeight: 600 } : { background: "#202024", color: "#d6d6da" }}>
+                  style={freq === k ? { background: "var(--fg)", color: "var(--bg)", fontWeight: 600 } : { background: "var(--surface-3)", color: "var(--fg-muted)" }}>
                   {label}
                 </button>
               ))}
@@ -282,7 +282,7 @@ export function EventForm({ instance, master, defaultStart, onDone }: Props) {
                         return base.includes(d) ? base.filter((x) => x !== d) : [...base, d];
                       })}
                       className="flex h-9 w-9 items-center justify-center rounded-full"
-                      style={on ? { background: LIME, color: "#0b0b0c", fontWeight: 700 } : { background: "#202024", color: "#b4b4ba" }}>
+                      style={on ? { background: LIME, color: "var(--on-accent)", fontWeight: 700 } : { background: "var(--surface-3)", color: "var(--fg-muted)" }}>
                       {WEEKDAYS_KO[d]}
                     </button>
                   );
@@ -290,19 +290,19 @@ export function EventForm({ instance, master, defaultStart, onDone }: Props) {
               </div>
             )}
             {freq !== "none" && (
-              <div className="flex flex-wrap items-center gap-2.5 border-t border-[#2a2a2e] pt-2.5">
+              <div className="flex flex-wrap items-center gap-2.5 border-t border-surface-4 pt-2.5">
                 <span className="text-[13px] text-fg-subtle">종료</span>
-                <div className="flex rounded-full bg-[#202024] p-[5px]">
+                <div className="flex rounded-full bg-[var(--surface-3)] p-[5px]">
                   {([["never", "없음"], ["until", "날짜"], ["count", "횟수"]] as const).map(([k, label]) => (
                     <button key={k} type="button" disabled={lockRepeat} onClick={() => setEndType(k)}
-                      className="rounded-full px-3.5 py-1.5" style={endType === k ? { background: "#3a3a40", color: "#fff", fontWeight: 600 } : { color: "#8d8d94" }}>
+                      className="rounded-full px-3.5 py-1.5" style={endType === k ? { background: "var(--surface-5)", color: "var(--fg)", fontWeight: 600 } : { color: "var(--fg-subtle)" }}>
                       {label}
                     </button>
                   ))}
                 </div>
-                {endType === "until" && <input type="date" value={endDate} min={sDate} disabled={lockRepeat} aria-label="반복 종료일" className={`${inputCls} ml-auto rounded-xl bg-[#202024] px-3 py-2`} onChange={(e) => setEndDate(e.target.value)} />}
+                {endType === "until" && <input type="date" value={endDate} min={sDate} disabled={lockRepeat} aria-label="반복 종료일" className={`${inputCls} ml-auto rounded-xl bg-[var(--surface-3)] px-3 py-2`} onChange={(e) => setEndDate(e.target.value)} />}
                 {endType === "count" && (
-                  <span className="ml-auto flex items-center gap-1.5 rounded-xl bg-[#202024] px-3 py-2">
+                  <span className="ml-auto flex items-center gap-1.5 rounded-xl bg-[var(--surface-3)] px-3 py-2">
                     <input type="number" min={1} max={999} value={endCount} disabled={lockRepeat} aria-label="반복 횟수" className={`${inputCls} w-14`} onChange={(e) => setEndCount(Number(e.target.value))} />회
                   </span>
                 )}
@@ -310,7 +310,7 @@ export function EventForm({ instance, master, defaultStart, onDone }: Props) {
             )}
           </>
         )}
-        {recurringEdit && <span className="text-xs text-[#6c6c73]">저장할 때 &quot;이번만 / 이후 전체 / 전체&quot; 중에서 선택합니다.</span>}
+        {recurringEdit && <span className="text-xs text-fg-dim">저장할 때 &quot;이번만 / 이후 전체 / 전체&quot; 중에서 선택합니다.</span>}
       </div>
 
       <div className="flex items-center justify-between gap-3">
@@ -319,7 +319,7 @@ export function EventForm({ instance, master, defaultStart, onDone }: Props) {
           {calendars.map((c) => (
             <button key={c.id} type="button" disabled={readOnly} aria-pressed={effectiveCalendar === c.id} onClick={() => setCalendarId(c.id)}
               className="flex items-center gap-[7px] rounded-full px-3.5 py-[7px]"
-              style={effectiveCalendar === c.id ? { background: "#3a3a40", color: "#fff" } : { background: "#202024", color: "#b4b4ba" }}>
+              style={effectiveCalendar === c.id ? { background: "var(--surface-5)", color: "var(--fg)" } : { background: "var(--surface-3)", color: "var(--fg-muted)" }}>
               <span className="h-2 w-2 rounded-full" style={{ background: c.color }} />{c.name}
             </button>
           ))}
@@ -332,12 +332,12 @@ export function EventForm({ instance, master, defaultStart, onDone }: Props) {
           {EVENT_COLORS.map((c) => (
             <button key={c.label} type="button" disabled={readOnly} title={c.label} aria-label={c.label} aria-pressed={color === c.value} onClick={() => setColor(c.value)}
               className="h-6 w-6 rounded-full"
-              style={{ background: c.value ?? "transparent", border: c.value ? "none" : "1.5px dashed #6c6c73", outline: color === c.value ? "2px solid #fff" : "none", outlineOffset: 2 }} />
+              style={{ background: c.value ?? "transparent", border: c.value ? "none" : "1.5px dashed var(--fg-dim)", outline: color === c.value ? "2px solid #fff" : "none", outlineOffset: 2 }} />
           ))}
         </div>
       </div>
 
-      {error && <p role="alert" className="text-sm text-danger">{error}</p>}
+      {error && <p role="alert" className="text-sm text-danger-ink">{error}</p>}
 
       <div className="flex items-center justify-between gap-2 pt-1">
         <div>
@@ -355,7 +355,7 @@ export function EventForm({ instance, master, defaultStart, onDone }: Props) {
       </div>
 
       {editing && ev && (
-        <span className="text-xs text-[#6c6c73]">{formatDateKo(init.start, tz)} 일정 · 삭제한 일정은 30일 뒤 영구 삭제됩니다</span>
+        <span className="text-xs text-fg-dim">{formatDateKo(init.start, tz)} 일정 · 삭제한 일정은 30일 뒤 영구 삭제됩니다</span>
       )}
 
       {askScope && (

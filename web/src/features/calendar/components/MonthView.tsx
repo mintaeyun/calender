@@ -42,7 +42,7 @@ export function MonthView({
   const order = weekStart === "monday" ? [1, 2, 3, 4, 5, 6, 0] : [0, 1, 2, 3, 4, 5, 6];
 
   return (
-    <div className="flex flex-col gap-2 rounded-[22px] bg-[#111113] px-4 pb-4 pt-3.5">
+    <div className="flex flex-col gap-2 rounded-[22px] bg-surface-sunken px-4 pb-4 pt-3.5">
       <div className="grid grid-cols-7 gap-1.5 px-2 text-[13px] text-fg-subtle">
         {order.map((d) => <span key={d}>{WEEKDAYS_KO[d]}</span>)}
       </div>
@@ -72,7 +72,7 @@ export function MonthView({
               }}
               className="flex min-h-[118px] min-w-0 cursor-pointer flex-col gap-1 rounded-xl p-2"
               style={{
-                background: isToday ? "#1c1c20" : "#161618",
+                background: isToday ? "var(--surface-2)" : "var(--surface)",
                 border: over === d ? `1px dashed ${LIME}` : isToday ? `1px solid ${LIME}` : "1px solid transparent",
                 opacity: inMonth ? 1 : 0.35,
               }}
@@ -80,7 +80,7 @@ export function MonthView({
               <div className="flex items-center justify-between">
                 <span
                   className="flex h-[26px] w-[26px] items-center justify-center rounded-full text-sm font-bold"
-                  style={{ background: isToday ? LIME : "transparent", color: isToday ? "#0b0b0c" : wd === 0 ? "oklch(0.75 0.14 25)" : "#f2f2f3" }}
+                  style={{ background: isToday ? LIME : "transparent", color: isToday ? "var(--on-accent)" : wd === 0 ? "oklch(0.75 0.14 25)" : "var(--fg)" }}
                 >
                   {+d.slice(8, 10)}
                 </span>
@@ -116,7 +116,7 @@ export function MonthView({
                   key={m.id}
                   onClick={(e) => e.stopPropagation()}
                   className="truncate rounded-md border px-1.5 py-0.5 text-[11px]"
-                  style={m.kind === "todo" ? { borderColor: LIME, color: LIME } : { borderColor: "#3a3a40", color: "#d6d6da" }}
+                  style={m.kind === "todo" ? { borderColor: LIME, color: "var(--lime-ink)" } : { borderColor: "var(--surface-5)", color: "var(--fg-muted)" }}
                   title={m.label}
                 >
                   {m.kind === "todo" ? "☐ " : "₩ "}{m.label}

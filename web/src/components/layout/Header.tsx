@@ -38,7 +38,7 @@ export function Header({ unreadCount = 0 }: { unreadCount?: number }) {
               href={n.href}
               aria-current={active ? "page" : undefined}
               className={`whitespace-nowrap rounded-full px-5 py-2.5 hover:no-underline ${
-                active ? "bg-white font-semibold text-black" : "bg-surface-2 text-fg-muted"
+                active ? "bg-fg font-semibold text-bg" : "bg-surface-2 text-fg-muted"
               }`}
             >
               {n.label}
@@ -52,7 +52,7 @@ export function Header({ unreadCount = 0 }: { unreadCount?: number }) {
           <span className="h-3 w-3 rounded-full border-2 border-fg-muted" />
           검색
         </Link>
-        <Link href="/notifications" className={`${pill} text-[#d6d6da]`}>
+        <Link href="/notifications" className={`${pill} text-fg-muted`}>
           알림
           {unreadCount > 0 && (
             <span className="rounded-full bg-[oklch(0.65_0.2_25)] px-[7px] py-px text-[11px] font-bold text-white">
@@ -64,7 +64,7 @@ export function Header({ unreadCount = 0 }: { unreadCount?: number }) {
           onClick={() => setMenu((v) => !v)}
           aria-label="계정 메뉴"
           aria-expanded={menu}
-          className="flex h-[42px] w-[42px] items-center justify-center rounded-full bg-[#3a3a40] text-sm font-semibold"
+          className="flex h-[42px] w-[42px] items-center justify-center rounded-full bg-surface-5 text-sm font-semibold"
         >
           {initial}
         </button>

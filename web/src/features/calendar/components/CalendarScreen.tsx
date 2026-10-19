@@ -118,7 +118,7 @@ export function CalendarScreen() {
       if (!w) return null;
       const rainy = w.icon === "rain" || w.icon === "drizzle" || w.icon === "thunder" || w.icon === "snow";
       return (
-        <span className="whitespace-nowrap text-[11px]" style={{ color: rainy ? "oklch(0.75 0.12 230)" : "#8d8d94" }} title={w.label}>
+        <span className="whitespace-nowrap text-[11px]" style={{ color: rainy ? "var(--sky-ink, oklch(0.75 0.12 230))" : "var(--fg-subtle)" }} title={w.label}>
           <span aria-hidden>{ICON_EMOJI[w.icon]}</span> {w.text}
         </span>
       );
@@ -176,14 +176,14 @@ export function CalendarScreen() {
             {title} {sub && <span className="text-fg-subtle">{sub}</span>}
           </h1>
           <div className="flex gap-1.5">
-            <button aria-label="이전" onClick={() => setUrl({ date: shiftAnchor(view, anchor, -1) })} className="flex h-[38px] w-[38px] items-center justify-center rounded-full bg-surface-2 text-[#d6d6da]">‹</button>
-            <button aria-label="다음" onClick={() => setUrl({ date: shiftAnchor(view, anchor, 1) })} className="flex h-[38px] w-[38px] items-center justify-center rounded-full bg-surface-2 text-[#d6d6da]">›</button>
-            <button onClick={() => setUrl({ date: today })} className="h-[38px] rounded-full border border-[#3a3a40] px-4 text-sm">오늘</button>
+            <button aria-label="이전" onClick={() => setUrl({ date: shiftAnchor(view, anchor, -1) })} className="flex h-[38px] w-[38px] items-center justify-center rounded-full bg-surface-2 text-fg-muted">‹</button>
+            <button aria-label="다음" onClick={() => setUrl({ date: shiftAnchor(view, anchor, 1) })} className="flex h-[38px] w-[38px] items-center justify-center rounded-full bg-surface-2 text-fg-muted">›</button>
+            <button onClick={() => setUrl({ date: today })} className="h-[38px] rounded-full border border-border-strong px-4 text-sm">오늘</button>
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2.5">
           <div className="flex gap-1.5 text-[13px]">
-            {([["todo", "할일 마감", LIME], ["pay", "결제일", "#d6d6da"], ["weather", "날씨", SKY]] as const).map(([k, label, c]) => (
+            {([["todo", "할일 마감", LIME], ["pay", "결제일", "var(--fg-muted)"], ["weather", "날씨", SKY]] as const).map(([k, label, c]) => (
               <button key={k} aria-pressed={overlays[k]} onClick={() => toggleOverlay(k)}
                 className="flex items-center gap-1.5 rounded-full bg-surface-2 px-3.5 py-2" style={{ opacity: overlays[k] ? 1 : 0.5 }}>
                 <span className="h-[7px] w-[7px] rounded-full" style={{ background: c }} />{label}
@@ -193,20 +193,20 @@ export function CalendarScreen() {
           <div className="flex rounded-full bg-surface-2 p-[5px] text-sm" role="tablist">
             {VIEWS.map(([k, label]) => (
               <button key={k} role="tab" aria-selected={view === k} onClick={() => setUrl({ view: k })}
-                className="whitespace-nowrap rounded-full px-[18px] py-2" style={view === k ? { background: "#3a3a40", color: "#fff", fontWeight: 600 } : { color: "#8d8d94" }}>
+                className="whitespace-nowrap rounded-full px-[18px] py-2" style={view === k ? { background: "var(--surface-5)", color: "var(--fg)", fontWeight: 600 } : { color: "var(--fg-subtle)" }}>
                 {label}
               </button>
             ))}
           </div>
-          <button onClick={() => setSearching((v) => !v)} aria-pressed={searching} className="whitespace-nowrap rounded-full border border-[#3a3a40] px-4 py-2.5 text-sm">검색</button>
-          <button onClick={() => openCreate(today, Math.min(21, new Date().getHours() + 1))} className="whitespace-nowrap rounded-full bg-white px-[18px] py-2.5 text-sm font-semibold text-black">
+          <button onClick={() => setSearching((v) => !v)} aria-pressed={searching} className="whitespace-nowrap rounded-full border border-border-strong px-4 py-2.5 text-sm">검색</button>
+          <button onClick={() => openCreate(today, Math.min(21, new Date().getHours() + 1))} className="whitespace-nowrap rounded-full bg-fg px-[18px] py-2.5 text-sm font-semibold text-bg">
             일정 추가 +
           </button>
         </div>
       </div>
 
-      {error && <p role="alert" className="rounded-xl bg-surface-3 px-4 py-3 text-sm text-danger">일정을 불러오지 못했습니다. 새로고침해 주세요.</p>}
-      {moveError && <p role="alert" className="rounded-xl bg-surface-3 px-4 py-3 text-sm text-danger">{moveError}</p>}
+      {error && <p role="alert" className="rounded-xl bg-surface-3 px-4 py-3 text-sm text-danger-ink">일정을 불러오지 못했습니다. 새로고침해 주세요.</p>}
+      {moveError && <p role="alert" className="rounded-xl bg-surface-3 px-4 py-3 text-sm text-danger-ink">{moveError}</p>}
 
       {searching && (
         <SearchPanel
@@ -278,12 +278,12 @@ export function CalendarScreen() {
               </button>
             ))}
             {(markers.get(dayList) ?? []).map((m) => (
-              <div key={m.id} className="rounded-xl border border-[#2a2a2e] px-3.5 py-2.5 text-sm text-fg-muted">{m.kind === "todo" ? "☐ 할일 마감 · " : "₩ 결제일 · "}{m.label}</div>
+              <div key={m.id} className="rounded-xl border border-surface-4 px-3.5 py-2.5 text-sm text-fg-muted">{m.kind === "todo" ? "☐ 할일 마감 · " : "₩ 결제일 · "}{m.label}</div>
             ))}
           </div>
           <div className="flex justify-end gap-2">
             <button className={btnGhost} onClick={() => setDayList(null)}>닫기</button>
-            <button className="rounded-full bg-white px-6 py-[11px] text-sm font-bold text-black" onClick={() => { const d = dayList; setDayList(null); openCreate(d); }}>일정 추가</button>
+            <button className="rounded-full bg-fg px-6 py-[11px] text-sm font-bold text-bg" onClick={() => { const d = dayList; setDayList(null); openCreate(d); }}>일정 추가</button>
           </div>
         </Modal>
       )}

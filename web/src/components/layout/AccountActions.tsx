@@ -4,7 +4,7 @@ import { useState, type FormEvent } from "react";
 import { authErrorMessage, deleteAccount } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/client";
 
-const input = "rounded-[14px] border-0 bg-[#1f1f23] px-4 py-3 text-[15px] text-fg outline-none focus:ring-2 focus:ring-lime/60";
+const input = "rounded-[14px] border-0 bg-surface-3 px-4 py-3 text-[15px] text-fg outline-none focus:ring-2 focus:ring-lime/60";
 
 /** 비밀번호 변경 (AUTH-3). 설정 > 프로필 탭(08)에 배치한다. */
 export function ChangePasswordForm() {
@@ -29,10 +29,10 @@ export function ChangePasswordForm() {
         <span className="text-[13px] text-fg-muted">새 비밀번호 (6자 이상)</span>
         <input type="password" required minLength={6} autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} className={input} />
       </label>
-      <button type="submit" disabled={busy} className="rounded-full bg-white px-5 py-3 text-sm font-bold text-black disabled:opacity-50">
+      <button type="submit" disabled={busy} className="rounded-full bg-fg px-5 py-3 text-sm font-bold text-bg disabled:opacity-50">
         {busy ? "변경 중…" : "비밀번호 변경"}
       </button>
-      {msg && <p role={msg.ok ? "status" : "alert"} className={`w-full text-sm ${msg.ok ? "text-lime" : "text-danger"}`}>{msg.text}</p>}
+      {msg && <p role={msg.ok ? "status" : "alert"} className={`w-full text-sm ${msg.ok ? "text-lime-ink" : "text-danger-ink"}`}>{msg.text}</p>}
     </form>
   );
 }
@@ -57,7 +57,7 @@ export function DeleteAccountButton() {
 
   if (!open) {
     return (
-      <button onClick={() => setOpen(true)} className="rounded-full border border-danger px-5 py-2.5 text-sm text-danger">
+      <button onClick={() => setOpen(true)} className="rounded-full border border-danger px-5 py-2.5 text-sm text-danger-ink">
         계정 삭제
       </button>
     );
@@ -68,10 +68,10 @@ export function DeleteAccountButton() {
         일정 · 할일 · 가계부와 영수증 등 <b className="text-fg">모든 데이터가 즉시 영구 삭제</b>되며 되돌릴 수 없습니다. 계속하려면 &ldquo;삭제&rdquo;를 입력하세요.
       </p>
       <input value={confirm} onChange={(e) => setConfirm(e.target.value)} aria-label="확인 문구" placeholder="삭제" className={input} />
-      {error && <p role="alert" className="text-sm text-danger">{error}</p>}
+      {error && <p role="alert" className="text-sm text-danger-ink">{error}</p>}
       <div className="flex gap-2">
-        <button onClick={() => { setOpen(false); setConfirm(""); }} disabled={busy} className="rounded-full border border-[#3a3a40] px-5 py-2.5 text-sm">취소</button>
-        <button onClick={run} disabled={busy || confirm !== "삭제"} className="rounded-full bg-danger px-5 py-2.5 text-sm font-bold text-[#1a0d0a] disabled:opacity-40">
+        <button onClick={() => { setOpen(false); setConfirm(""); }} disabled={busy} className="rounded-full border border-border-strong px-5 py-2.5 text-sm">취소</button>
+        <button onClick={run} disabled={busy || confirm !== "삭제"} className="rounded-full bg-danger px-5 py-2.5 text-sm font-bold text-on-accent disabled:opacity-40">
           {busy ? "삭제 중…" : "영구 삭제"}
         </button>
       </div>
