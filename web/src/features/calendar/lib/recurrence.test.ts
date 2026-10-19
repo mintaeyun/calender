@@ -11,7 +11,7 @@ const base: EventRow = {
   end_at: "2026-10-12T01:00:00Z",
   all_day: false, location: null, notes: null, color: null, rrule: null,
   recurring_event_id: null, original_start_at: null, exdates: [],
-  google_event_id: null, google_etag: null, google_updated_at: null, deleted_at: null,
+  google_event_id: null, google_etag: null, google_updated_at: null, google_synced_at: null, deleted_at: null,
   created_at: "", updated_at: "",
 };
 const ev = (o: Partial<EventRow>): EventRow => ({ ...base, ...o });

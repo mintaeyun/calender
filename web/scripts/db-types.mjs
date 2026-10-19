@@ -5,8 +5,9 @@ import { writeFileSync } from "node:fs";
 
 const target = new URL("../src/lib/supabase/database.types.ts", import.meta.url);
 // 기본은 로컬(Docker). `--linked` 를 주면 supabase link 된 원격 프로젝트 기준으로 생성한다.
-const source = process.argv.includes("--linked") ? "--linked" : "--local";
-const args = ["supabase", "gen", "types", "typescript", source, "--workdir", ".."];
+const ref = process.env.SUPABASE_PROJECT_REF; // link 되지 않은 worktree 에서는 이 환경변수로 프로젝트를 지정한다
+const source = ref ? ["--project-id", ref] : process.argv.includes("--linked") ? ["--linked"] : ["--local"];
+const args = ["supabase", "gen", "types", "typescript", ...source, "--workdir", ".."];
 const r = spawnSync("npx", args, { encoding: "utf8", shell: true });
 if (r.status !== 0 || !r.stdout.includes("export type Database")) {
   console.error(r.stderr || r.stdout || "supabase gen types 실패");
