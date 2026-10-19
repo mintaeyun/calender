@@ -43,7 +43,7 @@ export function TodoPage() {
   const counts = useMemo(() => Object.fromEntries(FILTERS.map(([k]) => [k, all.filter((t) => matchesFilter(t, k, today)).length])) as Record<TodoFilter, number>, [all, today]);
   const list = useMemo(() => all.filter((t) => matchesFilter(t, filter, today)).sort(compareTodos(sort)), [all, filter, sort, today]);
 
-  const pc = (id: string | null) => projects.find((p) => p.id === id)?.color ?? "#8d8d94";
+  const pc = (id: string | null) => projects.find((p) => p.id === id)?.color ?? "var(--fg-subtle)";
   const pn = (id: string | null) => projects.find((p) => p.id === id)?.name ?? "프로젝트 없음";
   const openCount = (pid: string) => (todosQ.data ?? []).filter((t) => t.project_id === pid && t.status !== "done").length;
   const filterLabel = FILTERS.find((f) => f[0] === filter)![1];
@@ -58,10 +58,10 @@ export function TodoPage() {
           </select>
           <div className="flex rounded-full bg-surface-2 p-[5px] text-sm">
             {([["list", "목록"], ["kanban", "칸반"]] as const).map(([k, l]) => (
-              <button key={k} onClick={() => setView(k)} className={`rounded-full px-[18px] py-2 ${view === k ? "bg-[#3a3a40] font-semibold text-white" : "text-fg-subtle"}`}>{l}</button>
+              <button key={k} onClick={() => setView(k)} className={`rounded-full px-[18px] py-2 ${view === k ? "bg-[var(--surface-5,#3a3a40)] font-semibold text-fg" : "text-fg-subtle"}`}>{l}</button>
             ))}
           </div>
-          <button onClick={() => openQuick("todo")} className="rounded-full bg-white px-[18px] py-2.5 text-sm font-semibold text-black">할일 추가 +</button>
+          <button onClick={() => openQuick("todo")} className="rounded-full bg-fg px-[18px] py-2.5 text-sm font-semibold text-bg">할일 추가 +</button>
         </div>
       </div>
 
@@ -72,23 +72,23 @@ export function TodoPage() {
           <div className="flex flex-col gap-[18px]">
             <div className="flex gap-1 overflow-x-auto lg:flex-col lg:gap-0.5 lg:overflow-visible" role="group" aria-label="할일 필터">
               {FILTERS.map(([k, label]) => (
-                <button key={k} onClick={() => setFilter(k)} aria-pressed={filter === k} className={`flex shrink-0 items-center gap-2 whitespace-nowrap rounded-xl px-3.5 py-[11px] text-[15px] lg:justify-between ${filter === k ? "bg-surface-2 text-white" : "text-fg-muted"}`}>
-                  <span>{label}</span><span className={`text-[13px] ${k === "overdue" && counts[k] > 0 ? "text-danger" : "text-[#6c6c73]"}`}>{counts[k]}</span>
+                <button key={k} onClick={() => setFilter(k)} aria-pressed={filter === k} className={`flex shrink-0 items-center gap-2 whitespace-nowrap rounded-xl px-3.5 py-[11px] text-[15px] lg:justify-between ${filter === k ? "bg-surface-2 text-fg" : "text-fg-muted"}`}>
+                  <span>{label}</span><span className={`text-[13px] ${k === "overdue" && counts[k] > 0 ? "text-danger" : "text-[color:var(--fg-dim,#6c6c73)]"}`}>{counts[k]}</span>
                 </button>
               ))}
             </div>
             <div className="flex flex-col gap-2 px-3.5">
-              <span className="text-xs tracking-wider text-[#6c6c73]">프로젝트</span>
+              <span className="text-xs tracking-wider text-[color:var(--fg-dim,#6c6c73)]">프로젝트</span>
               {projects.map((p) => (
-                <button key={p.id} onClick={() => setProjectId(projectId === p.id ? null : p.id)} className={`flex items-center gap-2 py-1 text-sm ${projectId === p.id ? "text-white" : "text-[#d6d6da]"}`}>
+                <button key={p.id} onClick={() => setProjectId(projectId === p.id ? null : p.id)} className={`flex items-center gap-2 py-1 text-sm ${projectId === p.id ? "text-fg" : "text-fg-muted"}`}>
                   <span className="h-2 w-2 rounded-sm" style={{ background: p.color }} />{p.name}
-                  <span className="ml-auto text-xs text-[#6c6c73]">{openCount(p.id)}</span>
+                  <span className="ml-auto text-xs text-[color:var(--fg-dim,#6c6c73)]">{openCount(p.id)}</span>
                 </button>
               ))}
-              <span className="mt-2.5 text-xs tracking-wider text-[#6c6c73]">태그</span>
+              <span className="mt-2.5 text-xs tracking-wider text-[color:var(--fg-dim,#6c6c73)]">태그</span>
               <div className="flex flex-wrap gap-1.5">
                 {tags.map((g) => (
-                  <button key={g.id} onClick={() => setTagId(tagId === g.id ? null : g.id)} className={`rounded-full px-2.5 py-1 text-xs ${tagId === g.id ? "bg-[#3a3a40] text-white" : "bg-surface-2"}`}>{g.name}</button>
+                  <button key={g.id} onClick={() => setTagId(tagId === g.id ? null : g.id)} className={`rounded-full px-2.5 py-1 text-xs ${tagId === g.id ? "bg-[var(--surface-5,#3a3a40)] text-fg" : "bg-surface-2"}`}>{g.name}</button>
                 ))}
               </div>
               <ProjectTagPanel />
@@ -97,16 +97,16 @@ export function TodoPage() {
           </div>
 
           <div className="flex flex-col rounded-[22px] bg-surface px-5 py-2.5">
-            {todosQ.isLoading && <div className="p-10 text-center text-[15px] text-[#6c6c73]">불러오는 중…</div>}
+            {todosQ.isLoading && <div className="p-10 text-center text-[15px] text-[color:var(--fg-dim,#6c6c73)]">불러오는 중…</div>}
             {list.map((t) => {
               const done = t.status === "done";
               const kind = dueKind(t, today);
               return (
                 <div key={t.id}
-                  className={`-mx-2.5 flex items-center gap-2.5 rounded-xl border-b border-border px-2.5 py-1 ${selId === t.id ? "bg-[#232327]" : ""} ${done ? "opacity-45" : ""}`}>
+                  className={`-mx-2.5 flex items-center gap-2.5 rounded-xl border-b border-border px-2.5 py-1 ${selId === t.id ? "bg-surface-3" : ""} ${done ? "opacity-45" : ""}`}>
                   <button aria-label={done ? `${t.title} 완료 취소` : `${t.title} 완료`} onClick={() => toggle.mutate(t)}
                     className="-m-2 flex shrink-0 items-center justify-center p-2">
-                    <span className={`flex h-[22px] w-[22px] items-center justify-center rounded-full border-[1.5px] text-xs ${kind === "over" ? "border-danger" : "border-[#55555c]"}`}>{done ? "✓" : ""}</span>
+                    <span className={`flex h-[22px] w-[22px] items-center justify-center rounded-full border-[1.5px] text-xs ${kind === "over" ? "border-danger" : "border-[color:var(--fg-faint,#55555c)]"}`}>{done ? "✓" : ""}</span>
                   </button>
                   <button onClick={() => selectTodo(t.id)} aria-current={selId === t.id} className="flex min-w-0 flex-1 items-center gap-2.5 py-2.5 text-left">
                     <span className="flex min-w-0 flex-1 flex-col gap-1">
@@ -118,16 +118,16 @@ export function TodoPage() {
                       </span>
                     </span>
                     <span className="h-fit rounded-full px-2.5 py-[3px] text-xs font-bold" style={{ background: PRI_COLORS[t.priority].bg, color: PRI_COLORS[t.priority].fg }}>{PRI_LABEL[t.priority]}</span>
-                    <span className={`w-[52px] text-right text-[13px] sm:w-[72px] ${done ? "text-[#6c6c73]" : kind === "over" ? "text-danger" : kind === "today" ? "text-lime" : "text-fg-subtle"}`}>{dueLabel(t.due_date, today)}</span>
+                    <span className={`w-[52px] text-right text-[13px] sm:w-[72px] ${done ? "text-[color:var(--fg-dim,#6c6c73)]" : kind === "over" ? "text-danger" : kind === "today" ? "text-lime" : "text-fg-subtle"}`}>{dueLabel(t.due_date, today)}</span>
                   </button>
                 </div>
               );
             })}
-            {!todosQ.isLoading && list.length === 0 && <div className="p-10 text-center text-[15px] text-[#6c6c73]">해당하는 할일이 없어요</div>}
+            {!todosQ.isLoading && list.length === 0 && <div className="p-10 text-center text-[15px] text-[color:var(--fg-dim,#6c6c73)]">해당하는 할일이 없어요</div>}
           </div>
 
           <div ref={detailRef} className="scroll-mt-4">
-            {selId ? <TodoDetail key={selId} id={selId} onDeleted={() => setSelId(null)} /> : <div className="rounded-[22px] bg-surface p-[22px] text-sm text-[#6c6c73]">할일을 선택하면 상세가 보여요</div>}
+            {selId ? <TodoDetail key={selId} id={selId} onDeleted={() => setSelId(null)} /> : <div className="rounded-[22px] bg-surface p-[22px] text-sm text-[color:var(--fg-dim,#6c6c73)]">할일을 선택하면 상세가 보여요</div>}
           </div>
         </div>
       ) : (

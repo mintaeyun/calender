@@ -8,7 +8,7 @@ import { formatWon, parseAmount } from "../lib/money";
 import { Modal } from "./Modal";
 
 const TYPE_LABEL = { cash: "현금", bank: "은행", card: "카드" } as const;
-const CARD_BG = { cash: ["#2a2a2e", "#f2f2f3"], bank: ["var(--lime)", "#0b0b0c"], card: ["var(--purple)", "#fff"] } as const;
+const CARD_BG = { cash: ["var(--surface-4, #2a2a2e)", "var(--fg)"], bank: ["var(--lime)", "var(--on-accent, #0b0b0c)"], card: ["var(--purple)", "#fff"] } as const;
 
 /** 계좌(LED-8): 잔액은 account_balances 뷰(초기잔액+거래 합계), 순자산(카드 부채는 음수), 계좌 CRUD, 계좌 간 이체. */
 export function LedgerAccounts() {
@@ -55,11 +55,11 @@ export function LedgerAccounts() {
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div className="flex flex-col gap-1">
           <span className="text-sm text-fg-subtle">순자산</span>
-          <span className="text-[44px] font-bold tracking-tight">{net < 0 ? "−" : ""}{formatWon(Math.abs(net))}<span className="text-2xl text-[#6c6c73]">원</span></span>
+          <span className="text-[44px] font-bold tracking-tight">{net < 0 ? "−" : ""}{formatWon(Math.abs(net))}<span className="text-2xl text-[color:var(--fg-dim,#6c6c73)]">원</span></span>
         </div>
         <div className="flex gap-2">
-          <button onClick={() => { setErr(""); setAdding(true); }} className="rounded-full border border-[#3a3a40] px-[18px] py-2.5 text-sm">계좌 추가 +</button>
-          <button onClick={() => { setErr(""); setMoving(true); }} disabled={active.length < 2} className="rounded-full border border-[#3a3a40] px-[18px] py-2.5 text-sm disabled:opacity-40">계좌 간 이체 ⇄</button>
+          <button onClick={() => { setErr(""); setAdding(true); }} className="rounded-full border border-[color:var(--border-strong,#3a3a40)] px-[18px] py-2.5 text-sm">계좌 추가 +</button>
+          <button onClick={() => { setErr(""); setMoving(true); }} disabled={active.length < 2} className="rounded-full border border-[color:var(--border-strong,#3a3a40)] px-[18px] py-2.5 text-sm disabled:opacity-40">계좌 간 이체 ⇄</button>
         </div>
       </div>
 
@@ -88,8 +88,8 @@ export function LedgerAccounts() {
             <span>{name(r.account_id)} → {name(r.to_account_id)}</span><span className="text-fg-subtle">{r.date.slice(5).replace("-", "/")} · {formatWon(r.amount)}</span>
           </div>
         ))}
-        {recent.length === 0 && <span className="text-sm text-[#6c6c73]">이체 내역이 없어요</span>}
-        <span className="text-xs text-[#6c6c73]">카드 결제일 정산은 지원하지 않아요. 카드값 납부는 은행 → 카드 이체로 기록하세요.</span>
+        {recent.length === 0 && <span className="text-sm text-[color:var(--fg-dim,#6c6c73)]">이체 내역이 없어요</span>}
+        <span className="text-xs text-[color:var(--fg-dim,#6c6c73)]">카드 결제일 정산은 지원하지 않아요. 카드값 납부는 은행 → 카드 이체로 기록하세요.</span>
       </div>
 
       {adding && (
@@ -99,7 +99,7 @@ export function LedgerAccounts() {
             <select value={f.type} onChange={(e) => setF({ ...f, type: e.target.value as keyof typeof TYPE_LABEL })} className={inp}>{Object.entries(TYPE_LABEL).map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select>
             <input value={f.initial} inputMode="numeric" onChange={(e) => setF({ ...f, initial: e.target.value })} placeholder="초기 잔액(원, 카드 부채는 음수)" className={inp} />
             {err && <span className="text-sm text-danger">{err}</span>}
-            <button onClick={addAccount} disabled={create.isPending} className="rounded-xl bg-white py-2.5 font-semibold text-black disabled:opacity-60">추가</button>
+            <button onClick={addAccount} disabled={create.isPending} className="rounded-xl bg-fg py-2.5 font-semibold text-bg disabled:opacity-60">추가</button>
           </div>
         </Modal>
       )}
@@ -111,7 +111,7 @@ export function LedgerAccounts() {
             <input value={t.amount} inputMode="numeric" onChange={(e) => setT({ ...t, amount: e.target.value })} placeholder="금액(원)" className={inp} />
             <input value={t.memo} onChange={(e) => setT({ ...t, memo: e.target.value })} placeholder="메모 (선택)" className={inp} />
             {err && <span className="text-sm text-danger">{err}</span>}
-            <button onClick={doTransfer} disabled={transfer.isPending} className="rounded-xl bg-white py-2.5 font-semibold text-black disabled:opacity-60">이체</button>
+            <button onClick={doTransfer} disabled={transfer.isPending} className="rounded-xl bg-fg py-2.5 font-semibold text-bg disabled:opacity-60">이체</button>
           </div>
         </Modal>
       )}

@@ -5,15 +5,15 @@ export type NotificationType = "event_start" | "todo_due" | "budget_warning" | "
 /** 종류 칩: 라벨과 색(목업의 칩 색 규칙: 일정=퍼플, 할일=라임, 예산·오류=경고, 날씨=하늘, 결제=회색) */
 export const TYPE_META: Record<NotificationType, { label: string; bg: string; fg: string }> = {
   event_start: { label: "일정", bg: "var(--purple)", fg: "#fff" },
-  todo_due: { label: "할일", bg: "var(--lime)", fg: "#0b0b0c" },
-  budget_warning: { label: "예산", bg: "var(--lime)", fg: "#0b0b0c" },
-  budget_exceeded: { label: "예산", bg: "var(--danger)", fg: "#1a0d0a" },
-  payment_due: { label: "결제", bg: "#34343a", fg: "#fff" },
-  rain_forecast: { label: "날씨", bg: "var(--sky)", fg: "#0b0b0c" },
-  sync_error: { label: "동기화", bg: "var(--danger)", fg: "#1a0d0a" },
+  todo_due: { label: "할일", bg: "var(--lime)", fg: "var(--on-accent, #0b0b0c)" },
+  budget_warning: { label: "예산", bg: "var(--lime)", fg: "var(--on-accent, #0b0b0c)" },
+  budget_exceeded: { label: "예산", bg: "var(--danger)", fg: "var(--on-accent, #1a0d0a)" },
+  payment_due: { label: "결제", bg: "var(--surface-5, #34343a)", fg: "var(--fg)" },
+  rain_forecast: { label: "날씨", bg: "var(--sky)", fg: "var(--on-accent, #0b0b0c)" },
+  sync_error: { label: "동기화", bg: "var(--danger)", fg: "var(--on-accent, #1a0d0a)" },
 };
 
-export const typeMeta = (t: string) => TYPE_META[t as NotificationType] ?? { label: "알림", bg: "#34343a", fg: "#fff" };
+export const typeMeta = (t: string) => TYPE_META[t as NotificationType] ?? { label: "알림", bg: "var(--surface-5, #34343a)", fg: "var(--fg)" };
 
 /** 설정 화면의 토글 6개. 예산은 80%·100% 두 종류를 함께 켜고 끈다. */
 export const SETTING_GROUPS: { key: string; label: string; desc: string; types: NotificationType[] }[] = [

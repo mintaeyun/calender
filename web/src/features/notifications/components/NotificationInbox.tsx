@@ -24,11 +24,11 @@ export function NotificationInbox() {
     <div className="mx-auto flex w-full max-w-[860px] flex-col gap-[18px]">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-display text-[30px]">알림 <span className="text-fg-subtle">{unread ? `읽지 않음 ${unread}` : "모두 읽음"}</span></h1>
-        <button onClick={() => markAll.mutate(undefined)} disabled={unread === 0} className="rounded-full border border-[#3a3a40] px-[18px] py-2.5 text-sm disabled:opacity-40">모두 읽음</button>
+        <button onClick={() => markAll.mutate(undefined)} disabled={unread === 0} className="rounded-full border border-[color:var(--border-strong,#3a3a40)] px-[18px] py-2.5 text-sm disabled:opacity-40">모두 읽음</button>
       </div>
       {isError && <div className="text-sm text-danger">{(error as Error).message}</div>}
       <ul className="flex flex-col rounded-[22px] bg-surface px-[22px] py-2">
-        {isLoading && <li className="p-10 text-center text-[#6c6c73]">불러오는 중…</li>}
+        {isLoading && <li className="p-10 text-center text-[color:var(--fg-dim,#6c6c73)]">불러오는 중…</li>}
         {data.map((n) => {
           const m = typeMeta(n.type);
           return (
@@ -51,7 +51,7 @@ export function NotificationInbox() {
             </li>
           );
         })}
-        {!isLoading && data.length === 0 && <li className="p-10 text-center text-[15px] text-[#6c6c73]">새 알림이 없어요</li>}
+        {!isLoading && data.length === 0 && <li className="p-10 text-center text-[15px] text-[color:var(--fg-dim,#6c6c73)]">새 알림이 없어요</li>}
       </ul>
     </div>
   );

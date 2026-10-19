@@ -11,7 +11,7 @@ function Switch({ on, onClick, label, disabled }: { on: boolean; onClick?: () =>
   return (
     <button role="switch" aria-checked={on} aria-label={label} disabled={disabled} onClick={onClick}
       className={`relative h-6 w-11 shrink-0 rounded-full ${disabled ? "opacity-50" : ""}`} style={{ background: on ? "var(--lime)" : "#3a3a40" }}>
-      <span className="absolute top-[3px] h-[18px] w-[18px] rounded-full bg-white" style={{ left: on ? 23 : 3 }} />
+      <span className="absolute top-[3px] h-[18px] w-[18px] rounded-full bg-fg" style={{ left: on ? 23 : 3 }} />
     </button>
   );
 }
@@ -89,7 +89,7 @@ export function NotificationSettings() {
         <span className="text-sm font-semibold">새 일정의 기본 알림</span>
         <div className="flex flex-wrap gap-2">
           {REMINDER_OPTIONS.map(([m, l]) => (
-            <button key={m} onClick={() => toggleReminder(m)} className={`rounded-full px-3.5 py-1.5 text-sm ${reminders.includes(m) ? "bg-[#3a3a40] font-semibold text-white" : "bg-surface-3 text-fg-subtle"}`}>{l}</button>
+            <button key={m} onClick={() => toggleReminder(m)} className={`rounded-full px-3.5 py-1.5 text-sm ${reminders.includes(m) ? "bg-[var(--surface-5,#3a3a40)] font-semibold text-fg" : "bg-surface-3 text-fg-subtle"}`}>{l}</button>
           ))}
         </div>
       </div>

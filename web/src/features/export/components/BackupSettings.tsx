@@ -35,7 +35,7 @@ export function BackupSettings() {
     } finally { setBusy(false); }
   };
 
-  const chip = (on: boolean) => `rounded-full px-4 py-2 text-sm ${on ? "bg-white font-semibold text-black" : "bg-surface-3 text-fg-muted"}`;
+  const chip = (on: boolean) => `rounded-full px-4 py-2 text-sm ${on ? "bg-fg font-semibold text-bg" : "bg-surface-3 text-fg-muted"}`;
 
   return (
     <div className="flex flex-col gap-8">
@@ -55,7 +55,7 @@ export function BackupSettings() {
           <div className="flex gap-2" role="radiogroup" aria-label="파일 형식">
             {(["csv", "xlsx"] as const).map((f) => <button key={f} role="radio" aria-checked={format === f} onClick={() => setFormat(f)} className={chip(format === f)}>{f === "csv" ? "CSV" : "Excel(xlsx)"}</button>)}
           </div>
-          <button onClick={() => void run()} disabled={busy} className="rounded-full bg-lime px-5 py-2.5 text-sm font-bold text-black disabled:opacity-60">{busy ? "만드는 중…" : "내려받기"}</button>
+          <button onClick={() => void run()} disabled={busy} className="rounded-full bg-lime px-5 py-2.5 text-sm font-bold text-[color:var(--on-accent,#0b0b0c)] disabled:opacity-60">{busy ? "만드는 중…" : "내려받기"}</button>
         </div>
         <span className="text-xs text-fg-subtle">파일은 이 브라우저에서 만들어지며 서버에 저장되지 않아요. CSV는 Excel에서 한글이 깨지지 않도록 UTF-8(BOM)으로 저장돼요. 반복 일정은 원본 1줄과 반복 규칙(RRULE)으로 내보내요.</span>
         {msg && <span className={`text-sm ${msg.ok ? "text-lime" : "text-danger"}`} role={msg.ok ? "status" : "alert"}>{msg.text}</span>}

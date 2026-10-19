@@ -5,13 +5,13 @@ export const PRIORITIES: Priority[] = ["high", "medium", "low"];
 export const PRI_LABEL: Record<Priority, string> = { high: "상", medium: "중", low: "하" };
 /** 목업의 PRI 값: [배경, 글자] — 상=경고색, 중=회색, 하=어두운 회색 */
 export const PRI_COLORS: Record<Priority, { bg: string; fg: string }> = {
-  high: { bg: "var(--danger)", fg: "#1a0d0a" },
-  medium: { bg: "#3a3a40", fg: "#f2f2f3" },
-  low: { bg: "#26262a", fg: "#b4b4ba" },
+  high: { bg: "var(--danger)", fg: "var(--on-accent, #1a0d0a)" },
+  medium: { bg: "var(--surface-5, #3a3a40)", fg: "var(--fg)" },
+  low: { bg: "var(--surface-4, #26262a)", fg: "var(--fg-muted)" },
 };
 
 export const COLUMNS: { status: TodoStatus; label: string; color: string }[] = [
-  { status: "todo", label: "대기", color: "#8d8d94" },
+  { status: "todo", label: "대기", color: "var(--fg-subtle)" },
   { status: "doing", label: "진행 중", color: "var(--purple)" },
   { status: "done", label: "완료", color: "var(--lime)" },
 ];
