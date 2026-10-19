@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { useTimezone } from "@/lib/profile";
-import { endOfDayUtc, startOfDayUtc, todayKey, zonedParts } from "@/lib/time";
+import { useProfile, useTimezone } from "@/lib/profile";
+import { addDays, endOfDayUtc, startOfDayUtc, todayKey, WEEKDAYS_KO, weekdayOf, zonedParts } from "@/lib/time";
 import { useQuickAdd } from "@/components/layout/QuickAdd";
 import { useEvents } from "@/features/calendar/hooks";
 import { useTodos, useToggleDone } from "@/features/todo/hooks";
@@ -19,6 +19,7 @@ import {
   classifyToday, greeting, prevMonthOf, previousMonthSamePeriod, remainingLabel, spendingBar, todayTodos,
   type DayEvent,
 } from "../lib/dashboard";
+import { binLabel, DENSITY_BINS, weekDensity, weekStartOf } from "../lib/density";
 
 const timeFmt = (d: Date, tz: string) => new Intl.DateTimeFormat("ko-KR", { timeZone: tz, hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(d);
 
@@ -76,6 +77,7 @@ export function Dashboard() {
         <TodayEvents now={now} />
         <TodayTodos />
         <RecentTransactions />
+        <WeekDensity />
       </div>
     </div>
   );
@@ -270,6 +272,44 @@ function RecentTransactions() {
           })}
         </ul>
       )}
+    </Panel>
+  );
+}
+
+// ── 이번 주 일정 밀도 ───────────────────────────────────────
+const HEAT = ["#221d33", "#2a2340", "#4b3aa0", "#7350e6", "#a68cf5"];
+
+function WeekDensity() {
+  const tz = useTimezone();
+  const weekStart = useProfile().data?.week_start === "sunday" ? "sunday" : "monday";
+  const today = todayKey(tz);
+  const first = weekStartOf(today, weekStart);
+  const range = useMemo(() => ({ start: startOfDayUtc(first, tz), end: endOfDayUtc(addDays(first, 6), tz) }), [first, tz]);
+  const { instances, isLoading, error } = useEvents(range);
+  const { days, matrix } = useMemo(
+    () => weekDensity(instances.map((i) => ({ start: i.start, end: i.end, allDay: i.event.all_day })), first, tz),
+    [instances, first, tz],
+  );
+  const state = error ? "error" : isLoading ? "loading" : "ok";
+  const cols = "grid grid-cols-[34px_repeat(7,1fr)] items-center gap-1";
+
+  return (
+    <Panel title="이번 주 일정 밀도" state={state}>
+      <div className="flex flex-col gap-1" role="table" aria-label="요일과 시간대별 일정 밀도">
+        <div className={`${cols} text-center text-[11px] text-fg-subtle`} role="row">
+          <span />
+          {days.map((d) => <span key={d} role="columnheader" className={d === today ? "font-bold text-fg" : ""}>{WEEKDAYS_KO[weekdayOf(d)]}</span>)}
+        </div>
+        {DENSITY_BINS.map((bin, bi) => (
+          <div key={bi} className={cols} role="row">
+            <span className="text-[11px] text-fg-subtle">{binLabel(bin)}</span>
+            {matrix[bi].map((v, di) => (
+              <div key={di} role="cell" className="h-[22px] rounded-md" style={{ background: HEAT[v] }}
+                aria-label={`${days[di]} ${bin[0]}시대 ${["일정 없음", "여유", "보통", "바쁨", "매우 바쁨"][v]}`} />
+            ))}
+          </div>
+        ))}
+      </div>
     </Panel>
   );
 }
