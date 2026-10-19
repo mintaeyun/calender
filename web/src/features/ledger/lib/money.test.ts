@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { balanceOf, formatSigned, parseAmount, validateTransfer } from "./money";
+import { balanceOf, compactWon, formatSigned, parseAmount, validateTransfer } from "./money";
 
 describe("parseAmount", () => {
   it("쉼표·원·공백을 제거한다", () => {
@@ -42,5 +42,15 @@ describe("validateTransfer", () => {
     expect(validateTransfer("a", null)).not.toBeNull();
     expect(validateTransfer("a", "a")).not.toBeNull();
     expect(validateTransfer("a", "b")).toBeNull();
+  });
+});
+
+describe("compactWon", () => {
+  it("만 단위 축약", () => {
+    expect(compactWon(5500)).toBe("5,500");
+    expect(compactWon(12000)).toBe("1.2만");
+    expect(compactWon(350000)).toBe("35만");
+    expect(compactWon(1642300)).toBe("164.2만");
+    expect(compactWon(10000)).toBe("1만");
   });
 });

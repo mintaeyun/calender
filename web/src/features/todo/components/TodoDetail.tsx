@@ -68,18 +68,18 @@ export function TodoDetail({ id, onDeleted }: { id: string; onDeleted: () => voi
         className="bg-transparent text-[22px] font-bold tracking-tight outline-none"
         aria-label="제목"
       />
-      <div className="grid grid-cols-[72px_1fr] items-center gap-x-3 gap-y-2.5 text-sm">
+      <div className="grid grid-cols-[60px_minmax(0,1fr)] items-center gap-x-3 gap-y-2.5 text-sm">
         <span className="text-fg-subtle">마감일</span>
         <span className="flex items-center gap-2">
-          <input type="date" value={t.due_date ?? ""} onChange={(e) => { const v = e.target.value || null; patch({ due_date: v, ...(t.recurrence_rule ? { recurrence_rule: buildRule(rec, v) } : {}) }); }} className={field} />
+          <input type="date" aria-label="마감일" value={t.due_date ?? ""} onChange={(e) => { const v = e.target.value || null; patch({ due_date: v, ...(t.recurrence_rule ? { recurrence_rule: buildRule(rec, v) } : {}) }); }} className={field} />
           <span className="text-xs text-fg-subtle">{dueFull(t.due_date)}</span>
         </span>
         <span className="text-fg-subtle">우선순위</span>
-        <select value={t.priority} onChange={(e) => patch({ priority: e.target.value as Priority })} className={`${field} w-24`}>
+        <select aria-label="우선순위" value={t.priority} onChange={(e) => patch({ priority: e.target.value as Priority })} className={`${field} w-24`}>
           {PRIORITIES.map((p) => <option key={p} value={p}>{PRI_LABEL[p]}</option>)}
         </select>
         <span className="text-fg-subtle">프로젝트</span>
-        <select value={t.project_id ?? ""} onChange={(e) => patch({ project_id: e.target.value || null })} className={`${field} w-40`}>
+        <select aria-label="프로젝트" value={t.project_id ?? ""} onChange={(e) => patch({ project_id: e.target.value || null })} className={`${field} w-40`}>
           <option value="">없음</option>
           {projects.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
         </select>
@@ -96,7 +96,7 @@ export function TodoDetail({ id, onDeleted }: { id: string; onDeleted: () => voi
         </div>
         <span className="text-fg-subtle">반복</span>
         <div className="flex flex-col gap-1.5">
-          <select value={rec.freq} onChange={(e) => saveRec({ ...rec, freq: e.target.value as RecurrenceDraft["freq"], byday: [] })} className={`${field} w-28`}>
+          <select aria-label="반복 주기" value={rec.freq} onChange={(e) => saveRec({ ...rec, freq: e.target.value as RecurrenceDraft["freq"], byday: [] })} className={`${field} w-28`}>
             <option value="NONE">없음</option><option value="DAILY">매일</option><option value="WEEKLY">매주</option>
             <option value="MONTHLY">매월</option><option value="YEARLY">매년</option>
           </select>
@@ -124,18 +124,18 @@ export function TodoDetail({ id, onDeleted }: { id: string; onDeleted: () => voi
             <button aria-label="체크" onClick={() => updItem.mutate({ id: i.id, patch: { done: !i.done } })}
               className="flex h-4 w-4 items-center justify-center rounded border-[1.5px] border-[#55555c] text-[10px]">{i.done ? "✓" : ""}</button>
             <span className={`flex-1 ${i.done ? "text-[#6c6c73] line-through" : ""}`}>{i.text}</span>
-            <button aria-label="항목 삭제" onClick={() => delItem.mutate(i.id)} className="text-fg-subtle opacity-0 group-hover:opacity-100">✕</button>
+            <button aria-label="항목 삭제" onClick={() => delItem.mutate(i.id)} className="p-1.5 text-fg-subtle opacity-100 focus:opacity-100 sm:opacity-0 sm:group-hover:opacity-100">✕</button>
           </div>
         ))}
         {items.length === 0 && <span className="text-sm text-[#6c6c73]">체크리스트 없음</span>}
         <form onSubmit={(e) => { e.preventDefault(); const v = newItem.trim(); if (!v) return; addItem.mutate({ todoId: t.id, text: v, positions: items.map((i) => i.position) }); setNewItem(""); }}>
-          <input value={newItem} onChange={(e) => setNewItem(e.target.value)} placeholder="+ 항목 추가" className="w-full bg-transparent text-[13px] text-fg outline-none placeholder:text-[#6c6c73]" />
+          <input aria-label="체크리스트 항목 추가" value={newItem} onChange={(e) => setNewItem(e.target.value)} placeholder="+ 항목 추가" className="w-full bg-transparent text-[13px] text-fg outline-none placeholder:text-[#6c6c73]" />
         </form>
       </div>
 
       <div className="flex flex-col gap-2 border-t border-border pt-3.5">
         <span className="text-[13px] text-fg-subtle">메모</span>
-        <textarea value={notes} onChange={(e) => setNotes(e.target.value)} onBlur={() => { if (notes !== (t.notes ?? "")) patch({ notes: notes || null }); }}
+        <textarea aria-label="메모" value={notes} onChange={(e) => setNotes(e.target.value)} onBlur={() => { if (notes !== (t.notes ?? "")) patch({ notes: notes || null }); }}
           rows={4} placeholder="메모 없음" className="resize-y bg-transparent text-sm leading-relaxed text-[#d6d6da] outline-none placeholder:text-[#6c6c73]" />
       </div>
     </div>

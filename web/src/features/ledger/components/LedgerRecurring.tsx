@@ -53,18 +53,18 @@ export function LedgerRecurring() {
           <span>이름</span><span>주기</span><span>다음 결제</span><span>계좌</span><span className="text-right">금액</span><span />
         </div>
         {list.map((r) => (
-          <div key={r.id} className={`grid grid-cols-[minmax(0,1fr)_100px] items-center gap-3 border-b border-surface-3 py-3.5 text-sm sm:grid-cols-[minmax(0,1fr)_120px_110px_110px_100px_90px] ${r.active ? "" : "opacity-50"}`}>
-            <span className="flex items-center gap-2.5"><span className="h-2 w-2 rounded-full" style={{ background: cat(r.category_id)?.color ?? "#55555c" }} />{r.name}{r.next_run_date === tomorrow && r.active && <span className="text-[11px] text-lime">내일</span>}</span>
+          <div key={r.id} className={`grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-3 border-b border-surface-3 py-3.5 text-sm sm:grid-cols-[minmax(0,1fr)_120px_110px_110px_100px_90px] ${r.active ? "" : "opacity-50"}`}>
+            <span className="flex min-w-0 flex-col gap-0.5"><span className="flex items-center gap-2.5"><span className="h-2 w-2 shrink-0 rounded-full" style={{ background: cat(r.category_id)?.color ?? "#55555c" }} /><span className="truncate">{r.name}</span>{r.next_run_date === tomorrow && r.active && <span className="text-[11px] text-lime">내일</span>}</span><span className="text-xs text-fg-subtle sm:hidden">{cycleLabel(r.cycle, r.pay_day, r.pay_month)} · 다음 {r.next_run_date.slice(5).replace("-", "/")} · {acct(r.account_id)}</span></span>
             <span className="hidden text-fg-muted sm:block">{cycleLabel(r.cycle, r.pay_day, r.pay_month)}</span>
             <span className="hidden sm:block">{r.next_run_date.slice(5).replace("-", "/")}</span>
             <span className="hidden text-fg-subtle sm:block">{acct(r.account_id)}</span>
             <span className="text-right font-semibold">{formatWon(r.amount)}</span>
-            <span className="hidden items-center justify-end gap-2.5 sm:flex">
-              <button role="switch" aria-checked={r.active} aria-label="활성" onClick={() => update.mutate({ id: r.id, patch: r.active ? { active: false } : { active: true, next_run_date: nextPayDate(r.cycle, r.pay_day, r.pay_month, addDays(today, -1)) } })}
+            <span className="flex items-center justify-end gap-2.5">
+              <button role="switch" aria-checked={r.active} aria-label={`${r.name} 활성`} onClick={() => update.mutate({ id: r.id, patch: r.active ? { active: false } : { active: true, next_run_date: nextPayDate(r.cycle, r.pay_day, r.pay_month, addDays(today, -1)) } })}
                 className="relative h-[22px] w-10 rounded-full" style={{ background: r.active ? "var(--lime)" : "#3a3a40" }}>
                 <span className="absolute top-[2px] h-[18px] w-[18px] rounded-full bg-white" style={{ left: r.active ? 20 : 2 }} />
               </button>
-              <button aria-label="삭제" onClick={() => { if (confirm(`'${r.name}' 고정지출을 삭제할까요? 이미 등록된 거래는 남아요.`)) del.mutate(r.id); }} className="text-fg-subtle hover:text-danger">✕</button>
+              <button aria-label={`${r.name} 삭제`} className="p-1.5 text-fg-subtle hover:text-danger" onClick={() => { if (confirm(`'${r.name}' 고정지출을 삭제할까요? 이미 등록된 거래는 남아요.`)) del.mutate(r.id); }} >✕</button>
             </span>
           </div>
         ))}

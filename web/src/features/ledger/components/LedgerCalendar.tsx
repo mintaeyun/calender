@@ -6,7 +6,7 @@ import { todayKey, WEEKDAYS_KO } from "@/lib/time";
 import { monthRange } from "../api";
 import { useAccounts, useCategories, useTransactions } from "../hooks";
 import { daysInMonth, firstWeekday, monthOf } from "../lib/month";
-import { formatSigned, formatWon } from "../lib/money";
+import { compactWon, formatSigned, formatWon } from "../lib/money";
 import { MonthNav } from "./MonthNav";
 
 /** 월별 달력(LED-4): 날짜별 수입(+)/지출(−) 합계, 날짜를 누르면 그날 거래 목록. */
@@ -47,10 +47,10 @@ export function LedgerCalendar() {
             if (!d) return <span key={`b${i}`} />;
             const s = byDay.get(d);
             return (
-              <button key={d} onClick={() => setSel(d)} className={`flex min-h-[72px] flex-col items-end gap-0.5 rounded-xl p-2 text-xs ${sel === d ? "bg-[#2a2a2e]" : "bg-surface-2"} ${d === today ? "outline outline-1 outline-lime" : ""}`}>
+              <button key={d} onClick={() => setSel(d)} aria-label={`${Number(d.slice(5, 7))}월 ${Number(d.slice(8))}일${s ? ` 수입 ${formatWon(s.income)}원 지출 ${formatWon(s.expense)}원` : ""}`} aria-pressed={sel === d} className={`flex min-h-[60px] min-w-0 flex-col items-end gap-0.5 overflow-hidden rounded-xl p-1 text-[10px] sm:min-h-[72px] sm:p-2 sm:text-xs ${sel === d ? "bg-[#2a2a2e]" : "bg-surface-2"} ${d === today ? "outline outline-1 outline-lime" : ""}`}>
                 <span className="text-fg-muted">{Number(d.slice(8))}</span>
-                {s?.income ? <span className="text-lime">+{formatWon(s.income)}</span> : null}
-                {s?.expense ? <span>−{formatWon(s.expense)}</span> : null}
+                {s?.income ? <span className="text-lime"><span className="hidden sm:inline">+{formatWon(s.income)}</span><span className="sm:hidden">+{compactWon(s.income)}</span></span> : null}
+                {s?.expense ? <span><span className="hidden sm:inline">−{formatWon(s.expense)}</span><span className="sm:hidden">−{compactWon(s.expense)}</span></span> : null}
               </button>
             );
           })}

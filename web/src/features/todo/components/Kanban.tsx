@@ -45,7 +45,7 @@ export function Kanban({ todos, today, projectColor, projectName, onSelect }: Pr
               if (dragId) dropAt(dragId, col.status, cards.filter((t) => t.id !== dragId).length); // 열 빈 곳에 놓으면 맨 아래
               setDragId(null);
             }}
-            className={`flex min-h-[520px] flex-col gap-2.5 rounded-[22px] bg-[#111113] p-4 ${overCol === col.status ? "outline outline-1 outline-lime" : ""}`}
+            className={`flex min-h-[120px] flex-col gap-2.5 md:min-h-[520px] rounded-[22px] bg-[#111113] p-4 ${overCol === col.status ? "outline outline-1 outline-lime" : ""}`}
           >
             <div className="flex items-center justify-between px-1 pb-1">
               <span className="flex items-center gap-2 text-base font-bold">
@@ -74,9 +74,9 @@ export function Kanban({ todos, today, projectColor, projectName, onSelect }: Pr
                     <span className="flex items-center gap-1.5"><span className="h-[7px] w-[7px] rounded-sm" style={{ background: projectColor(t.project_id) }} />{projectName(t.project_id)}</span>
                     <span className={kind === "over" ? "text-danger" : kind === "today" ? "text-lime" : ""}>{dueLabel(t.due_date, today)}</span>
                   </div>
-                  <div className="flex justify-end gap-1.5 text-xs text-fg-subtle">
-                    <button aria-label="이전 열로" disabled={col.status === "todo"} onClick={() => shift(t, -1)} className="rounded-full bg-surface-3 px-2 py-0.5 disabled:opacity-30">◀</button>
-                    <button aria-label="다음 열로" disabled={col.status === "done"} onClick={() => shift(t, 1)} className="rounded-full bg-surface-3 px-2 py-0.5 disabled:opacity-30">▶</button>
+                  <div className="flex justify-end gap-2 text-xs text-fg-subtle">
+                    <button aria-label="이전 열로" disabled={col.status === "todo"} onClick={() => shift(t, -1)} className="rounded-full bg-surface-3 px-3 py-1.5 disabled:opacity-30">◀</button>
+                    <button aria-label="다음 열로" disabled={col.status === "done"} onClick={() => shift(t, 1)} className="rounded-full bg-surface-3 px-3 py-1.5 disabled:opacity-30">▶</button>
                   </div>
                 </div>
               );
