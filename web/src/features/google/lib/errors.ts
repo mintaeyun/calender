@@ -67,4 +67,4 @@ export function shouldAutoSync(c: { last_synced_at: string | null; last_error: s
 /** 동기화 대상 캘린더 이름 (gcal-sync 함수의 target.ts 와 같은 규칙) */
 export const TARGET_CALENDAR_NAME = "mycal";
 export const isTargetCalendar = (name: string | null | undefined) =>
-  (name ?? "").replace(/s+/g, "").toLowerCase() === TARGET_CALENDAR_NAME;
+  (name ?? "").replace(/\s+/g, "").toLowerCase() === TARGET_CALENDAR_NAME;
