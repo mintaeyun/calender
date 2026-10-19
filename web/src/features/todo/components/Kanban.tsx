@@ -45,7 +45,7 @@ export function Kanban({ todos, today, projectColor, projectName, onSelect }: Pr
               if (dragId) dropAt(dragId, col.status, cards.filter((t) => t.id !== dragId).length); // 열 빈 곳에 놓으면 맨 아래
               setDragId(null);
             }}
-            className={`flex min-h-[120px] flex-col gap-2.5 md:min-h-[520px] rounded-[22px] bg-[#111113] p-4 ${overCol === col.status ? "outline outline-1 outline-lime" : ""}`}
+            className={`flex min-h-[120px] flex-col gap-2.5 md:min-h-[520px] rounded-[22px] bg-[var(--surface-sunken,#111113)] p-4 ${overCol === col.status ? "outline outline-1 outline-lime" : ""}`}
           >
             <div className="flex items-center justify-between px-1 pb-1">
               <span className="flex items-center gap-2 text-base font-bold">
@@ -64,7 +64,7 @@ export function Kanban({ todos, today, projectColor, projectName, onSelect }: Pr
                   onDragEnd={() => { setDragId(null); setOverCol(null); }}
                   onDragOver={(e) => e.preventDefault()}
                   onDrop={(e) => { e.preventDefault(); e.stopPropagation(); setOverCol(null); if (dragId && dragId !== t.id) dropAt(dragId, col.status, cards.filter((c) => c.id !== dragId).findIndex((c) => c.id === t.id)); setDragId(null); }}
-                  className={`flex cursor-grab flex-col gap-2.5 rounded-2xl bg-[#1c1c20] p-3.5 ${done ? "opacity-45" : ""} ${dragId === t.id ? "opacity-30" : ""}`}
+                  className={`flex cursor-grab flex-col gap-2.5 rounded-2xl bg-surface-2 p-3.5 ${done ? "opacity-45" : ""} ${dragId === t.id ? "opacity-30" : ""}`}
                 >
                   <div className="flex justify-between gap-2">
                     <button onClick={() => onSelect(t.id)} className={`text-left text-[15px] font-semibold ${done ? "line-through" : ""}`}>{t.title}</button>

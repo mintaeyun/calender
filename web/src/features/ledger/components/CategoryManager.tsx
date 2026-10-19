@@ -26,7 +26,7 @@ export function CategoryManager() {
     <div className="flex flex-col gap-3 text-sm">
       <div className="flex gap-2">
         {([["expense", "지출"], ["income", "수입"]] as const).map(([k, l]) => (
-          <button key={k} onClick={() => setKind(k)} className={`rounded-full px-4 py-1.5 ${kind === k ? "bg-white font-semibold text-black" : "bg-surface-3 text-fg-muted"}`}>{l}</button>
+          <button key={k} onClick={() => setKind(k)} className={`rounded-full px-4 py-1.5 ${kind === k ? "bg-fg font-semibold text-bg" : "bg-surface-3 text-fg-muted"}`}>{l}</button>
         ))}
       </div>
       <ul className="flex flex-col">
@@ -48,10 +48,10 @@ export function CategoryManager() {
       </ul>
       <div className="flex gap-2">
         <input value={name} onChange={(e) => setName(e.target.value)} onKeyDown={(e) => e.key === "Enter" && add()} placeholder="새 카테고리 이름" className="min-w-0 flex-1 rounded-xl bg-surface-3 px-3 py-2 outline-none" />
-        <button onClick={add} className="rounded-xl bg-white px-4 font-semibold text-black">추가</button>
+        <button onClick={add} className="rounded-xl bg-fg px-4 font-semibold text-bg">추가</button>
       </div>
       <div className="flex gap-1.5">
-        {COLORS.map((c) => <button key={c} aria-label="색 선택" onClick={() => setColor(c)} className={`h-6 w-6 rounded-full ${color === c ? "ring-2 ring-white" : ""}`} style={{ background: c }} />)}
+        {COLORS.map((c) => <button key={c} aria-label="색 선택" onClick={() => setColor(c)} className={`h-6 w-6 rounded-full ${color === c ? "ring-2 ring-fg" : ""}`} style={{ background: c }} />)}
       </div>
       {msg && <span className="text-xs text-lime" role="status">{msg}</span>}
     </div>

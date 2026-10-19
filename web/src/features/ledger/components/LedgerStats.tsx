@@ -11,7 +11,7 @@ import { formatWon } from "../lib/money";
 import { categoryDiffs, categoryShares, monthlyTrend, monthOverMonth, type CategoryAmount } from "../lib/stats";
 import { MonthNav } from "./MonthNav";
 
-const FALLBACK = "#55555c";
+const FALLBACK = "var(--fg-faint, #55555c)";
 
 /** 통계(LED-5): 카테고리 도넛, 최근 6개월 추이(만원), 전월 대비(같은 기간 1–N일). 이체는 제외. */
 export function LedgerStats() {
@@ -87,7 +87,7 @@ export function LedgerStats() {
                   <span className="font-semibold">{formatWon(s.amount)}</span><span className="text-right text-[13px] text-fg-subtle">{(s.ratio * 100).toFixed(1)}%</span>
                 </div>
               ))}
-              {shares.length === 0 && !q.isLoading && <span className="text-sm text-[#6c6c73]">{monthLabel(month)} 지출이 없어요</span>}
+              {shares.length === 0 && !q.isLoading && <span className="text-sm text-[color:var(--fg-dim,#6c6c73)]">{monthLabel(month)} 지출이 없어요</span>}
             </div>
           </div>
         </div>
@@ -98,9 +98,9 @@ export function LedgerStats() {
             <div className="h-[180px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={trend.map((t) => ({ label: `${Number(t.month.slice(5))}월`, v: Math.round(t.amount / 10000), cur: t.month === month }))} margin={{ top: 18, bottom: 0 }}>
-                  <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: "#8d8d94", fontSize: 13 }} />
-                  <Bar dataKey="v" radius={10} isAnimationActive={false} label={{ position: "top", fill: "#b4b4ba", fontSize: 12 }}>
-                    {trend.map((t) => <Cell key={t.month} fill={t.month === month ? "var(--lime)" : "#2e2a40"} />)}
+                  <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: "var(--fg-subtle)", fontSize: 13 }} />
+                  <Bar dataKey="v" radius={10} isAnimationActive={false} label={{ position: "top", fill: "var(--fg-muted)", fontSize: 12 }}>
+                    {trend.map((t) => <Cell key={t.month} fill={t.month === month ? "var(--lime)" : "var(--chart-muted, #2e2a40)"} />)}
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>

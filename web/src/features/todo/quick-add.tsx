@@ -28,11 +28,11 @@ export function QuickAddForm({ onClose }: QuickAddFormProps) {
     );
   };
 
-  const chip = (on: boolean) => `rounded-full px-3.5 py-2 text-sm ${on ? "bg-[#3a3a40] font-semibold text-white" : "bg-surface-2 text-fg-subtle"}`;
+  const chip = (on: boolean) => `rounded-full px-3.5 py-2 text-sm ${on ? "bg-[var(--surface-5,#3a3a40)] font-semibold text-fg" : "bg-surface-2 text-fg-subtle"}`;
 
   return (
     <form onSubmit={(e) => { e.preventDefault(); submit(); }} className="flex flex-col gap-4">
-      <input autoFocus value={title} onChange={(e) => { setTitle(e.target.value); setErr(""); }} placeholder="무엇을 해야 하나요?" className="bg-transparent text-2xl font-bold outline-none placeholder:text-[#55555c]" />
+      <input autoFocus value={title} onChange={(e) => { setTitle(e.target.value); setErr(""); }} placeholder="무엇을 해야 하나요?" className="bg-transparent text-2xl font-bold outline-none placeholder:text-[color:var(--fg-faint,#55555c)]" />
       <div className="flex flex-wrap gap-2">
         <button type="button" onClick={() => setDue(today)} className={chip(due === today)}>오늘</button>
         <button type="button" onClick={() => setDue(addDays(today, 1))} className={chip(due === addDays(today, 1))}>내일</button>
@@ -48,7 +48,7 @@ export function QuickAddForm({ onClose }: QuickAddFormProps) {
         </select>
       </div>
       {err && <span className="text-sm text-danger">{err}</span>}
-      <button type="submit" disabled={create.isPending} className="rounded-full bg-lime py-3.5 text-base font-bold text-black disabled:opacity-60">{create.isPending ? "저장 중…" : "저장"}</button>
+      <button type="submit" disabled={create.isPending} className="rounded-full bg-lime py-3.5 text-base font-bold text-[color:var(--on-accent,#0b0b0c)] disabled:opacity-60">{create.isPending ? "저장 중…" : "저장"}</button>
     </form>
   );
 }

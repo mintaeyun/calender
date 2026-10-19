@@ -48,9 +48,9 @@ export function LedgerList() {
     <div className="flex flex-col gap-3.5">
       <div className="flex flex-wrap items-center gap-2">
         {TYPE_TABS.map(([k, label]) => (
-          <button key={k} aria-pressed={filter.type === k} onClick={() => setFilter({ type: k })} className={`rounded-full px-4 py-[9px] text-sm ${filter.type === k ? "bg-white font-semibold text-black" : "bg-surface-2 text-fg-muted"}`}>{label}</button>
+          <button key={k} aria-pressed={filter.type === k} onClick={() => setFilter({ type: k })} className={`rounded-full px-4 py-[9px] text-sm ${filter.type === k ? "bg-fg font-semibold text-bg" : "bg-surface-2 text-fg-muted"}`}>{label}</button>
         ))}
-        <span className="mx-1 h-6 w-px bg-[#2a2a2e]" />
+        <span className="mx-1 h-6 w-px bg-[var(--surface-4,#2a2a2e)]" />
         <input type="date" aria-label="시작일" value={filter.from} onChange={(e) => setFilter({ from: e.target.value })} className={chipBase} />
         <span className="text-fg-subtle">–</span>
         <input type="date" aria-label="종료일" value={filter.to} onChange={(e) => setFilter({ to: e.target.value })} className={chipBase} />
@@ -80,19 +80,19 @@ export function LedgerList() {
       {q.isError && <div className="rounded-2xl bg-surface p-4 text-sm text-danger">거래를 불러오지 못했어요. {(q.error as Error).message}</div>}
 
       <div className="flex flex-col rounded-[22px] bg-surface px-[22px] pb-3.5 pt-2">
-        {q.isLoading && <div className="p-10 text-center text-[#6c6c73]">불러오는 중…</div>}
+        {q.isLoading && <div className="p-10 text-center text-[color:var(--fg-dim,#6c6c73)]">불러오는 중…</div>}
         {groups.map((g) => (
           <div key={g.date} className="flex flex-col">
             <div className="flex justify-between border-b border-border pb-2 pt-4 text-[13px] text-fg-subtle">
-              <span className="font-semibold text-[#d6d6da]">{dayLabel(g.date)}</span>
+              <span className="font-semibold text-fg-muted">{dayLabel(g.date)}</span>
               <span>{g.income > 0 && `수입 ${formatWon(g.income)} · `}지출 {formatWon(g.expense)}</span>
             </div>
             {g.rows.map((t) => {
               const c = cat(t.category_id);
               return (
                 <button key={t.id} onClick={() => setEditing(t)} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1.5 border-b border-surface-3 py-3 text-left text-sm sm:grid-cols-[140px_minmax(0,1fr)_160px_120px] sm:gap-y-0">
-                  <span className="order-3 flex w-fit items-center gap-1.5 rounded-full bg-[#2a2a2e] px-2.5 py-1 text-xs sm:order-none">
-                    <span className="h-[7px] w-[7px] rounded-full" style={{ background: t.type === "transfer" ? "#8d8d94" : c?.color ?? "#55555c" }} />
+                  <span className="order-3 flex w-fit items-center gap-1.5 rounded-full bg-[var(--surface-4,#2a2a2e)] px-2.5 py-1 text-xs sm:order-none">
+                    <span className="h-[7px] w-[7px] rounded-full" style={{ background: t.type === "transfer" ? "var(--fg-subtle)" : c?.color ?? "var(--fg-faint, #55555c)" }} />
                     {t.type === "transfer" ? "이체" : c?.name ?? "미분류"}
                   </span>
                   <span className="order-1 flex min-w-0 items-center gap-2 truncate sm:order-none">
@@ -109,21 +109,21 @@ export function LedgerList() {
             })}
           </div>
         ))}
-        {!q.isLoading && groups.length === 0 && <div className="p-10 text-center text-[15px] text-[#6c6c73]">조건에 맞는 거래가 없어요</div>}
+        {!q.isLoading && groups.length === 0 && <div className="p-10 text-center text-[15px] text-[color:var(--fg-dim,#6c6c73)]">조건에 맞는 거래가 없어요</div>}
       </div>
 
       {editing && (
         <Modal title="거래 수정" onClose={() => setEditing(null)}>
           <TxForm tx={editing} onDone={() => setEditing(null)} />
-          <button onClick={() => { setDeleting(editing); setEditing(null); }} className="rounded-full border border-[#3a3a40] py-2.5 text-sm text-danger">삭제</button>
+          <button onClick={() => { setDeleting(editing); setEditing(null); }} className="rounded-full border border-[color:var(--border-strong,#3a3a40)] py-2.5 text-sm text-danger">삭제</button>
         </Modal>
       )}
       {deleting && (
         <Modal title="거래를 삭제할까요?" onClose={() => setDeleting(null)} width={420}>
           <p className="text-sm text-fg-muted">{deleting.memo || "메모 없음"} · {formatSigned(deleting.amount, deleting.type)}원<br />삭제하면 되돌릴 수 없어요.</p>
           <div className="flex gap-2">
-            <button onClick={() => setDeleting(null)} className="flex-1 rounded-full border border-[#3a3a40] py-3 text-sm">취소</button>
-            <button disabled={del.isPending} onClick={() => del.mutate(deleting.id, { onSuccess: () => setDeleting(null) })} className="flex-1 rounded-full bg-danger py-3 text-sm font-bold text-black disabled:opacity-60">삭제</button>
+            <button onClick={() => setDeleting(null)} className="flex-1 rounded-full border border-[color:var(--border-strong,#3a3a40)] py-3 text-sm">취소</button>
+            <button disabled={del.isPending} onClick={() => del.mutate(deleting.id, { onSuccess: () => setDeleting(null) })} className="flex-1 rounded-full bg-danger py-3 text-sm font-bold text-[color:var(--on-accent,#0b0b0c)] disabled:opacity-60">삭제</button>
           </div>
           {del.isError && <span className="text-sm text-danger">{(del.error as Error).message}</span>}
         </Modal>

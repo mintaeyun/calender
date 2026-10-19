@@ -52,7 +52,7 @@ export function LedgerBudget() {
         <MonthNav month={month} onChange={setMonth} />
         <button
           onClick={() => copy.mutate({ from: addMonths(month, -1), to: month }, { onSuccess: (n) => setMsg(n ? `지난달 예산 ${n}건을 불러왔어요` : "불러올 예산이 없어요"), onError: (e) => setErr((e as Error).message) })}
-          className="rounded-full border border-[#3a3a40] px-4 py-2 text-sm"
+          className="rounded-full border border-[color:var(--border-strong,#3a3a40)] px-4 py-2 text-sm"
         >지난달 예산 불러오기</button>
       </div>
       {(err || msg) && <span className={`text-sm ${err ? "text-danger" : "text-lime"}`} role="status">{err || msg}</span>}
@@ -66,10 +66,10 @@ export function LedgerBudget() {
           <>
             <div className="flex flex-wrap items-baseline gap-2.5">
               <span className="text-[40px] font-bold tracking-tight">{formatWon(tu.spent)}</span>
-              <span className="text-xl text-[#6c6c73]">/ {formatWon(total.amount)}원</span>
+              <span className="text-xl text-[color:var(--fg-dim,#6c6c73)]">/ {formatWon(total.amount)}원</span>
               <span className="ml-2 text-[15px] font-semibold" style={{ color: tState === "over" ? "var(--danger)" : "var(--lime)" }}>{(tu.ratio * 100).toFixed(1)}%</span>
             </div>
-            <div className="relative h-3.5 overflow-hidden rounded-[7px] bg-[#2a2a2e]">
+            <div className="relative h-3.5 overflow-hidden rounded-[7px] bg-[var(--surface-4,#2a2a2e)]">
               <div className="h-full" style={{ width: `${Math.min(100, tu.ratio * 100)}%`, background: BAR[tState] }} />
               <div className="absolute inset-y-0 left-[80%] w-0.5 bg-fg" />
             </div>
@@ -80,7 +80,7 @@ export function LedgerBudget() {
             </div>
           </>
         ) : (
-          <button onClick={() => editAmount(null, null)} className="w-fit rounded-full bg-white px-5 py-2.5 text-sm font-semibold text-black">총예산 설정</button>
+          <button onClick={() => editAmount(null, null)} className="w-fit rounded-full bg-fg px-5 py-2.5 text-sm font-semibold text-bg">총예산 설정</button>
         )}
       </div>
 
@@ -94,10 +94,10 @@ export function LedgerBudget() {
           return (
             <div key={b.id} className="flex flex-col gap-2.5 rounded-[20px] bg-surface p-5">
               <div className="flex items-center justify-between">
-                <span className="flex items-center gap-2 text-base font-semibold"><span className="h-[9px] w-[9px] rounded-sm" style={{ background: cat?.color ?? "#55555c" }} />{cat?.name ?? "보관된 카테고리"}</span>
+                <span className="flex items-center gap-2 text-base font-semibold"><span className="h-[9px] w-[9px] rounded-sm" style={{ background: cat?.color ?? "var(--fg-faint, #55555c)" }} />{cat?.name ?? "보관된 카테고리"}</span>
                 <span className="rounded-full px-2.5 py-[3px] text-xs font-bold" style={{ background: st === "over" ? "var(--danger)" : st === "warn" ? "var(--lime)" : "#2a2a2e", color: st === "ok" ? "#d6d6da" : "#0b0b0c" }}>{Math.round(p)}%</span>
               </div>
-              <div className="h-2 overflow-hidden rounded bg-[#2a2a2e]"><div className="h-full" style={{ width: `${Math.min(100, p)}%`, background: BAR[st] }} /></div>
+              <div className="h-2 overflow-hidden rounded bg-[var(--surface-4,#2a2a2e)]"><div className="h-full" style={{ width: `${Math.min(100, p)}%`, background: BAR[st] }} /></div>
               <div className="flex justify-between text-[13px] text-fg-subtle"><span>{formatWon(spent)} 사용</span><span>예산 {formatWon(b.amount)}</span></div>
               <span className="text-xs" style={{ color: st === "over" ? "var(--danger)" : st === "warn" ? "var(--lime)" : "#8d8d94" }}>
                 {st === "over" ? `${formatWon(spent - b.amount)}원 초과` : st === "warn" ? "80% 도달" : `${formatWon(b.amount - spent)}원 남음`}
@@ -110,19 +110,19 @@ export function LedgerBudget() {
           );
         })}
         {adding ? (
-          <div className="flex flex-col gap-2 rounded-[20px] border border-dashed border-[#2e2e33] p-5 text-sm">
+          <div className="flex flex-col gap-2 rounded-[20px] border border-dashed border-border p-5 text-sm">
             <select value={newCat} onChange={(e) => setNewCat(e.target.value)} className="rounded-xl bg-surface-3 px-3 py-2 outline-none">
               <option value="">카테고리 선택</option>
               {cats.filter((c) => !catRows.some((b) => b.category_id === c.id)).map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
             </select>
             <input value={newAmt} inputMode="numeric" onChange={(e) => setNewAmt(e.target.value)} placeholder="예산 금액(원)" className="rounded-xl bg-surface-3 px-3 py-2 outline-none" />
             <div className="flex gap-2">
-              <button onClick={() => { if (!newCat) { setErr("카테고리를 선택하세요"); return; } save(newCat, newAmt, () => { setAdding(false); setNewCat(""); setNewAmt(""); }); }} className="flex-1 rounded-xl bg-white py-2 font-semibold text-black">저장</button>
-              <button onClick={() => setAdding(false)} className="flex-1 rounded-xl border border-[#3a3a40] py-2">취소</button>
+              <button onClick={() => { if (!newCat) { setErr("카테고리를 선택하세요"); return; } save(newCat, newAmt, () => { setAdding(false); setNewCat(""); setNewAmt(""); }); }} className="flex-1 rounded-xl bg-fg py-2 font-semibold text-bg">저장</button>
+              <button onClick={() => setAdding(false)} className="flex-1 rounded-xl border border-[color:var(--border-strong,#3a3a40)] py-2">취소</button>
             </div>
           </div>
         ) : (
-          <button onClick={() => setAdding(true)} className="flex min-h-[130px] items-center justify-center rounded-[20px] border-[1.5px] border-dashed border-[#2e2e33] p-5 text-sm text-fg-subtle">+ 카테고리 예산 추가</button>
+          <button onClick={() => setAdding(true)} className="flex min-h-[130px] items-center justify-center rounded-[20px] border-[1.5px] border-dashed border-border p-5 text-sm text-fg-subtle">+ 카테고리 예산 추가</button>
         )}
       </div>
     </div>

@@ -71,7 +71,7 @@ export function ImportTransactions() {
       <span className="text-base font-semibold">거래 가져오기 (CSV)</span>
       <span className="text-xs text-fg-subtle">첫 줄은 열 이름이어야 해요. 금액은 양의 정수, 지출/수입은 &lsquo;구분&rsquo; 열로 표시해요. 파일은 이 브라우저에서만 읽고 서버에 저장하지 않아요. 내보낸 거래 파일을 그대로 다시 가져올 수 있어요. (한 번에 최대 {MAX_IMPORT_ROWS}건)</span>
       <div className="flex items-center gap-3">
-        <button onClick={() => input.current?.click()} className="rounded-full border border-[#3a3a40] px-4 py-2 text-sm">CSV 파일 선택</button>
+        <button onClick={() => input.current?.click()} className="rounded-full border border-[color:var(--border-strong,#3a3a40)] px-4 py-2 text-sm">CSV 파일 선택</button>
         <span className="truncate text-sm text-fg-subtle">{fileName}</span>
         <input ref={input} type="file" accept=".csv,text/csv" className="hidden" aria-label="CSV 파일" onChange={(e) => void onFile(e.target.files?.[0])} />
       </div>
@@ -129,7 +129,7 @@ export function ImportTransactions() {
             </div>
           )}
 
-          <button onClick={() => void run()} disabled={!canImport} className="w-fit rounded-full bg-lime px-5 py-2.5 text-sm font-bold text-black disabled:opacity-40">
+          <button onClick={() => void run()} disabled={!canImport} className="w-fit rounded-full bg-lime px-5 py-2.5 text-sm font-bold text-[color:var(--on-accent,#0b0b0c)] disabled:opacity-40">
             {busy ? "가져오는 중…" : `${toImport.length}건 가져오기`}
           </button>
         </>

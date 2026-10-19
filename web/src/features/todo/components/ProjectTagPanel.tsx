@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useCreateProject, useCreateTag, useDeleteProject, useDeleteTag, useProjects, useTags, useUpdateProject, useUpdateTag } from "../hooks";
 
-const COLORS = ["#8d8d94", "oklch(0.55 0.22 290)", "oklch(0.9 0.19 125)", "oklch(0.7 0.12 230)", "oklch(0.75 0.16 25)", "oklch(0.68 0.17 290)"];
+const COLORS = ["var(--fg-subtle)", "oklch(0.55 0.22 290)", "oklch(0.9 0.19 125)", "oklch(0.7 0.12 230)", "oklch(0.75 0.16 25)", "oklch(0.68 0.17 290)"];
 
 /** 프로젝트·태그 관리(TODO-6): 추가, 이름/색 변경, 삭제(소속 할일은 프로젝트 없음으로 이동). */
 export function ProjectTagPanel() {
@@ -56,10 +56,10 @@ export function ProjectTagPanel() {
       <div className="flex gap-1.5">
         <select value={kind} onChange={(e) => setKind(e.target.value as "project" | "tag")} className="rounded-lg bg-surface-3 px-1.5 py-1 text-xs"><option value="project">프로젝트</option><option value="tag">태그</option></select>
         <input value={name} onChange={(e) => setName(e.target.value)} onKeyDown={(e) => e.key === "Enter" && add()} placeholder="이름" className="min-w-0 flex-1 rounded-lg bg-surface-3 px-2 py-1 text-xs outline-none" />
-        <button onClick={add} className="rounded-lg bg-white px-2 text-xs font-semibold text-black">추가</button>
+        <button onClick={add} className="rounded-lg bg-fg px-2 text-xs font-semibold text-bg">추가</button>
       </div>
       <div className="flex gap-1.5">
-        {COLORS.map((c) => <button key={c} aria-label="색 선택" onClick={() => setColor(c)} className={`h-5 w-5 rounded-full ${color === c ? "ring-2 ring-white" : ""}`} style={{ background: c }} />)}
+        {COLORS.map((c) => <button key={c} aria-label="색 선택" onClick={() => setColor(c)} className={`h-5 w-5 rounded-full ${color === c ? "ring-2 ring-fg" : ""}`} style={{ background: c }} />)}
       </div>
       {err && <span className="text-xs text-danger">{err}</span>}
     </div>
