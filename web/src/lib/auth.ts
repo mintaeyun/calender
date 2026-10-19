@@ -21,11 +21,17 @@ async function removeReceiptFiles(userId: string) {
 
 /**
  * 계정 삭제(AUTH-3): 영수증 파일을 먼저 지우고, DB 데이터는 on delete cascade 로 함께 삭제된다.
- * TODO(07): 호출 전에 구글 토큰 revoke(gcal-sync 함수)를 먼저 호출한다. REQUESTS.md 참고.
+ * 구글이 연결돼 있으면 먼저 연결을 해제한다(구글 쪽 권한 revoke + 토큰 삭제). 실패해도 삭제는 계속한다.
  */
 export async function deleteAccount() {
   const supabase = createClient();
   const { data: sess } = await supabase.auth.getSession();
+  try {
+    const { disconnectGoogle } = await import("@/features/google/api");
+    await disconnectGoogle(false);
+  } catch {
+    // 연결이 없거나 함수에 닿지 않아도 계정 삭제는 진행한다(토큰은 계정 삭제 시 DB에서 함께 사라진다).
+  }
   if (sess.session) await removeReceiptFiles(sess.session.user.id);
   const { error } = await supabase.rpc("delete_my_account");
   if (error) throw error;

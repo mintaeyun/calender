@@ -70,7 +70,7 @@ describe("재시도와 오류 분류", () => {
 
   it("오류 메시지에 토큰·시크릿이 들어가지 않는다", async () => {
     const { api } = make([res(400, { error: "invalid_grant" })]);
-    const e = await api.refreshAccessToken("super-secret-refresh").catch((x) => x as Error);
+    const e = (await api.refreshAccessToken("super-secret-refresh").catch((x) => x)) as Error;
     expect(e.message).not.toContain("super-secret-refresh");
     expect(e.message).not.toContain("csecret");
   });
