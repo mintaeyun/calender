@@ -102,6 +102,6 @@ export async function setSyncDirection(direction: GoogleConnection["sync_directi
 }
 
 export async function setPushLocal(enabled: boolean) {
-  const { error } = await createClient().from("google_connections").update({ push_local: enabled } as never) /* 마이그레이션 적용 후 타입 재생성하면 캐스트 제거 */.not("id", "is", null);
+  const { error } = await createClient().from("google_connections").update({ push_local: enabled }).not("id", "is", null);
   if (error) throw error;
 }

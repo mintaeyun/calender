@@ -255,6 +255,7 @@ export type Database = {
           exdates: string[]
           google_etag: string | null
           google_event_id: string | null
+          google_seen_run: string | null
           google_synced_at: string | null
           google_updated_at: string | null
           id: string
@@ -278,6 +279,7 @@ export type Database = {
           exdates?: string[]
           google_etag?: string | null
           google_event_id?: string | null
+          google_seen_run?: string | null
           google_synced_at?: string | null
           google_updated_at?: string | null
           id?: string
@@ -301,6 +303,7 @@ export type Database = {
           exdates?: string[]
           google_etag?: string | null
           google_event_id?: string | null
+          google_seen_run?: string | null
           google_synced_at?: string | null
           google_updated_at?: string | null
           id?: string
@@ -338,6 +341,7 @@ export type Database = {
           id: string
           last_error: string | null
           last_synced_at: string | null
+          push_local: boolean
           refresh_token_enc: string
           sync_direction: string
           sync_lock_until: string | null
@@ -351,6 +355,7 @@ export type Database = {
           id?: string
           last_error?: string | null
           last_synced_at?: string | null
+          push_local?: boolean
           refresh_token_enc: string
           sync_direction?: string
           sync_lock_until?: string | null
@@ -364,6 +369,7 @@ export type Database = {
           id?: string
           last_error?: string | null
           last_synced_at?: string | null
+          push_local?: boolean
           refresh_token_enc?: string
           sync_direction?: string
           sync_lock_until?: string | null
@@ -1100,12 +1106,55 @@ export type Database = {
         }[]
       }
       delete_my_account: { Args: never; Returns: undefined }
+      gcal_push_candidates: {
+        Args: { p_include_local: boolean; p_user: string }
+        Returns: {
+          all_day: boolean
+          calendar_id: string | null
+          color: string | null
+          created_at: string
+          deleted_at: string | null
+          end_at: string
+          exdates: string[]
+          google_etag: string | null
+          google_event_id: string | null
+          google_seen_run: string | null
+          google_synced_at: string | null
+          google_updated_at: string | null
+          id: string
+          location: string | null
+          notes: string | null
+          original_start_at: string | null
+          recurring_event_id: string | null
+          rrule: string | null
+          start_at: string
+          title: string
+          updated_at: string
+          user_id: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "events"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       gcal_soft_delete_stale: {
         Args: {
           p_before: string
           p_calendar: string
           p_max: string
           p_min: string
+          p_user: string
+        }
+        Returns: number
+      }
+      gcal_soft_delete_stale_run: {
+        Args: {
+          p_calendar: string
+          p_max: string
+          p_min: string
+          p_run: string
           p_user: string
         }
         Returns: number

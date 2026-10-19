@@ -30,7 +30,7 @@ export type EventFields = {
 
 export type NewEvent = Omit<
   EventRow,
-  "id" | "user_id" | "created_at" | "updated_at" | "deleted_at" | "google_event_id" | "google_etag" | "google_updated_at" | "google_synced_at"
+  "id" | "user_id" | "created_at" | "updated_at" | "deleted_at" | "google_event_id" | "google_etag" | "google_updated_at" | "google_synced_at" | "google_seen_run"
 >;
 
 export type Op =
